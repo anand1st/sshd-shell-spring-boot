@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>sshd.shell.springboot</groupId>
+    <groupId>io.github.anand1st</groupId>
     <artifactId>sshd-shell-spring-boot-test-app</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -18,7 +18,7 @@
             <version>1.5.3.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>sshd.shell.springboot</groupId>
+            <groupId>io.github.anand1st</groupId>
             <artifactId>sshd-shell-spring-boot-starter</artifactId>
             <version>1.0</version>
         </dependency>
