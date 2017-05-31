@@ -33,13 +33,13 @@ public @interface SshdShellCommand {
     
     /**
      * Command.
-     * @return 
+     * @return command
      */
     public String value();
     
     /**
      * Description of command.
-     * @return 
+     * @return description of command
      */
     public String description();
 }
