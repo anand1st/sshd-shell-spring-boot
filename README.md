@@ -3,6 +3,8 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.0 RELEASE.
 
+This starter has been tested with spring-boot 2.0.0.M1 and 1.5.3.RELEASE. In theory however, it should work with any older releases.
+
 # Usage
 All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application Context:
 
@@ -35,3 +37,4 @@ The following are sample inputs/outputs from the shell command:
 
 Limitations:
 1) Currently, every method must return a String and take in exactly one String parameter.
+2) Requires minimum JDK 8.
