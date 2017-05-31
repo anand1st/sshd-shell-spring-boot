@@ -25,15 +25,25 @@ All the developer needs to do it to create a class similar to below and make sur
 
 The following are sample inputs/outputs from the shell command:
 
-     app> echo help
-     Echo by users. Type 'echo help' for supported subcommands
-             bob      Bob's echo. Usage: echo bob <arg>
-	         alice    Alice's echo. Usage: echo alice <arg>
-     app> echo alice hi
-     alice says hi
-     app> echo bob hi
-     bob says hi
-     app>
+    app> echo help
+    Echo by users. Type 'echo help' for supported subcommands
+            bob      Bob's echo. Usage: echo bob <arg>
+	        alice    Alice's echo. Usage: echo alice <arg>
+    app> echo alice hi
+    alice says hi
+    app> echo bob hi
+    bob says hi
+    app>
+
+To import into Maven project, add the following dependency inside pom.xml:
+
+    <dependencies>
+        <dependency>
+	    <groupId>io.github.anand1st</groupId>
+	    <artifactId>sshd-shell-spring-boot-starter</artifactId>
+	    <version>1.0</version>
+	</dependency>
+    </dependencies>
 
 Limitations:
 1) Currently, every method must return a String and take in exactly one String parameter.
