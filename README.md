@@ -39,8 +39,8 @@ To import into Maven project, add the following dependency inside pom.xml:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
-	<artifactId>sshd-shell-spring-boot-starter</artifactId>
-	<version>1.0</version>
+        <artifactId>sshd-shell-spring-boot-starter</artifactId>
+        <version>1.0</version>
     </dependency>
 
 Limitations:
