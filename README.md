@@ -37,13 +37,11 @@ The following are sample inputs/outputs from the shell command:
 
 To import into Maven project, add the following dependency inside pom.xml:
 
-    <dependencies>
-        <dependency>
-	    <groupId>io.github.anand1st</groupId>
-	    <artifactId>sshd-shell-spring-boot-starter</artifactId>
-	    <version>1.0</version>
-	</dependency>
-    </dependencies>
+    <dependency>
+        <groupId>io.github.anand1st</groupId>
+	<artifactId>sshd-shell-spring-boot-starter</artifactId>
+	<version>1.0</version>
+    </dependency>
 
 Limitations:
 1) Currently, every method must return a String and take in exactly one String parameter.
