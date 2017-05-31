@@ -1,7 +1,7 @@
 # sshd-shell-spring-boot
 This artifact is a spring boot starter that provides SSH access to spring boot applications. It is primarily designed for  developers who want to roll out custom shell commands for various purposes.
 
-The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.0 RELEASE.
+The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
 This starter has been tested with spring-boot 2.0.0.M1 and 1.5.3.RELEASE. In theory however, it should work with any older releases.
 
