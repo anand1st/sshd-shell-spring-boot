@@ -25,16 +25,16 @@ All the developer needs to do it to create a class similar to below and make sur
 
 Supported properties in application.properties (defaults are as below):
 
-    sshd.port=8022			#Set to 0 for random port
-    sshd.enabled=false		#Set this to true to startup SSH daemon
-    sshd.username=admin
-    sshd.password= 			#A random string is generated if password is not set
-    sshd.publicKeyFile=
-    sshd.host=127.0.0.1		#Allowed IP addresses
-    sshd.hostKeyFile=hostKey.ser
-    sshd.prompt.color=default	#Supports black,red,green,yellow,blue,purple,cyan,white
-    sshd.prompt.title=app
-    sshd.text.color=default 	#Supports black,red,green,yellow,blue,purple,cyan,white
+    sshd.shell.port=8022			#Set to 0 for random port
+    sshd.shell.enabled=false		#Set this to true to startup SSH daemon
+    sshd.shell.username=admin
+    sshd.shell.password= 			#A random string is generated if password is not set
+    sshd.shell.publicKeyFile=
+    sshd.shell.host=127.0.0.1		#Allowed IP addresses
+    sshd.shell.hostKeyFile=hostKey.ser
+    sshd.shell.prompt.color=default		#Supports black,red,green,yellow,blue,purple,cyan,white
+    sshd.shell.prompt.title=app
+    sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
