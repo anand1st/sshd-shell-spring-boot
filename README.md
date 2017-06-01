@@ -25,6 +25,10 @@ All the developer needs to do it to create a class similar to below and make sur
 
 The following are sample inputs/outputs from the shell command:
 
+    app> help
+    Supported Commands
+    echo		Echo by users. Type 'echo help' for supported subcommands
+    exit		Exit shell
     app> echo help
     Echo by users. Type 'echo help' for supported subcommands
             bob      Bob's echo. Usage: echo bob <arg>
