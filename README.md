@@ -28,7 +28,7 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.port=8022			#Set to 0 for random port
     sshd.shell.enabled=false		#Set this to true to startup SSH daemon
     sshd.shell.username=admin
-    sshd.shell.password= 			#A random string is generated if password is not set
+    sshd.shell.password= 			#A random string is generated if password is not set and shown in logs
     sshd.shell.publicKeyFile=
     sshd.shell.host=127.0.0.1		#Allowed IP addresses
     sshd.shell.hostKeyFile=hostKey.ser
