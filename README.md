@@ -70,5 +70,5 @@ To import into Maven project, add the following dependency inside pom.xml:
     </dependency>
 
 Limitations:
-1) Currently, every method must return a String and take in exactly one String parameter.
+1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String parameter (denoting arguments in shell command that are possibly null).
 2) Requires minimum JDK 8.
