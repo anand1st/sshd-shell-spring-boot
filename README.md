@@ -38,10 +38,10 @@ Supported properties in application.properties (defaults are as below):
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
-    ssh -p <portNo> <username>@<host>
+    ssh -p <port> <username>@<host>
 or
 
-    ssh -p <portNo> -i <privateKeyFile> <username>@<host>
+    ssh -p <port> -i <privateKeyFile> <username>@<host>
     
 if public key file is used for SSH daemon.
 
