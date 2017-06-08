@@ -18,6 +18,7 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -46,14 +47,14 @@ public class SshdShellProperties {
         @lombok.Data
         public static class Prompt {
 
-            private String color = "default";
+            private AnsiColor color = AnsiColor.DEFAULT;
             private String title = "app";
         }
 
         @lombok.Data
         public static class Text {
 
-            private String color = "default";
+            private AnsiColor color = AnsiColor.DEFAULT;
         }
     }
 }
