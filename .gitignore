@@ -1,3 +1,4 @@
 /sshd-shell-spring-boot-starter/target/
 /sshd-shell-spring-boot-test-app/target/
 /sshd-shell-spring-boot-test-app/hostKey.ser
+/sshd-shell-spring-boot-starter/nbactions.xml
