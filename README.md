@@ -23,6 +23,28 @@ All the developer needs to do it to create a class similar to below and make sur
         }
     }
 
+Supported properties in application.properties (defaults are as below):
+
+    sshd.shell.port=8022			#Set to 0 for random port
+    sshd.shell.enabled=false		#Set this to true to startup SSH daemon
+    sshd.shell.username=admin
+    sshd.shell.password= 			#A random string is generated if password is not set and shown in logs
+    sshd.shell.publicKeyFile=
+    sshd.shell.host=127.0.0.1		#Allowed IP addresses
+    sshd.shell.hostKeyFile=hostKey.ser
+    sshd.shell.prompt.color=default		#Supports black,red,green,yellow,blue,purple,cyan,white
+    sshd.shell.prompt.title=app
+    sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
+
+To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
+
+    ssh -p <port> <username>@<host>
+or
+
+    ssh -p <port> -i <privateKeyFile> <username>@<host>
+    
+if public key file is used for SSH daemon.
+
 The following are sample inputs/outputs from the shell command:
 
     app> help
@@ -48,5 +70,5 @@ To import into Maven project, add the following dependency inside pom.xml:
     </dependency>
 
 Limitations:
-1) Currently, every method must return a String and take in exactly one String parameter.
+1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String parameter (denoting arguments in shell command that are possibly null).
 2) Requires minimum JDK 8.
