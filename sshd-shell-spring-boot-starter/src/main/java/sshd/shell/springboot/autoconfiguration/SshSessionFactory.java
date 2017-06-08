@@ -21,6 +21,8 @@ package sshd.shell.springboot.autoconfiguration;
 import java.util.Map;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.Command;
+import org.springframework.boot.Banner;
+import org.springframework.core.env.Environment;
 
 /**
  *
@@ -31,9 +33,11 @@ class SshSessionFactory implements Factory<Command> {
 
     private final SshdShellProperties properties;
     private final Map<String, Map<String, CommandSupplier>> commandMap;
+    private final Environment environment;
+    private final Banner shellBanner;
 
     @Override
     public Command create() {
-        return new SshSessionInstance(properties, commandMap);
+        return new SshSessionInstance(properties, commandMap, environment, shellBanner);
     }
 }

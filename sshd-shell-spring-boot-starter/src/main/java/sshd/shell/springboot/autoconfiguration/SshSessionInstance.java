@@ -21,14 +21,17 @@ package sshd.shell.springboot.autoconfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import jline.console.ConsoleReader;
 import org.apache.sshd.server.Command;
-import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
+import org.springframework.boot.Banner;
+import org.springframework.boot.ansi.AnsiColor;
+import org.springframework.boot.ansi.AnsiOutput;
+import org.springframework.core.env.Environment;
 
 /**
  *
@@ -37,43 +40,39 @@ import org.apache.sshd.server.ExitCallback;
 @lombok.extern.slf4j.Slf4j
 class SshSessionInstance implements Command, Runnable {
 
-    private static final Properties ANSI_PROPERTIES = new Properties();
     private static final String SUPPORTED_COMMANDS_MESSAGE = "Enter '" + SshdShellAutoConfiguration.HELP
             + "' for a list of supported commands";
     private static final String UNSUPPORTED_COMMANDS_MESSAGE = "Unknown command. " + SUPPORTED_COMMANDS_MESSAGE;
-
-    static {
-        InputStream inputStream = SshSessionInstance.class.getResourceAsStream("/ansi-colors.properties");
-        try {
-            ANSI_PROPERTIES.load(inputStream);
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("Unable to load ansi-colors.properties in classpath", ex);
-        }
-    }
     private final SshdShellProperties properties;
     private final Map<String, Map<String, CommandSupplier>> commandMap;
+    private final Environment environment;
+    private final Banner shellBanner;
     private InputStream is;
     private OutputStream os;
     private ExitCallback callback;
     private Thread sshThread;
     private PrintWriter writer;
 
-    SshSessionInstance(SshdShellProperties properties, Map<String, Map<String, CommandSupplier>> commandMap) {
+    SshSessionInstance(SshdShellProperties properties, Map<String, Map<String, CommandSupplier>> commandMap,
+            Environment environment, Banner shellBanner) {
         this.properties = properties;
         this.commandMap = commandMap;
+        this.environment = environment;
+        this.shellBanner = shellBanner;
     }
 
     @Override
-    public void start(Environment env) throws IOException {
+    public void start(org.apache.sshd.server.Environment env) throws IOException {
         sshThread = new Thread(this, "sshd-cli");
         sshThread.start();
     }
 
     @Override
     public void run() {
+        printBanner();
         try (ConsoleReader reader = new ConsoleReader(is, os)) {
-            reader.setPrompt(ANSI_PROPERTIES.getProperty(properties.getShell().getPrompt().getColor())
-                    + properties.getShell().getPrompt().getTitle() + "> " + ANSI_PROPERTIES.getProperty("default"));
+            reader.setPrompt(AnsiOutput.encode(properties.getShell().getPrompt().getColor())
+                    + properties.getShell().getPrompt().getTitle() + "> " + AnsiOutput.encode(AnsiColor.DEFAULT));
             writer = new PrintWriter(reader.getOutput());
             writeResponse(SUPPORTED_COMMANDS_MESSAGE);
             String line;
@@ -89,10 +88,16 @@ class SshSessionInstance implements Command, Runnable {
         }
     }
 
+    private void printBanner() {
+        // Set line separator with \r for newlines to properly print out image banners and then reset it again
+        System.setProperty("line.separator", "\n\r");
+        shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
+        System.setProperty("line.separator", "\n");
+    }
+
     private void writeResponse(String response) {
-        writer.println(ANSI_PROPERTIES.getProperty(properties.getShell().getText().getColor()) + response);
+        writer.println(AnsiOutput.encode(properties.getShell().getText().getColor()) + response);
         writer.write(ConsoleReader.RESET_LINE);
-        writer.write(ANSI_PROPERTIES.getProperty("default"));
         writer.flush();
     }
 

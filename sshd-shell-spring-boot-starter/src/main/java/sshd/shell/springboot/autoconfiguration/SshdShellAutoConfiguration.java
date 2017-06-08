@@ -34,6 +34,8 @@ import org.apache.sshd.server.config.keys.AuthorizedKeysAuthenticator;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
+import org.springframework.boot.ImageBanner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -41,6 +43,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -55,14 +62,17 @@ public class SshdShellAutoConfiguration {
 
     public static final String HELP = "help";
     public static final String EXECUTE = "__execute";
+    private static final String[] SUPPORTED_IMAGES = {"gif", "jpg", "png"};
     private final String summaryHelp = "__summaryHelp";
 
     @Autowired
     private SshdShellProperties properties;
     @Autowired
     private ApplicationContext appContext;
+    @Autowired
+    private Environment environment;
     private SshServer server;
-
+    
     @PostConstruct
     void startServer() throws IOException, NoSuchMethodException, InterruptedException {
         if (Objects.isNull(properties.getShell().getPassword())) {
@@ -80,7 +90,7 @@ public class SshdShellAutoConfiguration {
                 -> username.equals(properties.getShell().getUsername())
                 && password.equals(properties.getShell().getPassword()));
         server.setPort(properties.getShell().getPort());
-        server.setShellFactory(new SshSessionFactory(properties, sshdCliCommands()));
+        server.setShellFactory(new SshSessionFactory(properties, sshdCliCommands(), environment, shellBanner()));
         server.start();
         properties.getShell().setPort(server.getPort()); // In case server port is 0, a random port is assigned.
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -95,9 +105,35 @@ public class SshdShellAutoConfiguration {
         });
         log.info("SSH server started on port {}", properties.getShell().getPort());
     }
+    
+    private Banner shellBanner() {
+        Banners banners = new Banners();
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        String location = environment.getProperty("banner.image.location");
+        if (StringUtils.hasLength(location)) {
+            Resource imageBanner = resourceLoader.getResource(location);
+            if (imageBanner.exists()) {
+                banners.addBanner(new ImageBanner(imageBanner));
+            }
+        } else {
+            for (String ext : SUPPORTED_IMAGES) {
+                Resource resource = resourceLoader.getResource("banner." + ext);
+                if (resource.exists()) {
+                    banners.addBanner(new ImageBanner(resource));
+                    break;
+                }
+            }
+        }
+        Resource textBanner = resourceLoader.getResource(environment.getProperty("banner.location", "banner.txt"));
+        if (textBanner.exists()) {
+            banners.addBanner(new ShellResourceBanner(textBanner));
+        }
+        return banners;
+    }
 
     @Bean
-    Map<String, Map<String, CommandSupplier>> sshdCliCommands() throws NoSuchMethodException, InterruptedException {
+    Map<String, Map<String, CommandSupplier>> sshdCliCommands() throws NoSuchMethodException,
+            InterruptedException {
         Map<String, Map<String, CommandSupplier>> sshdCliCommands = new TreeMap<>();
         for (Map.Entry<String, Object> entry : appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()) {
             loadSshdCliSuppliers(sshdCliCommands, entry.getValue());
