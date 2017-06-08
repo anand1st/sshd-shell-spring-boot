@@ -23,7 +23,7 @@ All the developer needs to do it to create a class similar to below and make sur
         }
     }
 
-Supported properties in application.properties (defaults are as below):
+Supported properties in application.properties (defaults are as below) for version 1.0:
 
     sshd.shell.port=8022			#Set to 0 for random port
     sshd.shell.enabled=false		#Set this to true to startup SSH daemon
@@ -35,6 +35,11 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.prompt.color=default		#Supports black,red,green,yellow,blue,purple,cyan,white
     sshd.shell.prompt.title=app
     sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
+
+For 1.1-SNAPSHOT, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified
+
+    sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
+    sshd.shell.text.color=DEFAULT
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
