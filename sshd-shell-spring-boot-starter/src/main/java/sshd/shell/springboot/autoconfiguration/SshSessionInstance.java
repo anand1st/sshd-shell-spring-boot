@@ -90,9 +90,10 @@ class SshSessionInstance implements Command, Runnable {
 
     private void printBanner() {
         // Set line separator with \r for newlines to properly print out image banners and then reset it again
+        String originalSeparator = System.getProperty("line.separator");
         System.setProperty("line.separator", "\n\r");
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
-        System.setProperty("line.separator", "\n");
+        System.setProperty("line.separator", originalSeparator);
     }
 
     private void writeResponse(String response) {
