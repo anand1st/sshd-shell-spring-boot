@@ -29,6 +29,7 @@ import java.util.Properties;
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author anand
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.enabled=true", "sshd.shell.port=0",
-    "sshd.shell.hostKeyFile=target/hostKey.ser", "logging.level.sshd.shell=DEBUG"})
+@SpringBootTest(classes = ConfigTest.class)
 public class SshdShellAutoConfigurationTest {
 
     @Autowired
@@ -80,8 +80,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         Thread.sleep(1000);
-        assertEquals("\u001B[0mEnter 'help' for a list of supported commands\n\r\u001B[0m\u001B[0mapp> "
-                + "\u001B[0mexit\r\n", os.toString());
+        System.out.println(os.toString());
+        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> exit\r\n"));
         channel.disconnect();
         session.disconnect();
     }
@@ -101,8 +101,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         Thread.sleep(1000);
-        assertEquals("\u001B[0mEnter 'help' for a list of supported commands\n\r\u001B[0m\u001B[0mapp> "
-                + "\u001B[0miae\r\n", os.toString());
+        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> iae\r\n"));
         channel.disconnect();
         session.disconnect();
     }
@@ -122,9 +121,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         Thread.sleep(1000);
-        assertEquals("\u001B[0mEnter 'help' for a list of supported commands\n\r\u001B[0m\u001B[0mapp> "
-                + "\u001B[0mxxx\r\n\u001B[0mUnknown command. Enter 'help' for a list of supported commands\n\r"
-                + "\u001B[0m\u001B[0mapp> \u001B[0m", os.toString());
+        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> xxx\r\nUnknown "
+                + "command. Enter 'help' for a list of supported commands\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
@@ -144,9 +142,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         Thread.sleep(1000);
-        assertEquals("\u001B[0mEnter 'help' for a list of supported commands\n\r\u001B[0m\u001B[0mapp> "
-                + "\u001B[0mtest nonexistent\r\n\u001B[0mUnknown sub command 'nonexistent'. Type 'test help' for more "
-                + "information\n\r\u001B[0m\u001B[0mapp> \u001B[0m", os.toString());
+        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> test nonexistent\r\n"
+                + "Unknown sub command 'nonexistent'. Type 'test help' for more information\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
@@ -166,9 +163,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         Thread.sleep(1000);
-        assertEquals("\u001B[0mEnter 'help' for a list of supported commands\n\r\u001B[0m\u001B[0mapp> "
-                + "\u001B[0mtest\r\n\u001B[0mtest description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute"
-                + "\n\r\u001B[0m\u001B[0mapp> \u001B[0m", os.toString());
+        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> test\r\ntest "
+                + "description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }

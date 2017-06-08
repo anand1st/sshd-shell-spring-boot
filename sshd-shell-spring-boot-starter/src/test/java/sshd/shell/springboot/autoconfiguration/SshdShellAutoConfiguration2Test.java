@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +39,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author anand
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.enabled=true", "sshd.shell.port=0",
-    "sshd.shell.hostKeyFile=target/hostKey.ser", "sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
-    "logging.level.sshd.shell=DEBUG"})
+@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
+    "banner.image.location=banner.png"})
 public class SshdShellAutoConfiguration2Test {
-    
+
     @Autowired
     private SshdShellProperties properties;
-    
+
     @Test
     public void testTestCommand() throws JSchException, InterruptedException {
         JSch jsch = new JSch();
@@ -62,8 +61,8 @@ public class SshdShellAutoConfiguration2Test {
         channel.setOutputStream(os);
         channel.connect();
         Thread.sleep(1000);
-        assertEquals("\u001B[0mEnter 'help' for a list of supported commands\n\r\u001B[0m\u001B[0mapp> "
-                + "\u001B[0mtest run bob\r\n\u001B[0mtest run bob\n\r\u001B[0m\u001B[0mapp> \u001B[0m", os.toString());
+        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> test run bob\r\n"
+                + "test run bob\n\rapp> ")); 
         channel.disconnect();
         session.disconnect();
     }
