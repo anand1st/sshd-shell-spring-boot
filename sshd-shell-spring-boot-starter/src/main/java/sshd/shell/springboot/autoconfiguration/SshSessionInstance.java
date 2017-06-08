@@ -42,6 +42,7 @@ class SshSessionInstance implements Command, Runnable {
 
     private static final String SUPPORTED_COMMANDS_MESSAGE = "Enter '" + SshdShellAutoConfiguration.HELP
             + "' for a list of supported commands";
+    private static final String LINE_SEPARATOR = "line.separator";
     private static final String UNSUPPORTED_COMMANDS_MESSAGE = "Unknown command. " + SUPPORTED_COMMANDS_MESSAGE;
     private final SshdShellProperties properties;
     private final Map<String, Map<String, CommandSupplier>> commandMap;
@@ -90,10 +91,10 @@ class SshSessionInstance implements Command, Runnable {
 
     private void printBanner() {
         // Set line separator with \r for newlines to properly print out image banners and then reset it again
-        String originalSeparator = System.getProperty("line.separator");
-        System.setProperty("line.separator", "\n\r");
+        String originalSeparator = System.getProperty(LINE_SEPARATOR);
+        System.setProperty(LINE_SEPARATOR, "\n\r");
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
-        System.setProperty("line.separator", originalSeparator);
+        System.setProperty(LINE_SEPARATOR, originalSeparator);
     }
 
     private void writeResponse(String response) {
