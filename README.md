@@ -36,7 +36,7 @@ Supported properties in application.properties (defaults are as below) for versi
     sshd.shell.prompt.title=app
     sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
 
-For 1.1-SNAPSHOT, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified
+For version 1.1, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified
 
     sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
     sshd.shell.text.color=DEFAULT
@@ -71,7 +71,7 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
     </dependency>
 
 Limitations:
