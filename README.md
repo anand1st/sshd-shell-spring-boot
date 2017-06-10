@@ -3,7 +3,7 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.M1 and 1.5.3.RELEASE. In theory however, it should work with any older releases.
+This starter has been tested with spring-boot 2.0.0.BUILD-SNAPSHOT, 2.0.0.M1 and 1.5.3.RELEASE. In theory however, it should work with any older releases.
 
 # Usage
 All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application Context:
@@ -36,7 +36,7 @@ Supported properties in application.properties (defaults are as below) for versi
     sshd.shell.prompt.title=app
     sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
 
-For version 1.1, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified
+For version 1.1, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified as the following:
 
     sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
     sshd.shell.text.color=DEFAULT
