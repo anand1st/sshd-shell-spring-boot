@@ -103,7 +103,6 @@ public class SshdShellAutoConfigurationTest {
         await().atMost(5, SECONDS).until(() 
                 -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> iae\r\nError "
                         + "performing method invocation\r\njava.lang.IllegalArgumentException: iae\n\rapp> "));
-        System.out.println(os.toString());
         channel.disconnect();
         session.disconnect();
     }
