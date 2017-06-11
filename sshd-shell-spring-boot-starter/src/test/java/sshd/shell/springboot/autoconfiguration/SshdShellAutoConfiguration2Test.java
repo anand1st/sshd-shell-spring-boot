@@ -25,9 +25,10 @@ import com.jcraft.jsch.Session;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import static org.junit.Assert.assertTrue;
+import static org.awaitility.Awaitility.await;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class SshdShellAutoConfiguration2Test {
     private SshdShellProperties properties;
 
     @Test
-    public void testTestCommand() throws JSchException, InterruptedException {
+    public void testTestCommand() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         jsch.addIdentity("src/test/resources/id_rsa");
@@ -60,9 +61,8 @@ public class SshdShellAutoConfiguration2Test {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> test run bob\r\n"
-                + "test run bob\n\rapp> ")); 
+        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+                + "\rapp> test run bob\r\ntest run bob\n\rapp> ")); 
         channel.disconnect();
         session.disconnect();
     }

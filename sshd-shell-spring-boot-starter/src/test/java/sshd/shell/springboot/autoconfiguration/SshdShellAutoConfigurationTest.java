@@ -26,10 +26,11 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class SshdShellAutoConfigurationTest {
     private SshdShellProperties properties;
 
     @Test
-    public void testExpectedDataFromMethodCallsAndHelp() throws Exception {
+    public void testExpectedDataFromMethodCallsAndHelp() throws InterruptedException {
         assertEquals(5, sshdCliCommands.size());
         assertEquals("Supported Commands\n\rdummy\t\tdummy description\n\rexit\t\tExit shell\n\riae\t\tthrows IAE\n\r"
                 + "test\t\ttest description", sshdCliCommands.get("help").get(SshdShellAutoConfiguration.EXECUTE)
@@ -66,7 +67,7 @@ public class SshdShellAutoConfigurationTest {
     }
     
     @Test
-    public void testExitCommand() throws JSchException, InterruptedException {
+    public void testExitCommand() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
@@ -79,15 +80,14 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        System.out.println(os.toString());
-        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> exit\r\n"));
+        await().atMost(5, SECONDS).until(() 
+                -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> exit\r\n"));
         channel.disconnect();
         session.disconnect();
     }
     
     @Test
-    public void testIAECommand() throws JSchException, InterruptedException {
+    public void testIAECommand() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
@@ -100,14 +100,16 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> iae\r\n"));
+        await().atMost(5, SECONDS).until(() 
+                -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> iae\r\nError "
+                        + "performing method invocation\r\njava.lang.IllegalArgumentException: iae\n\rapp> "));
+        System.out.println(os.toString());
         channel.disconnect();
         session.disconnect();
     }
     
     @Test
-    public void testUnsupportedCommand() throws JSchException, InterruptedException {
+    public void testUnsupportedCommand() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
@@ -120,15 +122,14 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> xxx\r\nUnknown "
-                + "command. Enter 'help' for a list of supported commands\n\rapp> "));
+        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+                + "\rapp> xxx\r\nUnknown command. Enter 'help' for a list of supported commands\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
     
     @Test
-    public void testUnsupportedSubCommand() throws JSchException, InterruptedException {
+    public void testUnsupportedSubCommand() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
@@ -141,15 +142,15 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> test nonexistent\r\n"
-                + "Unknown sub command 'nonexistent'. Type 'test help' for more information\n\rapp> "));
+        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+                + "\rapp> test nonexistent\r\nUnknown sub command 'nonexistent'. Type 'test help' for more information"
+                + "\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
     
     @Test
-    public void testHelpCommand() throws JSchException, InterruptedException {
+    public void testHelpCommand() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
@@ -162,9 +163,8 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        assertTrue(os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> test\r\ntest "
-                + "description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute\n\rapp> "));
+        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+                + "\rapp> test\r\ntest description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
