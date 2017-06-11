@@ -72,7 +72,7 @@ public class SshdShellAutoConfiguration {
     @Autowired
     private Environment environment;
     private SshServer server;
-    
+
     @PostConstruct
     void startServer() throws IOException, NoSuchMethodException, InterruptedException {
         if (Objects.isNull(properties.getShell().getPassword())) {
@@ -105,7 +105,7 @@ public class SshdShellAutoConfiguration {
         });
         log.info("SSH server started on port {}", properties.getShell().getPort());
     }
-    
+
     private Banner shellBanner() {
         Banners banners = new Banners();
         ResourceLoader resourceLoader = new DefaultResourceLoader();
@@ -193,14 +193,18 @@ public class SshdShellAutoConfiguration {
                 if (ex.getCause() instanceof InterruptedException) {
                     throw (InterruptedException) ex.getCause();
                 } else {
-                    throw new IllegalArgumentException("Error with command implementation", ex);
+                    return getErrorInfo(ex.getCause());
                 }
             } catch (IllegalAccessException | IllegalArgumentException ex) {
-                log.error("Error performing method invocation", ex);
-                return "Error performing method invocation." + (log.isDebugEnabled() ? "\n" + ex
-                        : " Please check server logs for more information");
+                return getErrorInfo(ex);
             }
         };
+    }
+
+    private String getErrorInfo(Throwable ex) {
+        log.error("Error performing method invocation", ex);
+        return "Error performing method invocation\r\n" + (log.isDebugEnabled() ? ex
+                : "Please check server logs for more information");
     }
 
     private void loadMethodLevelCommandSupplier(Class<?> clazz, Map<String, CommandSupplier> map, Object obj)
