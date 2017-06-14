@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import java.util.regex.Pattern;
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import static org.awaitility.Awaitility.await;
@@ -52,10 +53,10 @@ public class SshdShellAutoConfigurationTest {
 
     @Test
     public void testExpectedDataFromMethodCallsAndHelp() throws InterruptedException {
-        assertEquals(5, sshdCliCommands.size());
-        assertEquals("Supported Commands\n\rdummy\t\tdummy description\n\rexit\t\tExit shell\n\riae\t\tthrows IAE\n\r"
-                + "test\t\ttest description", sshdCliCommands.get("help").get(SshdShellAutoConfiguration.EXECUTE)
-                        .get(null));
+        assertEquals(6, sshdCliCommands.size());
+        assertEquals("Supported Commands\n\rdummy\t\tdummy description\n\rexit\t\tExit shell\n\rhealth\t\tHealth of "
+                + "services\n\riae\t\tthrows IAE\n\rtest\t\ttest description", sshdCliCommands.get("help")
+                        .get(SshdShellAutoConfiguration.EXECUTE).get(null));
         assertEquals("test description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute",
                 sshdCliCommands.get("test").get(SshdShellAutoConfiguration.HELP).get(null));
         assertEquals("test run successful", sshdCliCommands.get("test").get("run").get("successful"));
@@ -164,6 +165,70 @@ public class SshdShellAutoConfigurationTest {
         channel.connect();
         await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
                 + "\rapp> test\r\ntest description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute\n\rapp> "));
+        channel.disconnect();
+        session.disconnect();
+    }
+    
+    @Test
+    public void testHealthCommandNoArg() throws JSchException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        channel.setInputStream(new CharSequenceInputStream("health show\r", StandardCharsets.UTF_8));
+        OutputStream os = new ByteArrayOutputStream();
+        channel.setOutputStream(os);
+        channel.connect();
+        await().atMost(5, SECONDS).until(() -> os.toString().contains("app> health show\r\nSupported health indicators "
+                + "below:\n\r\tdiskspace\n\rUsage: health show <health indicator>\n\rapp> "));
+        channel.disconnect();
+        session.disconnect();
+    }
+    
+    @Test
+    public void testHealthCommandUnsupportedHealthIndicator() throws JSchException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        channel.setInputStream(new CharSequenceInputStream("health show unknown\r", StandardCharsets.UTF_8));
+        OutputStream os = new ByteArrayOutputStream();
+        channel.setOutputStream(os);
+        channel.connect();
+        await().atMost(5, SECONDS).until(() -> os.toString().contains("app> health show unknown\r\nUnsupported health "
+                + "indicator unknown\n\rSupported health indicators below:\n\r\tdiskspace\n\rUsage: health show "
+                + "<health indicator>\n\rapp> "));
+        channel.disconnect();
+        session.disconnect();
+    }
+    
+    @Test
+    public void testHealthCommandValidHealthIndicator() throws JSchException, InterruptedException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        channel.setInputStream(new CharSequenceInputStream("health show diskspace\r", StandardCharsets.UTF_8));
+        OutputStream os = new ByteArrayOutputStream();
+        channel.setOutputStream(os);
+        channel.connect();
+        Thread.sleep(1000);
+        System.out.println(os.toString());
+        Pattern pattern = Pattern.compile(".*app> health show diskspace\r\n\\{\"status\":\"UP\",\"diskspace\":\\{.*",
+                Pattern.DOTALL);
+        await().atMost(5, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
         channel.disconnect();
         session.disconnect();
     }
