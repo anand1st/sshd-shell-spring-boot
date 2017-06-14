@@ -36,6 +36,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.ImageBanner;
+import org.springframework.boot.ResourceBanner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -126,7 +127,7 @@ public class SshdShellAutoConfiguration {
         }
         Resource textBanner = resourceLoader.getResource(environment.getProperty("banner.location", "banner.txt"));
         if (textBanner.exists()) {
-            banners.addBanner(new ShellResourceBanner(textBanner));
+            banners.addBanner(new ShellBannerDecorator(new ResourceBanner(textBanner)));
         }
         return banners;
     }
