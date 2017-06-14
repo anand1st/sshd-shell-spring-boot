@@ -63,7 +63,7 @@ public class SshdShellAutoConfiguration {
     public static final String HELP = "help";
     public static final String EXECUTE = "__execute";
     private static final String[] SUPPORTED_IMAGES = {"gif", "jpg", "png"};
-    private final String summaryHelp = "__summaryHelp";
+    private static final String SUMMARY_HELP = "__summaryHelp";
 
     @Autowired
     private SshdShellProperties properties;
@@ -90,7 +90,7 @@ public class SshdShellAutoConfiguration {
                 -> username.equals(properties.getShell().getUsername())
                 && password.equals(properties.getShell().getPassword()));
         server.setPort(properties.getShell().getPort());
-        server.setShellFactory(new SshSessionFactory(properties, sshdCliCommands(), environment, shellBanner()));
+        server.setShellFactory(new SshSessionFactory(properties, sshdShellCommands(), environment, shellBanner()));
         server.start();
         properties.getShell().setPort(server.getPort()); // In case server port is 0, a random port is assigned.
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -132,41 +132,42 @@ public class SshdShellAutoConfiguration {
     }
 
     @Bean
-    Map<String, Map<String, CommandSupplier>> sshdCliCommands() throws NoSuchMethodException,
+    Map<String, Map<String, CommandSupplier>> sshdShellCommands() throws NoSuchMethodException,
             InterruptedException {
-        Map<String, Map<String, CommandSupplier>> sshdCliCommands = new TreeMap<>();
+        Map<String, Map<String, CommandSupplier>> sshdShellCommandsMap = new TreeMap<>();
         for (Map.Entry<String, Object> entry : appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()) {
-            loadSshdCliSuppliers(sshdCliCommands, entry.getValue());
+            loadSshdShellCommands(sshdShellCommandsMap, entry.getValue());
         }
         StringBuilder sb = new StringBuilder("Supported Commands");
-        for (Map.Entry<String, Map<String, CommandSupplier>> entry : sshdCliCommands.entrySet()) {
+        for (Map.Entry<String, Map<String, CommandSupplier>> entry : sshdShellCommandsMap.entrySet()) {
             sb.append("\n\r").append(entry.getKey()).append("\t\t")
-                    .append(entry.getValue().remove(summaryHelp).get(null));
+                    .append(entry.getValue().remove(SUMMARY_HELP).get(null));
         }
-        sshdCliCommands.put(HELP, Collections.singletonMap(EXECUTE, arg -> sb.toString()));
-        return sshdCliCommands;
+        sshdShellCommandsMap.put(HELP, Collections.singletonMap(EXECUTE, arg -> sb.toString()));
+        return sshdShellCommandsMap;
     }
 
-    private void loadSshdCliSuppliers(Map<String, Map<String, CommandSupplier>> sshdCliCommandMap, Object obj)
+    private void loadSshdShellCommands(Map<String, Map<String, CommandSupplier>> sshdShellCommandsMap, Object obj)
             throws SecurityException, NoSuchMethodException, InterruptedException {
         Class<?> clazz = AopUtils.isAopProxy(obj) ? AopUtils.getTargetClass(obj) : obj.getClass();
         SshdShellCommand annotation = AnnotationUtils.findAnnotation(clazz, SshdShellCommand.class);
-        Map<String, CommandSupplier> map = getSupplierMap(sshdCliCommandMap, annotation);
-        loadSshdCliSuppliers(clazz, annotation, map, obj);
+        Map<String, CommandSupplier> map = getSupplierMap(sshdShellCommandsMap, annotation);
+        loadSshdShellCommandSuppliers(clazz, annotation, map, obj);
     }
 
-    private Map<String, CommandSupplier> getSupplierMap(Map<String, Map<String, CommandSupplier>> sshdCliCommandMap,
+    private Map<String, CommandSupplier> getSupplierMap(Map<String, Map<String, CommandSupplier>> sshdShellCommandsMap,
             SshdShellCommand annotation) {
-        Map<String, CommandSupplier> map = sshdCliCommandMap.get(annotation.value());
+        Map<String, CommandSupplier> map = sshdShellCommandsMap.get(annotation.value());
         if (Objects.isNull(map)) {
             map = new TreeMap<>();
-            sshdCliCommandMap.put(annotation.value(), map);
+            sshdShellCommandsMap.put(annotation.value(), map);
         }
         return map;
     }
 
-    private void loadSshdCliSuppliers(Class<?> clazz, SshdShellCommand annotation, Map<String, CommandSupplier> map,
-            Object obj) throws NoSuchMethodException, SecurityException, InterruptedException {
+    private void loadSshdShellCommandSuppliers(Class<?> clazz, SshdShellCommand annotation,
+            Map<String, CommandSupplier> map, Object obj) throws NoSuchMethodException, SecurityException,
+            InterruptedException {
         loadClassLevelCommandSupplier(clazz, annotation, map, obj);
         loadMethodLevelCommandSupplier(clazz, map, obj);
     }
@@ -181,7 +182,7 @@ public class SshdShellAutoConfiguration {
         } catch (NoSuchMethodException ex) {
             log.debug("Does not contain default command method {}", ex.getMessage());
         }
-        map.put(summaryHelp, arg -> annotation.description());
+        map.put(SUMMARY_HELP, arg -> annotation.description());
         map.put(HELP, arg -> annotation.description());
     }
 
