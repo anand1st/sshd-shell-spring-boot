@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SshdShellCommand(value = "exit", description = "Exit shell")
-public class ExitCommand {
+class ExitCommand {
     
     final String exit(String arg) throws InterruptedException {
         throw new InterruptedException("Exiting shell");
