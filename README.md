@@ -39,10 +39,12 @@ Supported properties in application.properties (defaults are as below) for versi
     sshd.shell.prompt.title=app
     sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
 
-For version 1.1, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified as the following:
+From version 1.1, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified as the following:
 
     sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
     sshd.shell.text.color=DEFAULT
+
+From version 1.2, supports HealthIndicator when spring-boot-actuator is included.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
@@ -75,7 +77,7 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
     </dependency>
 
 Limitations:
