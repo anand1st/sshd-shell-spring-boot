@@ -58,6 +58,7 @@ The following are sample inputs/outputs from the shell command:
     app> help
     Supported Commands
     echo		Echo by users. Type 'echo help' for supported subcommands
+    health		Display health services
     exit		Exit shell
     app> echo help
     Echo by users. Type 'echo help' for supported subcommands
