@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SshdShellCommand(value = "test", description = "test description")
-public class TestCommand {
+class TestCommand {
     
     @SshdShellCommand(value = "run", description = "test run")
     final String run(String arg) {

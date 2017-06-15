@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SshdShellCommand(value = "iae", description = "throws IAE")
-public class IAECommand {
+class IAECommand {
     
     public void iae(String arg) {
         throw new IllegalArgumentException("iae");
