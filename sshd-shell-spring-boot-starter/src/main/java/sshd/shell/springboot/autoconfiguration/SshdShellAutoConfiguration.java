@@ -55,11 +55,11 @@ import org.springframework.util.StringUtils;
  * @author anand
  */
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = "sshd.shell.springboot")
 @ConditionalOnProperty(name = "sshd.shell.enabled", havingValue = "true")
 @EnableConfigurationProperties(SshdShellProperties.class)
 @lombok.extern.slf4j.Slf4j
-public class SshdShellAutoConfiguration {
+class SshdShellAutoConfiguration {
 
     public static final String HELP = "help";
     public static final String EXECUTE = "__execute";
