@@ -184,7 +184,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         await().atMost(5, SECONDS).until(() -> os.toString().contains("app> health show\r\nSupported health indicators "
-                + "below:\n\r\tdiskspace\n\rUsage: health show <health indicator>\n\rapp> "));
+                + "below:\n\r\tdiskspace\n\r\theapmemory\n\rUsage: health show <health indicator>\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
@@ -204,14 +204,14 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(os);
         channel.connect();
         await().atMost(5, SECONDS).until(() -> os.toString().contains("app> health show unknown\r\nUnsupported health "
-                + "indicator unknown\n\rSupported health indicators below:\n\r\tdiskspace\n\rUsage: health show "
-                + "<health indicator>\n\rapp> "));
+                + "indicator unknown\n\rSupported health indicators below:\n\r\tdiskspace\n\r\theapmemory\n\rUsage: "
+                + "health show <health indicator>\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
     
     @Test
-    public void testHealthCommandValidHealthIndicator() throws JSchException, InterruptedException {
+    public void testHealthCommandValidHealthIndicator() throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
@@ -224,9 +224,28 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        Thread.sleep(1000);
-        System.out.println(os.toString());
         Pattern pattern = Pattern.compile(".*app> health show diskspace\r\n\\{\"status\":\"UP\",\"diskspace\":\\{.*",
+                Pattern.DOTALL);
+        await().atMost(5, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
+        channel.disconnect();
+        session.disconnect();
+    }
+    
+    @Test
+    public void testHealthCommandHeapMemoryHealthIndicator() throws JSchException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        channel.setInputStream(new CharSequenceInputStream("health show heapmemory\r", StandardCharsets.UTF_8));
+        OutputStream os = new ByteArrayOutputStream();
+        channel.setOutputStream(os);
+        channel.connect();
+        Pattern pattern = Pattern.compile(".*app> health show heapmemory\r\n\\{\"heapmemory\":\\{.*",
                 Pattern.DOTALL);
         await().atMost(5, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
         channel.disconnect();
