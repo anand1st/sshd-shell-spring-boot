@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.command;
 
 import org.springframework.stereotype.Component;
+import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**
  *
@@ -26,9 +27,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SshdShellCommand(value = "exit", description = "Exit shell")
-class ExitCommand {
+public final class ExitCommand {
     
-    final String exit(String arg) throws InterruptedException {
+    public String exit(String arg) throws InterruptedException {
         throw new InterruptedException("Exiting shell");
     }
 }

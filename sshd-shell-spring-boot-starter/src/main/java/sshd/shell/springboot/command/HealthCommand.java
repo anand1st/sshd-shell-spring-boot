@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.command;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,10 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.CompositeHealthIndicatorConfiguration;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**
  *
@@ -42,7 +44,7 @@ import org.springframework.util.StringUtils;
 @Component
 @ConditionalOnClass(value = CompositeHealthIndicatorConfiguration.class)
 @SshdShellCommand(value = "health", description = "Health of services")
-class HealthCommand {
+public class HealthCommand {
 
     private static final Pattern HEALTH_INDICATOR_PATTERN = Pattern.compile("(.*?)HealthIndicator");
     private final String helpMessage;
@@ -50,7 +52,7 @@ class HealthCommand {
     private final ObjectWriter objectWriter = new ObjectMapper().writer();
 
     @Autowired
-    HealthCommand(List<HealthIndicator> healthIndicators) {
+    public HealthCommand(List<HealthIndicator> healthIndicators) {
         healthIndicatorMap = healthIndicators.stream().collect(Collectors.toMap(healthIndicator -> {
             Matcher matcher = HEALTH_INDICATOR_PATTERN.matcher(healthIndicator.getClass().getSimpleName());
             Assert.isTrue(matcher.matches(), "HealthIndicator classes not matching pattern");
@@ -62,7 +64,7 @@ class HealthCommand {
     }
 
     @SshdShellCommand(value = "show", description = "Display health services")
-    String show(String arg) throws JsonProcessingException {
+    public final String show(String arg) throws JsonProcessingException {
         if (StringUtils.isEmpty(arg)) {
             return helpMessage;
         }
@@ -71,7 +73,9 @@ class HealthCommand {
         }
         Health health = healthIndicatorMap.get(arg).health();
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("status", health.getStatus().getCode());
+        if (health.getStatus() != Status.UNKNOWN) {
+            map.put("status", health.getStatus().getCode());
+        }
         map.put(arg, health.getDetails());
         return objectWriter.writeValueAsString(map);
     }
