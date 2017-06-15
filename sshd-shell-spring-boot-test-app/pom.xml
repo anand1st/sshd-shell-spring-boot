@@ -18,6 +18,14 @@
             <artifactId>spring-boot-actuator</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.github.anand1st</groupId>
             <artifactId>sshd-shell-spring-boot-starter</artifactId>
             <version>${project.version}</version>
