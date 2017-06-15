@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
     "banner.image.location=banner.png"})
-public class SshdShellAutoConfiguration2Test {
+public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
 
     @Autowired
     private SshdShellProperties properties;
