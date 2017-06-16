@@ -62,13 +62,21 @@ public enum SshSessionContext {
         THREAD_CONTEXT.remove();
     }
     
-    public static String readLine(String text, Character mask) throws IOException {
+    /**
+     * Read input from line with mask. Use null if input is to be echoed. Use 0 if nothing is to be echoed and other
+     * characters that get echoed with input
+     * @param text Text to show
+     * @param mask mask
+     * @return input from user
+     * @throws IOException
+     */
+    public static String readInput(String text, Character mask) throws IOException {
         ConsoleReader reader = get(CONSOLE_READER);
         AnsiColor textColor = get(TEXT_COLOR);
         return reader.readLine(AnsiOutput.encode(textColor) + text + " " + AnsiOutput.encode(AnsiColor.DEFAULT), mask);
     }
     
-    public static String readLine(String text) throws IOException {
-        return readLine(text, null);
+    public static String readInput(String text) throws IOException {
+        return readInput(text, null);
     }
 }
