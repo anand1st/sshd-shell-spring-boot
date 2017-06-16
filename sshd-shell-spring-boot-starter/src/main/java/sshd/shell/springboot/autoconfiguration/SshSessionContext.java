@@ -72,7 +72,7 @@ public enum SshSessionContext {
      * @param text Text to show
      * @param mask mask
      * @return input from user
-     * @throws IOException
+     * @throws IOException if any
      */
     public static String readInput(String text, Character mask) throws IOException {
         ConsoleReader reader = get(CONSOLE_READER);
