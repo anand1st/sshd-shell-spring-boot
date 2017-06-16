@@ -15,11 +15,17 @@ public class EchoCommand {
     
     @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
     public String bobSays(String arg) throws IOException {
-        return "bob echoes " + arg + " and hello " + SshSessionContext.readInput("What's your name?");
+        String name = SshSessionContext.readInput("What's your name?");
+        SshSessionContext.put("name", name);
+        return "bob echoes " + arg + " and your name is " + name;
     }
     
     @SshdShellCommand(value = "alice", description = "Alice's echo. Usage: echo alice <arg>")
     public String aliceSays(String arg) {
-        return "alice says " + arg;
+        String str = "";
+        if (SshSessionContext.containsKey("name")) {
+            str = ", Name " + SshSessionContext.get("name") + " exists";
+        }
+        return "alice says " + arg + str;
     }
 }
