@@ -45,7 +45,7 @@ All the developer needs to do it to create a class similar to below and make sur
         }
     }
 
-Supported properties in application.properties (defaults are as below) for version 1.0:
+Supported properties in application.properties (defaults are as below):
 
     sshd.shell.port=8022			#Set to 0 for random port
     sshd.shell.enabled=false		#Set this to true to startup SSH daemon
