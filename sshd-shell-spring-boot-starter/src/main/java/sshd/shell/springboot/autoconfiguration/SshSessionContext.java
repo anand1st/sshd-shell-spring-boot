@@ -57,6 +57,10 @@ public enum SshSessionContext {
     public static boolean containsKey(String key) {
         return THREAD_CONTEXT.get().containsKey(key);
     }
+    
+    public static boolean isEmpty() {
+        return THREAD_CONTEXT.get().isEmpty();
+    }
 
     public static void clear() {
         THREAD_CONTEXT.remove();
