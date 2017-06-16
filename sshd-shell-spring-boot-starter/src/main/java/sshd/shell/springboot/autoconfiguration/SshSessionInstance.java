@@ -76,6 +76,7 @@ class SshSessionInstance implements Command, Runnable {
                     + properties.getShell().getPrompt().getTitle() + "> " + AnsiOutput.encode(AnsiColor.DEFAULT));
             writer = new PrintWriter(reader.getOutput());
             writeResponse(SUPPORTED_COMMANDS_MESSAGE);
+            createDefaultSessionContext();
             String line;
             while ((line = reader.readLine()) != null) {
                 handleUserInput(line.trim());
@@ -85,6 +86,7 @@ class SshSessionInstance implements Command, Runnable {
         } catch (InterruptedException ex) {
             log.info(ex.getMessage());
         } finally {
+            SshSessionContext.clear();
             callback.onExit(0);
         }
     }
@@ -95,6 +97,11 @@ class SshSessionInstance implements Command, Runnable {
         System.setProperty(LINE_SEPARATOR, "\n\r");
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         System.setProperty(LINE_SEPARATOR, originalSeparator);
+    }
+    
+    private void createDefaultSessionContext() throws IOException {
+        SshSessionContext.put(SshSessionContext.CONSOLE_READER, new ConsoleReader(is, os));
+        SshSessionContext.put(SshSessionContext.TEXT_COLOR, properties.getShell().getText().getColor());
     }
 
     private void writeResponse(String response) {
