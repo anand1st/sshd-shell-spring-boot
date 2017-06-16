@@ -8,6 +8,19 @@ The motivation for this starter was due to the fact that spring-boot had officia
 
 This starter has been tested with spring-boot 2.0.0.BUILD-SNAPSHOT, 2.0.0.M1 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
 
+To import into Maven project, add the following dependency inside pom.xml:
+
+    <dependency>
+        <groupId>io.github.anand1st</groupId>
+        <artifactId>sshd-shell-spring-boot-starter</artifactId>
+        <version>1.2</version>
+    </dependency>
+
+# Note
+Versions < 1.2 are deprecated and unsupported. Please upgrade to the latest. This document will only hold supporting information for latest release and snapshot versions.
+
+SshSessionContext has been introduced. 
+
 # Usage
 All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application Context:
 
@@ -16,13 +29,19 @@ All the developer needs to do it to create a class similar to below and make sur
     public class EchoCommand {
     
         @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
-        public String bobSays(String arg) {
-            return "bob says " + arg;  
+        public String bobSays(String arg) throws IOException {
+            String name = SshSessionContext.readInput("What's your name?");
+            SshSessionContext.put("name", name);
+            return "bob echoes " + arg + " and your name is " + name;
         }
     
         @SshdShellCommand(value = "alice", description = "Alice's echo. Usage: echo alice <arg>")
         public String aliceSays(String arg) {
-            return "alice says " + arg;
+            String str = "";
+            if (SshSessionContext.containsKey("name")) {
+                str = ", Name " + SshSessionContext.get("name") + " exists";
+            }
+            return "alice says " + arg + str;
         }
     }
 
@@ -35,25 +54,19 @@ Supported properties in application.properties (defaults are as below) for versi
     sshd.shell.publicKeyFile=
     sshd.shell.host=127.0.0.1		#Allowed IP addresses
     sshd.shell.hostKeyFile=hostKey.ser
-    sshd.shell.prompt.color=default		#Supports black,red,green,yellow,blue,purple,cyan,white
     sshd.shell.prompt.title=app
-    sshd.shell.text.color=default 		#Supports black,red,green,yellow,blue,purple,cyan,white
-
-From version 1.1, support for Spring Boot Banners has been added. Custom prompt and text color support has been removed and substituted with those from Spring Boot itself. The following properties need to be modified as the following:
-
     sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
     sshd.shell.text.color=DEFAULT
-
-From version 1.2, supports HealthIndicator when spring-boot-actuator is included.
+    
+When spring-boot-actuator is included, HealthIndicator classes in classpath will be loaded. The 'health' command will show all HealthIndicator components.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
     ssh -p <port> <username>@<host>
-or
+
+If public key file is used for SSH daemon:
 
     ssh -p <port> -i <privateKeyFile> <username>@<host>
-    
-if public key file is used for SSH daemon.
 
 The following are sample inputs/outputs from the shell command:
 
@@ -72,14 +85,6 @@ The following are sample inputs/outputs from the shell command:
     bob says hi
     app>
 
-To import into Maven project, add the following dependency inside pom.xml:
-
-    <dependency>
-        <groupId>io.github.anand1st</groupId>
-        <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>1.2</version>
-    </dependency>
-
 Limitations:
-1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String parameter (denoting arguments in shell command that are possibly null).
+1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String parameter (denoting nullable arguments in shell command).
 2) Requires minimum JDK 8.
