@@ -19,7 +19,7 @@ To import into Maven project, add the following dependency inside pom.xml:
 # Note
 Versions < 1.2 are deprecated and unsupported. Please upgrade to the latest. This document will only hold supporting information for latest release and snapshot versions.
 
-SshSessionContext has been introduced. 
+SshSessionContext has been introduced. This allows us for states to be maintained in between commands. Support for interactive input output for command has also been introduced via SshSessionContext.readInput method. Examples can be seen in sample test application and below.
 
 # Usage
 All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application Context:
