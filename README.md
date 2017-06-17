@@ -82,7 +82,10 @@ The following are sample inputs/outputs from the shell command:
     app> echo alice hi
     alice says hi
     app> echo bob hi
-    bob says hi
+    What's your name? Jake
+    bob echoes hi and your name is Jake
+    app> echo alice hi
+    alice says hi, Name Jake exists
     app>
 
 Limitations:
