@@ -18,7 +18,6 @@ package sshd.shell.springboot.autoconfiguration;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.boot.Banner;
 import org.springframework.core.env.Environment;
 
@@ -29,13 +28,11 @@ import org.springframework.core.env.Environment;
 class Banners implements Banner {
 
     private final List<Banner> banners = new ArrayList<>();
-    
+
     void addBanner(Banner banner) {
-        if (Objects.nonNull(banner)) {
-            banners.add(banner);
-        }
+        banners.add(new ShellBannerDecorator(banner));
     }
-    
+
     @Override
     public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
         banners.forEach(banner -> banner.printBanner(environment, sourceClass, out));
