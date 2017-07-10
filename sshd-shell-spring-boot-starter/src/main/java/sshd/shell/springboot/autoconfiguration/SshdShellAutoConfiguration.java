@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.Function;
 import javax.annotation.PostConstruct;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
@@ -112,24 +113,23 @@ class SshdShellAutoConfiguration {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         String location = environment.getProperty("banner.image.location");
         if (StringUtils.hasLength(location)) {
-            Resource imageBanner = resourceLoader.getResource(location);
-            if (imageBanner.exists()) {
-                banners.addBanner(new ShellBannerDecorator(new ImageBanner(imageBanner)));
-            }
+            addBanner(resourceLoader, location, banners, resource -> new ImageBanner(resource));
         } else {
             for (String ext : SUPPORTED_IMAGES) {
-                Resource resource = resourceLoader.getResource("banner." + ext);
-                if (resource.exists()) {
-                    banners.addBanner(new ShellBannerDecorator(new ImageBanner(resource)));
-                    break;
-                }
+                addBanner(resourceLoader, "banner." + ext, banners, resource -> new ImageBanner(resource));
             }
         }
-        Resource textBanner = resourceLoader.getResource(environment.getProperty("banner.location", "banner.txt"));
-        if (textBanner.exists()) {
-            banners.addBanner(new ShellBannerDecorator(new ResourceBanner(textBanner)));
-        }
+        addBanner(resourceLoader, environment.getProperty("banner.location", "banner.txt"), banners,
+                resource -> new ResourceBanner(resource));
         return banners;
+    }
+
+    private void addBanner(ResourceLoader resourceLoader, String bannerResourceName, Banners banners,
+            Function<Resource, Banner> function) {
+        Resource bannerResource = resourceLoader.getResource(bannerResourceName);
+        if (bannerResource.exists()) {
+            banners.addBanner(function.apply(bannerResource));
+        }
     }
 
     @Bean
