@@ -70,7 +70,7 @@ class SshSessionInstance implements Command, Runnable {
 
     @Override
     public void run() {
-        printBanner();
+        shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         try (ConsoleReader reader = new ConsoleReader(is, os)) {
             reader.setPrompt(AnsiOutput.encode(properties.getShell().getPrompt().getColor())
                     + properties.getShell().getPrompt().getTitle() + "> " + AnsiOutput.encode(AnsiColor.DEFAULT));
@@ -89,14 +89,6 @@ class SshSessionInstance implements Command, Runnable {
             SshSessionContext.clear();
             callback.onExit(0);
         }
-    }
-
-    private void printBanner() {
-        // Set line separator with \r for newlines to properly print out image banners and then reset it again
-        String originalSeparator = System.getProperty(LINE_SEPARATOR);
-        System.setProperty(LINE_SEPARATOR, "\n\r");
-        shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
-        System.setProperty(LINE_SEPARATOR, originalSeparator);
     }
     
     private void createDefaultSessionContext() throws IOException {

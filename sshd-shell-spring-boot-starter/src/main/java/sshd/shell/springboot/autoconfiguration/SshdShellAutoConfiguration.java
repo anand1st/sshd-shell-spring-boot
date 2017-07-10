@@ -114,13 +114,13 @@ class SshdShellAutoConfiguration {
         if (StringUtils.hasLength(location)) {
             Resource imageBanner = resourceLoader.getResource(location);
             if (imageBanner.exists()) {
-                banners.addBanner(new ImageBanner(imageBanner));
+                banners.addBanner(new ShellBannerDecorator(new ImageBanner(imageBanner)));
             }
         } else {
             for (String ext : SUPPORTED_IMAGES) {
                 Resource resource = resourceLoader.getResource("banner." + ext);
                 if (resource.exists()) {
-                    banners.addBanner(new ImageBanner(resource));
+                    banners.addBanner(new ShellBannerDecorator(new ImageBanner(resource)));
                     break;
                 }
             }
