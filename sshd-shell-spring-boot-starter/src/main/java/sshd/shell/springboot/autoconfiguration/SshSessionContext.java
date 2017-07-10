@@ -80,6 +80,12 @@ public enum SshSessionContext {
         return reader.readLine(AnsiOutput.encode(textColor) + text + " " + AnsiOutput.encode(AnsiColor.DEFAULT), mask);
     }
     
+    /**
+     * Read input from line with input echoed.
+     * @param text Text to show
+     * @return input from user
+     * @throws IOException if any
+     */
     public static String readInput(String text) throws IOException {
         return readInput(text, null);
     }
