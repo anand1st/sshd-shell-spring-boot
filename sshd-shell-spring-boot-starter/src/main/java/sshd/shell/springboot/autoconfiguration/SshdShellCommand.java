@@ -42,4 +42,6 @@ public @interface SshdShellCommand {
      * @return description of command
      */
     public String description();
+    
+    public String[] roles() default {"*"};
 }

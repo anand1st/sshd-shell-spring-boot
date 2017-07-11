@@ -30,7 +30,7 @@ import org.springframework.core.env.Environment;
  */
 @lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 class SshSessionFactory implements Factory<Command> {
-
+    
     private final SshdShellProperties properties;
     private final Map<String, Map<String, CommandSupplier>> commandMap;
     private final Environment environment;

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.function.Function;
 import javax.annotation.PostConstruct;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
@@ -36,8 +35,6 @@ import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
-import org.springframework.boot.ImageBanner;
-import org.springframework.boot.ResourceBanner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -46,10 +43,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.util.StringUtils;
 
 /**
  *
@@ -64,7 +57,6 @@ class SshdShellAutoConfiguration {
 
     public static final String HELP = "help";
     public static final String EXECUTE = "__execute";
-    private static final String[] SUPPORTED_IMAGES = {"gif", "jpg", "png"};
     private static final String SUMMARY_HELP = "__summaryHelp";
 
     @Autowired
@@ -73,7 +65,6 @@ class SshdShellAutoConfiguration {
     private ApplicationContext appContext;
     @Autowired
     private Environment environment;
-    private SshServer server;
 
     @PostConstruct
     void startServer() throws IOException, NoSuchMethodException, InterruptedException {
@@ -82,7 +73,7 @@ class SshdShellAutoConfiguration {
             log.info("********** User password not set. Use following password to login: {} **********",
                     properties.getShell().getPassword());
         }
-        server = SshServer.setUpDefaultServer();
+        SshServer server = SshServer.setUpDefaultServer();
         server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File(properties.getShell().getHostKeyFile())));
         server.setPublickeyAuthenticator(Objects.isNull(properties.getShell().getPublicKeyFile())
                 ? RejectAllPublickeyAuthenticator.INSTANCE
@@ -107,29 +98,10 @@ class SshdShellAutoConfiguration {
         });
         log.info("SSH server started on port {}", properties.getShell().getPort());
     }
-
-    private Banner shellBanner() {
-        Banners banners = new Banners();
-        ResourceLoader resourceLoader = new DefaultResourceLoader();
-        String location = environment.getProperty("banner.image.location");
-        if (StringUtils.hasLength(location)) {
-            addBanner(resourceLoader, location, banners, resource -> new ImageBanner(resource));
-        } else {
-            for (String ext : SUPPORTED_IMAGES) {
-                addBanner(resourceLoader, "banner." + ext, banners, resource -> new ImageBanner(resource));
-            }
-        }
-        addBanner(resourceLoader, environment.getProperty("banner.location", "banner.txt"), banners,
-                resource -> new ResourceBanner(resource));
-        return banners;
-    }
-
-    private void addBanner(ResourceLoader resourceLoader, String bannerResourceName, Banners banners,
-            Function<Resource, Banner> function) {
-        Resource bannerResource = resourceLoader.getResource(bannerResourceName);
-        if (bannerResource.exists()) {
-            banners.addBanner(function.apply(bannerResource));
-        }
+    
+    @Bean
+    Banner shellBanner() {
+        return new ShellBanner(environment);
     }
 
     @Bean

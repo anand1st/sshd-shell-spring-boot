@@ -42,7 +42,6 @@ class SshSessionInstance implements Command, Runnable {
 
     private static final String SUPPORTED_COMMANDS_MESSAGE = "Enter '" + SshdShellAutoConfiguration.HELP
             + "' for a list of supported commands";
-    private static final String LINE_SEPARATOR = "line.separator";
     private static final String UNSUPPORTED_COMMANDS_MESSAGE = "Unknown command. " + SUPPORTED_COMMANDS_MESSAGE;
     private final SshdShellProperties properties;
     private final Map<String, Map<String, CommandSupplier>> commandMap;
