@@ -1,0 +1,43 @@
+/*
+ * Copyright 2017 anand.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package sshd.shell.springboot.server;
+
+import java.util.Collections;
+import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
+import org.apache.sshd.server.session.ServerSession;
+import sshd.shell.springboot.autoconfiguration.Constants;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
+
+/**
+ *
+ * @author anand
+ */
+class SimpleSshdPasswordAuthenticator implements PasswordAuthenticator {
+
+    private final SshdShellProperties.Shell props;
+    
+    SimpleSshdPasswordAuthenticator(SshdShellProperties properties) {
+        props = properties.getShell();
+    }
+
+    @Override
+    public boolean authenticate(String username, String password, ServerSession session) throws
+            PasswordChangeRequiredException {
+        session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
+        return username.equals(props.getUsername()) && password.equals(props.getPassword());
+    }
+}
