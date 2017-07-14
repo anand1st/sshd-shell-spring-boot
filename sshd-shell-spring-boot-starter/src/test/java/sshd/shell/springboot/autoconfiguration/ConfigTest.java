@@ -18,7 +18,15 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import java.util.Arrays;
+import java.util.Collection;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  *
@@ -26,4 +34,49 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class ConfigTest {
+
+    @Bean
+    public AuthenticationProvider authProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(username -> new UserDetails() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Collection<? extends GrantedAuthority> getAuthorities() {
+                return Arrays.<GrantedAuthority>asList(new SimpleGrantedAuthority(
+                        username.equals("alice") ? "ALICE" : "ADMIN"));
+            }
+
+            @Override
+            public String getPassword() {
+                return username;
+            }
+
+            @Override
+            public String getUsername() {
+                return username;
+            }
+
+            @Override
+            public boolean isAccountNonExpired() {
+                return true;
+            }
+
+            @Override
+            public boolean isAccountNonLocked() {
+                return true;
+            }
+
+            @Override
+            public boolean isCredentialsNonExpired() {
+                return true;
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return true;
+            }
+        });
+        return authProvider;
+    }
 }
