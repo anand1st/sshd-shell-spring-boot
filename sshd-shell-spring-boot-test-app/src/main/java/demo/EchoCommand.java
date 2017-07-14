@@ -10,7 +10,7 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
  * @author anand
  */
 @Component
-@SshdShellCommand(value = "echo", description = "Echo by users. Type 'echo help' for supported subcommands")
+@SshdShellCommand(value = "echo", description = "Echo by users. Type 'echo' for supported subcommands")
 public class EchoCommand {
     
     @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
@@ -27,5 +27,10 @@ public class EchoCommand {
             str = ", Name " + SshSessionContext.get("name") + " exists";
         }
         return "alice says " + arg + str;
+    }
+    
+    @SshdShellCommand(value = "admin", description = "Admin's echo. Usage: echo admin <arg>", roles = "ADMIN")
+    public String adminSays(String arg) {
+        return "admin says " + arg;
     }
 }
