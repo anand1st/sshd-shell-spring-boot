@@ -32,7 +32,7 @@ import org.springframework.core.env.Environment;
 class SshSessionFactory implements Factory<Command> {
     
     private final SshdShellProperties properties;
-    private final Map<String, Map<String, CommandSupplier>> commandMap;
+    private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
     private final Environment environment;
     private final Banner shellBanner;
 

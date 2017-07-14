@@ -43,5 +43,9 @@ public @interface SshdShellCommand {
      */
     public String description();
     
+    /**
+     * Roles that can execute command.
+     * @return supported roles for executing command
+     */
     public String[] roles() default {"*"};
 }

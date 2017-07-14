@@ -23,7 +23,7 @@ package sshd.shell.springboot.autoconfiguration;
  * @author anand
  */
 @FunctionalInterface
-interface CommandSupplier {
+interface CommandExecutor {
     
     String get(String arg) throws InterruptedException;
 }

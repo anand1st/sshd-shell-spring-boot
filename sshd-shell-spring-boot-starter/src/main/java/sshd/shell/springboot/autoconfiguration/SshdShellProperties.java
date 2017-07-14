@@ -29,6 +29,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @lombok.Data
 public class SshdShellProperties {
 
+    public static enum AuthType {
+        SIMPLE,
+        DAO
+    }
+
     private final Shell shell = new Shell();
 
     @lombok.Data
@@ -43,6 +48,7 @@ public class SshdShellProperties {
         private String hostKeyFile = "hostKey.ser";
         private final Prompt prompt = new Prompt();
         private final Text text = new Text();
+        private final Auth auth = new Auth();
 
         @lombok.Data
         public static class Prompt {
@@ -55,6 +61,13 @@ public class SshdShellProperties {
         public static class Text {
 
             private AnsiColor color = AnsiColor.DEFAULT;
+        }
+
+        @lombok.Data
+        public static class Auth {
+
+            private AuthType authType = AuthType.SIMPLE;
+            private String authProviderBeanName;
         }
     }
 }
