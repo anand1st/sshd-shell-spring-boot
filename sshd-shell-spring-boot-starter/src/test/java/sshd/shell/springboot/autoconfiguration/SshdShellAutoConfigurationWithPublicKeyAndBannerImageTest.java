@@ -61,7 +61,7 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
                 + "\rapp> test run bob\r\ntest run bob\n\rapp> ")); 
         channel.disconnect();
         session.disconnect();

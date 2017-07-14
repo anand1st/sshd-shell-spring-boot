@@ -25,15 +25,15 @@ import org.springframework.stereotype.Component;
  * @author anand
  */
 @Component
-@SshdShellCommand(value = "test", description = "test description")
+@SshdShellCommand(value = "test", description = "test description", roles = {"USER", "ADMIN"})
 class TestCommand {
     
-    @SshdShellCommand(value = "run", description = "test run")
+    @SshdShellCommand(value = "run", description = "test run", roles = "USER")
     final String run(String arg) {
         return "test run " + arg;
     }
     
-    @SshdShellCommand(value = "execute", description = "test execute")
+    @SshdShellCommand(value = "execute", description = "test execute", roles = "ADMIN")
     final String execute(String arg) {
         return "test execute successful";
     }

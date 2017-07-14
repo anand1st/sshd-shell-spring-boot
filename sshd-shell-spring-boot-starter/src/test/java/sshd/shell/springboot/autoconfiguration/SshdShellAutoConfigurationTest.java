@@ -24,14 +24,12 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Properties;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import java.util.regex.Pattern;
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,30 +45,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class SshdShellAutoConfigurationTest {
 
     @Autowired
-    private Map<String, Map<String, CommandSupplier>> sshdCliCommands;
-    @Autowired
     private SshdShellProperties properties;
-
-    @Test
-    public void testExpectedDataFromMethodCallsAndHelp() throws InterruptedException {
-        assertEquals(6, sshdCliCommands.size());
-        assertEquals("Supported Commands\n\rdummy\t\tdummy description\n\rexit\t\tExit shell\n\rhealth\t\tHealth of "
-                + "services\n\riae\t\tthrows IAE\n\rtest\t\ttest description", sshdCliCommands.get("help")
-                        .get(SshdShellAutoConfiguration.EXECUTE).get(null));
-        assertEquals("test description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute",
-                sshdCliCommands.get("test").get(SshdShellAutoConfiguration.HELP).get(null));
-        assertEquals("test run successful", sshdCliCommands.get("test").get("run").get("successful"));
-        assertEquals("test execute successful", sshdCliCommands.get("test").get("execute").get(null));
-        assertEquals("dummy run successful", sshdCliCommands.get("dummy").get("run").get(null));
-        assertEquals("dummy description\n\r\trun\t\tdummy run",
-                sshdCliCommands.get("dummy").get(SshdShellAutoConfiguration.HELP).get(null));
-        assertEquals("Exit shell", sshdCliCommands.get("exit").get(SshdShellAutoConfiguration.HELP).get(null));
-    }
     
     @Test
     public void testExitCommand() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -81,7 +62,7 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() 
+        await().atMost(2, SECONDS).until(() 
                 -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> exit\r\n"));
         channel.disconnect();
         session.disconnect();
@@ -90,7 +71,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testIAECommand() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -101,7 +83,7 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() 
+        await().atMost(2, SECONDS).until(() 
                 -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> iae\r\nError "
                         + "performing method invocation\r\njava.lang.IllegalArgumentException: iae\n\rapp> "));
         channel.disconnect();
@@ -111,7 +93,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testUnsupportedCommand() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -122,7 +105,7 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
                 + "\rapp> xxx\r\nUnknown command. Enter 'help' for a list of supported commands\n\rapp> "));
         channel.disconnect();
         session.disconnect();
@@ -131,7 +114,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testUnsupportedSubCommand() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -142,7 +126,7 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
                 + "\rapp> test nonexistent\r\nUnknown sub command 'nonexistent'. Type 'test help' for more information"
                 + "\n\rapp> "));
         channel.disconnect();
@@ -150,9 +134,10 @@ public class SshdShellAutoConfigurationTest {
     }
     
     @Test
-    public void testHelpCommand() throws JSchException {
+    public void testSubcommand() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -163,8 +148,32 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
-                + "\rapp> test\r\ntest description\n\r\trun\t\ttest run\n\r\texecute\t\ttest execute\n\rapp> "));
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands"
+                + "\n\rapp> test\r\nSupported subcommand for test\n\rexecute\t\ttest execute\n\rrun\t\ttest run"
+                + "\n\rapp> "));
+        channel.disconnect();
+        session.disconnect();
+    }
+    
+    @Test
+    public void testHelp() throws JSchException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        channel.setInputStream(new CharSequenceInputStream("help\r", StandardCharsets.UTF_8));
+        OutputStream os = new ByteArrayOutputStream();
+        channel.setOutputStream(os);
+        channel.connect();
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands"
+                + "\n\rapp> help\r\nSupported Commands\n\rdummy\t\tdummy description\n\rexit\t\tExit shell\n\rhealth"
+                + "\t\tHealth of services\n\rhelp\t\tShow list of help commands\n\riae\t\tthrows IAE\n\rtest"
+                + "\t\ttest description\n\rapp> "));
         channel.disconnect();
         session.disconnect();
     }
@@ -172,7 +181,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testHealthCommandNoArg() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -183,7 +193,7 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() -> os.toString().contains("app> health show\r\nSupported health indicators "
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("app> health show\r\nSupported health indicators "
                 + "below:\n\r\tdiskspace\n\r\theapmemory\n\rUsage: health show <health indicator>\n\rapp> "));
         channel.disconnect();
         session.disconnect();
@@ -192,7 +202,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testHealthCommandUnsupportedHealthIndicator() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -203,7 +214,7 @@ public class SshdShellAutoConfigurationTest {
         OutputStream os = new ByteArrayOutputStream();
         channel.setOutputStream(os);
         channel.connect();
-        await().atMost(5, SECONDS).until(() -> os.toString().contains("app> health show unknown\r\nUnsupported health "
+        await().atMost(2, SECONDS).until(() -> os.toString().contains("app> health show unknown\r\nUnsupported health "
                 + "indicator unknown\n\rSupported health indicators below:\n\r\tdiskspace\n\r\theapmemory\n\rUsage: "
                 + "health show <health indicator>\n\rapp> "));
         channel.disconnect();
@@ -213,7 +224,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testHealthCommandValidHealthIndicator() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -226,7 +238,7 @@ public class SshdShellAutoConfigurationTest {
         channel.connect();
         Pattern pattern = Pattern.compile(".*app> health show diskspace\r\n\\{\"status\":\"UP\",\"diskspace\":\\{.*",
                 Pattern.DOTALL);
-        await().atMost(5, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
+        await().atMost(2, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
         channel.disconnect();
         session.disconnect();
     }
@@ -234,7 +246,8 @@ public class SshdShellAutoConfigurationTest {
     @Test
     public void testHealthCommandHeapMemoryHealthIndicator() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
         session.setPassword(properties.getShell().getPassword());
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");
@@ -247,7 +260,7 @@ public class SshdShellAutoConfigurationTest {
         channel.connect();
         Pattern pattern = Pattern.compile(".*app> health show heapmemory\r\n\\{\"heapmemory\":\\{.*",
                 Pattern.DOTALL);
-        await().atMost(5, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
+        await().atMost(2, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
         channel.disconnect();
         session.disconnect();
     }
