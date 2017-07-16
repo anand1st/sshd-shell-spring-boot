@@ -52,10 +52,10 @@ All the developer needs to do it to create a class similar to below and make sur
             return "alice says " + arg + str;
         }
 	
-	@SshdShellCommand(value = "admin", description = "Admin's echo. Usage: echo admin <arg>", roles = "ADMIN")
-	public String adminSays(String arg) {
-	    return "admin says " + arg;
-	}
+	    @SshdShellCommand(value = "admin", description = "Admin's echo. Usage: echo admin <arg>", roles = "ADMIN")
+	    public String adminSays(String arg) {
+	        return "admin says " + arg;
+	    }
     }
 
 Supported properties in application.properties (defaults are as below):
