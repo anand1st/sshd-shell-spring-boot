@@ -41,7 +41,7 @@ All the developer needs to do it to create a class similar to below and make sur
     
         @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
         public String bobSays(String arg) throws IOException {
-	    SshSessionContext.writeOutput("Need user info");
+	        SshSessionContext.writeOutput("Need user info");
             String name = SshSessionContext.readInput("What's your name?");
             SshSessionContext.put("name", name);
             return "bob echoes " + arg + " and your name is " + name;
