@@ -13,11 +13,14 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
     </dependency>
 
 # Note
 Versions < 1.3 are deprecated and unsupported. This document will only hold supporting information greater than version 1.3.
+
+# Version 1.5
+Minor refactorization. Exposed API for writing output i.e. SshSessionContext.writeOutput method.
 
 # Version 1.4
 In version 1.4, major changes have been made. They include 
@@ -38,6 +41,7 @@ All the developer needs to do it to create a class similar to below and make sur
     
         @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
         public String bobSays(String arg) throws IOException {
+	    SshSessionContext.writeOutput("Need user info");
             String name = SshSessionContext.readInput("What's your name?");
             SshSessionContext.put("name", name);
             return "bob echoes " + arg + " and your name is " + name;
