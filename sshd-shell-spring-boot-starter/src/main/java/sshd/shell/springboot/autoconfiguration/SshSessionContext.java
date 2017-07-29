@@ -16,6 +16,7 @@
 package sshd.shell.springboot.autoconfiguration;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import jline.console.ConsoleReader;
@@ -39,6 +40,7 @@ public enum SshSessionContext {
     
     static final String CONSOLE_READER = "__consoleReader";
     static final String TEXT_COLOR = "__textColor";
+    static final String WRITER = "__writer";
 
     public static void put(String key, Object value) {
         THREAD_CONTEXT.get().put(key, value);
@@ -88,5 +90,16 @@ public enum SshSessionContext {
      */
     public static String readInput(String text) throws IOException {
         return readInput(text, null);
+    }
+    
+    /**
+     * Write output.
+     * @param text Text output
+     */
+    public static void writeOutput(String text) {
+        PrintWriter writer = get(WRITER);
+        writer.println(AnsiOutput.encode(get(TEXT_COLOR)) + text);
+        writer.write(ConsoleReader.RESET_LINE);
+        writer.flush();
     }
 }

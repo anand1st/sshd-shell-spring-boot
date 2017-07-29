@@ -78,8 +78,8 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
             reader.setPrompt(AnsiOutput.encode(properties.getPrompt().getColor()) + properties.getPrompt().getTitle()
                     + "> " + AnsiOutput.encode(AnsiColor.DEFAULT));
             writer = new PrintWriter(reader.getOutput());
-            writeResponse(SUPPORTED_COMMANDS_MESSAGE);
-            createDefaultSessionContext();
+            createDefaultSessionContext(reader);
+            SshSessionContext.writeOutput(SUPPORTED_COMMANDS_MESSAGE);
             String line;
             while ((line = reader.readLine()) != null) {
                 handleUserInput(line.trim());
@@ -94,17 +94,12 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
         }
     }
 
-    private void createDefaultSessionContext() throws IOException {
-        SshSessionContext.put(SshSessionContext.CONSOLE_READER, new ConsoleReader(is, os));
+    private void createDefaultSessionContext(ConsoleReader reader) throws IOException {
+        SshSessionContext.put(SshSessionContext.CONSOLE_READER, reader);
         SshSessionContext.put(SshSessionContext.TEXT_COLOR, properties.getText().getColor());
+        SshSessionContext.put(SshSessionContext.WRITER, writer);
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
-    }
-
-    private void writeResponse(String response) {
-        writer.println(AnsiOutput.encode(properties.getText().getColor()) + response);
-        writer.write(ConsoleReader.RESET_LINE);
-        writer.flush();
     }
 
     private void handleUserInput(String userInput) throws InterruptedException {
@@ -112,13 +107,13 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
         String command = part[0];
         Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(command);
         if (Objects.isNull(commandExecutables)) {
-            writeResponse(UNSUPPORTED_COMMANDS_MESSAGE);
+            SshSessionContext.writeOutput(UNSUPPORTED_COMMANDS_MESSAGE);
             return;
         }
         CommandExecutableDetails ced = commandExecutables.get(Constants.EXECUTE);
         Collection<String> userRoles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
         if (!ced.matchesRole(userRoles)) {
-            writeResponse("Permission denied");
+            SshSessionContext.writeOutput("Permission denied");
             return;
         }
         if (part.length < 2) {
@@ -128,21 +123,22 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
                         .filter(e -> !e.getKey().equals(Constants.EXECUTE) && e.getValue().matchesRole(userRoles))
                         .forEach(e -> sb.append("\n\r").append(e.getKey()).append("\t\t")
                         .append(e.getValue().getDescription()));
-                writeResponse(sb.toString());
+                SshSessionContext.writeOutput(sb.toString());
             } else {
-                writeResponse(ced.getCommandExecutor().get(null));
+                SshSessionContext.writeOutput(ced.getCommandExecutor().get(null));
             }
         } else if (commandExecutables.containsKey(part[1])) {
             String subCommand = part[1];
             ced = commandExecutables.get(subCommand);
             if (!ced.matchesRole(userRoles)) {
-                writeResponse("Permission denied");
+                SshSessionContext.writeOutput("Permission denied");
             } else {
-                writeResponse(commandExecutables.get(subCommand).getCommandExecutor()
+                SshSessionContext.writeOutput(commandExecutables.get(subCommand).getCommandExecutor()
                         .get(part.length == 2 ? null : part[2]));
             }
         } else {
-            writeResponse("Unknown sub command '" + part[1] + "'. Type '" + part[0] + " help' for more information");
+            SshSessionContext.writeOutput("Unknown sub command '" + part[1] + "'. Type '" + part[0] 
+                    + " help' for more information");
         }
     }
 
