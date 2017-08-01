@@ -18,6 +18,7 @@ package sshd.shell.springboot.health;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
  * @author anand
  */
 @Component
+@ConditionalOnClass(HealthIndicator.class)
 class HeapMemoryHealthIndicator implements HealthIndicator {
 
     private static final int MB = 1024 * 1024;
