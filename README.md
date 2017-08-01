@@ -6,18 +6,21 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.BUILD-SNAPSHOT, 2.0.0.M2 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
+This starter has been tested with spring-boot 2.0.0.BUILD-SNAPSHOT, 2.0.0.M3 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
 
 To import into Maven project, add the following dependency inside pom.xml:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>1.5</version>
+        <version>1.5.1</version>
     </dependency>
 
 # Note
 Versions < 1.3 are deprecated and unsupported. This document will only hold supporting information greater than version 1.3.
+
+# Version 1.5.1
+Fixed CNFE bug when spring-boot-starter-actuator is not in classpath.
 
 # Version 1.5
 Minor refactorization. Exposed API for writing output i.e. SshSessionContext.writeOutput method.
