@@ -58,12 +58,12 @@ class SshdServer {
         switch (properties.getShell().getAuth().getAuthType()) {
             case SIMPLE:
                 return new SimpleSshdPasswordAuthenticator(properties);
-            case DAO:
+            case AUTH_PROVIDER:
                 try {
                     AuthenticationProvider authProvider = Objects.isNull(props.getAuthProviderBeanName())
                             ? appContext.getBean(AuthenticationProvider.class)
                             : appContext.getBean(props.getAuthProviderBeanName(), AuthenticationProvider.class);
-                    return new DaoSshdPasswordAuthenticator(authProvider);
+                    return new AuthProviderSshdPasswordAuthenticator(authProvider);
                 } catch (BeansException ex) {
                     throw new IllegalArgumentException("Expected a default or valid AuthenticationProvider bean", ex);
                 }

@@ -30,11 +30,11 @@ import sshd.shell.springboot.autoconfiguration.Constants;
  * @author anand
  */
 @lombok.extern.slf4j.Slf4j
-class DaoSshdPasswordAuthenticator implements PasswordAuthenticator {
+class AuthProviderSshdPasswordAuthenticator implements PasswordAuthenticator {
 
     private final AuthenticationProvider authProvider;
     
-    DaoSshdPasswordAuthenticator(AuthenticationProvider authProvider) {
+    AuthProviderSshdPasswordAuthenticator(AuthenticationProvider authProvider) {
         this.authProvider = authProvider;
     }
     

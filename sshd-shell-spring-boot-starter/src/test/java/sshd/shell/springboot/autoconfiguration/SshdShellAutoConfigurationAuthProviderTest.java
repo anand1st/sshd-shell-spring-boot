@@ -35,9 +35,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author anand
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.auth.authType=DAO", "sshd.shell.username=bob",
-    "sshd.shell.password=bob"})
-public class SshdShellAutoConfigurationDaoTest {
+@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.auth.authType=AUTH_PROVIDER",
+    "sshd.shell.username=bob", "sshd.shell.password=bob"})
+public class SshdShellAutoConfigurationAuthProviderTest {
 
     @Autowired
     private SshdShellProperties properties;

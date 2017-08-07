@@ -31,7 +31,7 @@ public class SshdShellProperties {
 
     public static enum AuthType {
         SIMPLE,
-        DAO
+        AUTH_PROVIDER
     }
 
     private final Shell shell = new Shell();
