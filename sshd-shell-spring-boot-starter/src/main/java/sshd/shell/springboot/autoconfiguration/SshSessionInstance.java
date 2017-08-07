@@ -32,6 +32,7 @@ import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.springframework.boot.Banner;
@@ -88,7 +89,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
             while ((line = reader.readLine(prompt)) != null) {
                 try {
                     handleUserInput(line.trim());
-                } catch (InterruptedException ex) {
+                } catch (InterruptedException | UserInterruptException ex) {
                     log.info(ex.getMessage());
                     SshSessionContext.writeOutput(ex.getMessage());
                     cleanup();
@@ -151,14 +152,8 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     }
 
     private void cleanup() {
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException ex) {
-            log.error("Interrupted exception", ex);
-        } finally {
-            SshSessionContext.clear();
-            callback.onExit(0);
-        }
+        SshSessionContext.clear();
+        callback.onExit(0);
     }
 
     @Override

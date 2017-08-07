@@ -37,6 +37,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author anand
  */
 @SpringBootApplication
+@lombok.extern.slf4j.Slf4j
 public class ConfigTest {
 
     @Bean
@@ -97,7 +98,7 @@ public class ConfigTest {
                 }
                 return true;
             } finally {
-                System.out.println(sb.toString());
+                log.debug(sb.toString());
             }
         });
     }
