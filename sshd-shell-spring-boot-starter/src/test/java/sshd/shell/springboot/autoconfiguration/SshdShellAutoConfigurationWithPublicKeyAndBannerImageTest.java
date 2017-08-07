@@ -22,13 +22,11 @@ import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import org.apache.commons.io.input.CharSequenceInputStream;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import static org.awaitility.Awaitility.await;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +46,7 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
     private SshdShellProperties properties;
 
     @Test
-    public void testTestCommand() throws JSchException {
+    public void testTestCommand() throws JSchException, IOException {
         JSch jsch = new JSch();
         Session session = jsch.getSession("admin", "localhost", properties.getShell().getPort());
         jsch.addIdentity("src/test/resources/id_rsa");
@@ -57,12 +55,13 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
         session.setConfig(config);
         session.connect();
         ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("test run bob\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
-                + "\rapp> test run bob\r\ntest run bob\n\rapp> ")); 
+        pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "test run bob");
         channel.disconnect();
         session.disconnect();
     }

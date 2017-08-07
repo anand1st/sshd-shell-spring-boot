@@ -26,11 +26,14 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import jline.console.ConsoleReader;
 import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.springframework.boot.Banner;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
@@ -74,28 +77,33 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     @Override
     public void run() {
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
-        try (ConsoleReader reader = new ConsoleReader(is, os)) {
-            reader.setPrompt(AnsiOutput.encode(properties.getPrompt().getColor()) + properties.getPrompt().getTitle()
-                    + "> " + AnsiOutput.encode(AnsiColor.DEFAULT));
-            writer = new PrintWriter(reader.getOutput());
+        try (Terminal terminal = TerminalBuilder.builder().system(false).streams(is, os).build()) {
+            LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
+            writer = terminal.writer();
             createDefaultSessionContext(reader);
             SshSessionContext.writeOutput(SUPPORTED_COMMANDS_MESSAGE);
             String line;
-            while ((line = reader.readLine()) != null) {
-                handleUserInput(line.trim());
+            String prompt = AnsiOutput.encode(properties.getPrompt().getColor()) + properties.getPrompt().getTitle()
+                    + "> " + AnsiOutput.encode(AnsiColor.DEFAULT);
+            while ((line = reader.readLine(prompt)) != null) {
+                try {
+                    handleUserInput(line.trim());
+                } catch (InterruptedException ex) {
+                    log.info(ex.getMessage());
+                    SshSessionContext.writeOutput(ex.getMessage());
+                    cleanup();
+                    break;
+                }
             }
         } catch (IOException ex) {
-            log.error("Error with console reader", ex);
-        } catch (InterruptedException ex) {
-            log.info(ex.getMessage());
+            log.error("Error building terminal instance", ex);
         } finally {
-            SshSessionContext.clear();
-            callback.onExit(0);
+            cleanup();
         }
     }
 
-    private void createDefaultSessionContext(ConsoleReader reader) throws IOException {
-        SshSessionContext.put(SshSessionContext.CONSOLE_READER, reader);
+    private void createDefaultSessionContext(LineReader reader) {
+        SshSessionContext.put(SshSessionContext.LINE_READER, reader);
         SshSessionContext.put(SshSessionContext.TEXT_COLOR, properties.getText().getColor());
         SshSessionContext.put(SshSessionContext.WRITER, writer);
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
@@ -137,8 +145,19 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
                         .get(part.length == 2 ? null : part[2]));
             }
         } else {
-            SshSessionContext.writeOutput("Unknown sub command '" + part[1] + "'. Type '" + part[0] 
+            SshSessionContext.writeOutput("Unknown sub command '" + part[1] + "'. Type '" + part[0]
                     + " help' for more information");
+        }
+    }
+
+    private void cleanup() {
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException ex) {
+            log.error("Interrupted exception", ex);
+        } finally {
+            SshSessionContext.clear();
+            callback.onExit(0);
         }
     }
 

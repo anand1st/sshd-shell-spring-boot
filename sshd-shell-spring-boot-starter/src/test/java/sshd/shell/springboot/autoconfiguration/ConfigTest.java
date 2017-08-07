@@ -18,8 +18,12 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import static org.awaitility.Awaitility.await;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -78,5 +82,23 @@ public class ConfigTest {
             }
         });
         return authProvider;
+    }
+
+    public static void checkResponse(InputStream pis, String expected) throws IOException {
+        await().atMost(2, TimeUnit.SECONDS).until(() -> {
+            StringBuilder sb = new StringBuilder();
+            try {
+                while (true) {
+                    sb.append((char) pis.read());
+                    String s = sb.toString();
+                    if (s.contains(expected)) {
+                        break;
+                    }
+                }
+                return true;
+            } finally {
+                System.out.println(sb.toString());
+            }
+        });
     }
 }

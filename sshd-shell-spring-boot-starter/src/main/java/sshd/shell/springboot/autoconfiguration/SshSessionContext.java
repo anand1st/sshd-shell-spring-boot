@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-import jline.console.ConsoleReader;
+import org.jline.reader.LineReader;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 
@@ -38,7 +38,7 @@ public enum SshSessionContext {
         }
     };
     
-    static final String CONSOLE_READER = "__consoleReader";
+    static final String LINE_READER = "__lineReader";
     static final String TEXT_COLOR = "__textColor";
     static final String WRITER = "__writer";
 
@@ -77,7 +77,7 @@ public enum SshSessionContext {
      * @throws IOException if any
      */
     public static String readInput(String text, Character mask) throws IOException {
-        ConsoleReader reader = get(CONSOLE_READER);
+        LineReader reader = get(LINE_READER);
         AnsiColor textColor = get(TEXT_COLOR);
         return reader.readLine(AnsiOutput.encode(textColor) + text + " " + AnsiOutput.encode(AnsiColor.DEFAULT), mask);
     }
@@ -98,8 +98,7 @@ public enum SshSessionContext {
      */
     public static void writeOutput(String text) {
         PrintWriter writer = get(WRITER);
-        writer.println(AnsiOutput.encode(get(TEXT_COLOR)) + text);
-        writer.write(ConsoleReader.RESET_LINE);
+        writer.println(AnsiOutput.encode(get(TEXT_COLOR)) + text + AnsiOutput.encode(AnsiColor.DEFAULT));
         writer.flush();
     }
 }

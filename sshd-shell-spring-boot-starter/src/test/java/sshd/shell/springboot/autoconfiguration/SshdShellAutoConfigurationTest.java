@@ -22,33 +22,32 @@ import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import java.util.regex.Pattern;
-import org.apache.commons.io.input.CharSequenceInputStream;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import static org.awaitility.Awaitility.await;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author anand
  */
+@DirtiesContext
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ConfigTest.class)
 public class SshdShellAutoConfigurationTest {
 
     @Autowired
     private SshdShellProperties properties;
-    
+
     @Test
-    public void testExitCommand() throws JSchException {
+    public void testExitCommand() throws JSchException, IOException {
         JSch jsch = new JSch();
         Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
                 properties.getShell().getPort());
@@ -58,18 +57,223 @@ public class SshdShellAutoConfigurationTest {
         session.setConfig(config);
         session.connect();
         ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("exit\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
-        await().atMost(2, SECONDS).until(() 
-                -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> exit\r\n"));
+        pos.write("exit\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Exiting shell");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testIAECommand() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("iae\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Error performing method invocation\r\r\njava.lang.IllegalArgumentException: "
+                + "iae");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testUnsupportedCommand() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("xxx\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Unknown command. Enter 'help' for a list of supported commands");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testUnsupportedSubCommand() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("test nonexistent\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Unknown sub command 'nonexistent'. Type 'test help' for more information");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testSubcommand() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("test\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive\t\ttest interactive\r\n\rrun\t\ttest "
+                + "run");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testHelp() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("help\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Supported Commands\r\n\rdummy\t\tdummy description\r\n\rexit\t\tExit shell\r\n\r"
+                + "health\t\tHealth of services\r\n\rhelp\t\tShow list of help commands\r\n\riae\t\tthrows IAE\r\n\r"
+                + "test\t\ttest description");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testHealthCommandNoArg() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("health show\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Supported health indicators below:\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\r"
+                + "Usage: health show <health indicator>");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testHealthCommandUnsupportedHealthIndicator() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("health show unknown\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Unsupported health indicator unknown\r\n\rSupported health indicators below:"
+                + "\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\rUsage: health show <health indicator>");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testHealthCommandValidHealthIndicator() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("health show diskspace\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "{\"status\":\"UP\",\"diskspace\":{");
+        channel.disconnect();
+        session.disconnect();
+    }
+
+    @Test
+    public void testHealthCommandHeapMemoryHealthIndicator() throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
+                properties.getShell().getPort());
+        session.setPassword(properties.getShell().getPassword());
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
+        channel.connect();
+        pos.write("health show heapmemory\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "{\"heapmemory\":{");
         channel.disconnect();
         session.disconnect();
     }
     
     @Test
-    public void testIAECommand() throws JSchException {
+    public void testInteractive() throws JSchException, IOException {
         JSch jsch = new JSch();
         Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
                 properties.getShell().getPort());
@@ -79,188 +283,14 @@ public class SshdShellAutoConfigurationTest {
         session.setConfig(config);
         session.connect();
         ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("iae\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
+        PipedInputStream pis = new PipedInputStream();
+        PipedOutputStream pos = new PipedOutputStream();
+        channel.setInputStream(new PipedInputStream(pos));
+        channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
-        await().atMost(2, SECONDS).until(() 
-                -> os.toString().contains("Enter 'help' for a list of supported commands\n\rapp> iae\r\nError "
-                        + "performing method invocation\r\njava.lang.IllegalArgumentException: iae\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testUnsupportedCommand() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("xxx\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
-                + "\rapp> xxx\r\nUnknown command. Enter 'help' for a list of supported commands\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testUnsupportedSubCommand() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("test nonexistent\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands\n"
-                + "\rapp> test nonexistent\r\nUnknown sub command 'nonexistent'. Type 'test help' for more information"
-                + "\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testSubcommand() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("test\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands"
-                + "\n\rapp> test\r\nSupported subcommand for test\n\rexecute\t\ttest execute\n\rrun\t\ttest run"
-                + "\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testHelp() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("help\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("Enter 'help' for a list of supported commands"
-                + "\n\rapp> help\r\nSupported Commands\n\rdummy\t\tdummy description\n\rexit\t\tExit shell\n\rhealth"
-                + "\t\tHealth of services\n\rhelp\t\tShow list of help commands\n\riae\t\tthrows IAE\n\rtest"
-                + "\t\ttest description\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testHealthCommandNoArg() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("health show\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("app> health show\r\nSupported health indicators "
-                + "below:\n\r\tdiskspace\n\r\theapmemory\n\rUsage: health show <health indicator>\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testHealthCommandUnsupportedHealthIndicator() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("health show unknown\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        await().atMost(2, SECONDS).until(() -> os.toString().contains("app> health show unknown\r\nUnsupported health "
-                + "indicator unknown\n\rSupported health indicators below:\n\r\tdiskspace\n\r\theapmemory\n\rUsage: "
-                + "health show <health indicator>\n\rapp> "));
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testHealthCommandValidHealthIndicator() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("health show diskspace\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        Pattern pattern = Pattern.compile(".*app> health show diskspace\r\n\\{\"status\":\"UP\",\"diskspace\":\\{.*",
-                Pattern.DOTALL);
-        await().atMost(2, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
-        channel.disconnect();
-        session.disconnect();
-    }
-    
-    @Test
-    public void testHealthCommandHeapMemoryHealthIndicator() throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.setInputStream(new CharSequenceInputStream("health show heapmemory\r", StandardCharsets.UTF_8));
-        OutputStream os = new ByteArrayOutputStream();
-        channel.setOutputStream(os);
-        channel.connect();
-        Pattern pattern = Pattern.compile(".*app> health show heapmemory\r\n\\{\"heapmemory\":\\{.*",
-                Pattern.DOTALL);
-        await().atMost(2, SECONDS).until(() -> pattern.matcher(os.toString()).matches());
+        pos.write("test interactive\r".getBytes(StandardCharsets.UTF_8));
+        pos.write("anand\r".getBytes(StandardCharsets.UTF_8));
+        ConfigTest.checkResponse(pis, "Name: anandHi anand");
         channel.disconnect();
         session.disconnect();
     }

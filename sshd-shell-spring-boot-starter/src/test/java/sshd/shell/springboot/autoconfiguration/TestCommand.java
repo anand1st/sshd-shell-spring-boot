@@ -18,6 +18,7 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import java.io.IOException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,5 +37,11 @@ class TestCommand {
     @SshdShellCommand(value = "execute", description = "test execute", roles = "ADMIN")
     final String execute(String arg) {
         return "test execute successful";
+    }
+    
+    @SshdShellCommand(value = "interactive", description = "test interactive")
+    final String interactive(String arg) throws IOException {
+        String name = SshSessionContext.readInput("Name:");
+        return "Hi " + name;
     }
 }

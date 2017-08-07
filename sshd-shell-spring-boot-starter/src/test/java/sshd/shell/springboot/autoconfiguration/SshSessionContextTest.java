@@ -15,17 +15,11 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import jline.console.ConsoleReader;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import org.springframework.boot.ansi.AnsiColor;
 
 /**
  *
@@ -41,13 +35,6 @@ public class SshSessionContextTest {
         assertTrue(SshSessionContext.containsKey("test"));
         assertEquals("test", SshSessionContext.remove("test"));
         assertFalse(SshSessionContext.containsKey("test"));
-        InputStream is = new ByteArrayInputStream("test\r".getBytes());
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        SshSessionContext.put(SshSessionContext.CONSOLE_READER, new ConsoleReader(is, os));
-        SshSessionContext.put(SshSessionContext.TEXT_COLOR, AnsiColor.DEFAULT);
-        SshSessionContext.readInput("hello");
-        assertTrue(os.toString(StandardCharsets.UTF_8).contains("hello test"));
-        assertFalse(SshSessionContext.isEmpty());
         SshSessionContext.clear();
         assertTrue(SshSessionContext.isEmpty());
     }
