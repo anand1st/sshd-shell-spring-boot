@@ -20,6 +20,7 @@ package sshd.shell.springboot.autoconfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -85,7 +86,7 @@ public class ConfigTest {
         return authProvider;
     }
 
-    public static void checkResponse(InputStream pis, String expected) throws IOException {
+    public static void checkResponse(InputStream pis, OutputStream pos, String expected) throws IOException {
         await().atMost(2, TimeUnit.SECONDS).until(() -> {
             StringBuilder sb = new StringBuilder();
             try {
@@ -99,6 +100,8 @@ public class ConfigTest {
                 return true;
             } finally {
                 log.debug(sb.toString());
+                pis.close();
+                pos.close();
             }
         });
     }

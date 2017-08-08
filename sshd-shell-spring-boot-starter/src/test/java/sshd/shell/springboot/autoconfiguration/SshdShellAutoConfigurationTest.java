@@ -84,8 +84,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("iae\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Error performing method invocation\r\r\njava.lang.IllegalArgumentException: "
-                + "iae");
+        ConfigTest.checkResponse(pis, pos, "Error performing method invocation\r\r\n"
+                + "java.lang.IllegalArgumentException: iae");
         channel.disconnect();
         session.disconnect();
     }
@@ -107,7 +107,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("xxx\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Unknown command. Enter 'help' for a list of supported commands");
+        ConfigTest.checkResponse(pis, pos, "Unknown command. Enter 'help' for a list of supported commands");
         channel.disconnect();
         session.disconnect();
     }
@@ -129,7 +129,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test nonexistent\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Unknown sub command 'nonexistent'. Type 'test help' for more information");
+        ConfigTest.checkResponse(pis, pos, "Unknown sub command 'nonexistent'. Type 'test help' for more information");
         channel.disconnect();
         session.disconnect();
     }
@@ -151,8 +151,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive\t\ttest interactive\r\n\rrun\t\ttest "
-                + "run");
+        ConfigTest.checkResponse(pis, pos, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive"
+                + "\t\ttest interactive\r\n\rrun\t\ttest run");
         channel.disconnect();
         session.disconnect();
     }
@@ -174,9 +174,9 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("help\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Supported Commands\r\n\rdummy\t\tdummy description\r\n\rexit\t\tExit shell\r\n\r"
-                + "health\t\tHealth of services\r\n\rhelp\t\tShow list of help commands\r\n\riae\t\tthrows IAE\r\n\r"
-                + "test\t\ttest description");
+        ConfigTest.checkResponse(pis, pos, "Supported Commands\r\n\rdummy\t\tdummy description\r\n\rexit\t\tExit shell"
+                + "\r\n\rhealth\t\tHealth of services\r\n\rhelp\t\tShow list of help commands\r\n\riae\t\tthrows IAE"
+                + "\r\n\rtest\t\ttest description");
         channel.disconnect();
         session.disconnect();
     }
@@ -198,7 +198,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("health show\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Supported health indicators below:\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\r"
+        ConfigTest.checkResponse(pis, pos, "Supported health indicators below:\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\r"
                 + "Usage: health show <health indicator>");
         channel.disconnect();
         session.disconnect();
@@ -221,8 +221,8 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("health show unknown\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Unsupported health indicator unknown\r\n\rSupported health indicators below:"
-                + "\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\rUsage: health show <health indicator>");
+        ConfigTest.checkResponse(pis, pos, "Unsupported health indicator unknown\r\n\rSupported health indicators "
+                + "below:\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\rUsage: health show <health indicator>");
         channel.disconnect();
         session.disconnect();
     }
@@ -245,7 +245,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("health show diskspace\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "{\"status\":\"UP\",\"diskspace\":{");
+        ConfigTest.checkResponse(pis, pos, "{\"status\":\"UP\",\"diskspace\":{");
         channel.disconnect();
         session.disconnect();
     }
@@ -267,7 +267,7 @@ public class SshdShellAutoConfigurationTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("health show heapmemory\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "{\"heapmemory\":{");
+        ConfigTest.checkResponse(pis, pos, "{\"heapmemory\":{");
         channel.disconnect();
         session.disconnect();
     }
@@ -290,7 +290,7 @@ public class SshdShellAutoConfigurationTest {
         channel.connect();
         pos.write("test interactive\r".getBytes(StandardCharsets.UTF_8));
         pos.write("anand\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Name: anandHi anand");
+        ConfigTest.checkResponse(pis, pos, "Name: anandHi anand");
         channel.disconnect();
         session.disconnect();
     }

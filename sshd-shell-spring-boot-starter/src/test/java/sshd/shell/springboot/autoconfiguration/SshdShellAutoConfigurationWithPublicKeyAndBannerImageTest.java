@@ -61,7 +61,7 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "test run bob");
+        ConfigTest.checkResponse(pis, pos, "test run bob");
         channel.disconnect();
         session.disconnect();
     }

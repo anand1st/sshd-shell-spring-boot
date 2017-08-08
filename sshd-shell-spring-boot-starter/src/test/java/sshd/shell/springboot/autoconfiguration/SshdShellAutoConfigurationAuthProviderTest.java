@@ -59,7 +59,7 @@ public class SshdShellAutoConfigurationAuthProviderTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Permission denied");
+        ConfigTest.checkResponse(pis, pos, "Permission denied");
         channel.disconnect();
         session.disconnect();
     }
@@ -81,7 +81,7 @@ public class SshdShellAutoConfigurationAuthProviderTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test run\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "Permission denied");
+        ConfigTest.checkResponse(pis, pos, "Permission denied");
         channel.disconnect();
         session.disconnect();
     }
@@ -103,7 +103,7 @@ public class SshdShellAutoConfigurationAuthProviderTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test execute bob\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, "test execute successful");
+        ConfigTest.checkResponse(pis, pos, "test execute successful");
         channel.disconnect();
         session.disconnect();
     }
