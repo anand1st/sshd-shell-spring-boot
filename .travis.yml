@@ -1,5 +1,5 @@
 language: java
 sudo: false
 before_script: cd sshd-shell-spring-boot-starter
-script: mvn clean verify coveralls:report
+script: mvn coveralls:report
 dist: trusty
