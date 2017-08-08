@@ -25,7 +25,7 @@
     <parent>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-parent</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>2.0</version>
     </parent>
     <artifactId>sshd-shell-spring-boot-starter</artifactId>
     <name>SSH Shell starter for Spring Boot Application</name>
