@@ -27,7 +27,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,7 +226,6 @@ public class SshdShellAutoConfigurationTest {
         session.disconnect();
     }
 
-    @Ignore
     @Test
     public void testHealthCommandValidHealthIndicator() throws JSchException, IOException {
         JSch jsch = new JSch();
