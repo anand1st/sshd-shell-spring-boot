@@ -90,6 +90,7 @@ public class SshdShellAutoConfigurationTest {
         session.disconnect();
     }
 
+    @Ignore
     @Test
     public void testUnsupportedCommand() throws JSchException, IOException {
         JSch jsch = new JSch();
