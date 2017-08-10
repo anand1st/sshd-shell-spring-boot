@@ -13,11 +13,15 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>1.5.1</version>
+        <version>2.0</version>
     </dependency>
 
 # Note
 Versions < 1.3 are deprecated and unsupported. This document will only hold supporting information greater than version 1.3.
+
+# Version 2.0
+Migrated from jline version 2.x to 3.x.
+Renamed property for sshd.shell.auth.authType from DAO to AUTH_PROVIDER.
 
 # Version 1.5.1
 Fixed CNFE bug when spring-boot-starter-actuator is not in classpath.
