@@ -15,104 +15,52 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
-import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author anand
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.auth.authType=AUTH_PROVIDER",
     "sshd.shell.username=bob", "sshd.shell.password=bob"})
-public class SshdShellAutoConfigurationAuthProviderTest {
-
-    @Autowired
-    private SshdShellProperties properties;
+public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSupport {
     
     @Test
     public void testDaoAuthWithoutRightPermission() throws JSchException, IOException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        PipedInputStream pis = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream();
-        channel.setInputStream(new PipedInputStream(pos));
-        channel.setOutputStream(new PipedOutputStream(pis));
-        channel.connect();
-        pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, pos, "Permission denied");
-        channel.disconnect();
-        session.disconnect();
+        sshCall((is, os) -> {
+            write(os, "test run bob");
+            verifyResponse(is, "Permission denied");
+        });
     }
     
     @Test
     public void testDaoAuthWithoutRightPermission2() throws JSchException, IOException {
-        JSch jsch = new JSch();
         // See ConfigTest.java for why username is alice
-        Session session = jsch.getSession("alice", "localhost", properties.getShell().getPort());
-        session.setPassword("alice");
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        PipedInputStream pis = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream();
-        channel.setInputStream(new PipedInputStream(pos));
-        channel.setOutputStream(new PipedOutputStream(pis));
-        channel.connect();
-        pos.write("test run\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, pos, "Permission denied");
-        channel.disconnect();
-        session.disconnect();
+        sshCall("alice", "alice", (is, os ) -> {
+            write(os, "test run");
+            verifyResponse(is, "Permission denied");
+        });
     }
     
     @Test
     public void testDaoAuthWithRightPermission() throws JSchException, IOException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
-        session.setPassword(properties.getShell().getPassword());
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        session.connect();
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        PipedInputStream pis = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream();
-        channel.setInputStream(new PipedInputStream(pos));
-        channel.setOutputStream(new PipedOutputStream(pis));
-        channel.connect();
-        pos.write("test execute bob\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, pos, "test execute successful");
-        channel.disconnect();
-        session.disconnect();
+        sshCall((is, os) -> {
+            write(os, "test execute bob");
+            verifyResponse(is, "test execute successful");
+        });
     }
     
     @Test(expected = JSchException.class)
     public void testDaoFailedAuth() throws JSchException {
         JSch jsch = new JSch();
-        Session session = jsch.getSession(properties.getShell().getUsername(), "localhost",
-                properties.getShell().getPort());
+        Session session = jsch.getSession(props.getShell().getUsername(), props.getShell().getHost(),
+                props.getShell().getPort());
         session.setPassword("wrong");
         Properties config = new Properties();
         config.put("StrictHostKeyChecking", "no");

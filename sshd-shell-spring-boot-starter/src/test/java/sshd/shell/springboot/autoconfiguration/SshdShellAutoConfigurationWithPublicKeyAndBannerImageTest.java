@@ -28,19 +28,16 @@ import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author anand
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
     "banner.image.location=banner.png"})
-public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
+public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends AbstractSshSupport {
 
     @Autowired
     private SshdShellProperties properties;
@@ -61,7 +58,10 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest {
         channel.setOutputStream(new PipedOutputStream(pis));
         channel.connect();
         pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
-        ConfigTest.checkResponse(pis, pos, "test run bob");
+        pos.flush();
+        verifyResponse(pis, "test run bob");
+        pis.close();
+        pos.close();
         channel.disconnect();
         session.disconnect();
     }
