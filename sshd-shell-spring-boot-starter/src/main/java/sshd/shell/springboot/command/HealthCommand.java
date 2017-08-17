@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.CompositeHealthIndicatorConfiguration;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
@@ -42,7 +42,7 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
  * @author anand
  */
 @Component
-@ConditionalOnClass(value = CompositeHealthIndicatorConfiguration.class)
+@ConditionalOnClass(value = AbstractHealthIndicator.class)
 @SshdShellCommand(value = "health", description = "Health of services")
 public class HealthCommand {
 
