@@ -64,8 +64,8 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.prompt.title=app
     sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
     sshd.shell.text.color=DEFAULT
-    sshd.shell.auth.authType=SIMPLE		# Since v1.4. Possible values: SIMPLE, AUTH_PROVIDER
-    sshd.shell.auth.authProviderBeanName=	# Since v1.4. Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
+    sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
+    sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
 When spring-boot-actuator is included, HealthIndicator classes in classpath will be loaded. The 'health' command will show all HealthIndicator components.
 
