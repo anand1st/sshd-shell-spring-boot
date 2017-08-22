@@ -17,30 +17,10 @@ To import into Maven project, add the following dependency inside pom.xml:
     </dependency>
 
 # Note
-Versions < 1.3 are deprecated and unsupported. This document will only hold supporting information greater than version 1.3.
+Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+Support for role-based access control using spring-security's AuthenticationProvider bean. SshdShellCommand annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if sshd.shell.authType=AUTH_PROVIDER and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command. 
 
-# Version 2.1
-Cleaned up pom dependencies.
-
-# Version 2.0
-Migrated from jline version 2.x to 3.x.
-Renamed property for sshd.shell.auth.authType from DAO to AUTH_PROVIDER.
-
-# Version 1.5.1
-Fixed CNFE bug when spring-boot-starter-actuator is not in classpath.
-
-# Version 1.5
-Minor refactorization. Exposed API for writing output i.e. SshSessionContext.writeOutput method.
-
-# Version 1.4
-In version 1.4, major changes have been made. They include 
-1) Support for authentication using spring-security's AuthenticationProvider. To use this, set the following property in application.properties
-
-       sshd.shell.auth.authType=DAO
-2) Support for role-based access control. SshdShellCommand annotation now includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag. If a user's role matches the roles in the command classes, he/she should be able to execute the command. See #Usage
-
-# Version 1.3
-In version 1.3, SshSessionContext has been introduced. This allows for states to be maintained in between commands. Support for interactive input/output for command has also been introduced via SshSessionContext.readInput method. Masking of input characters supported. Examples can be seen in sample test application and below.
+Every user session has a session context which a developer can use to manage state between command invocations
 
 # Usage
 All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application Context:
@@ -84,8 +64,8 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.prompt.title=app
     sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
     sshd.shell.text.color=DEFAULT
-    sshd.shell.auth.authType=SIMPLE		# Since v1.4. Possible values: SIMPLE, DAO
-    sshd.shell.auth.authProviderBeanName=	# Since v1.4. Bean name of authentication provider if authType is DAO (optional)
+    sshd.shell.auth.authType=SIMPLE		# Since v1.4. Possible values: SIMPLE, AUTH_PROVIDER
+    sshd.shell.auth.authProviderBeanName=	# Since v1.4. Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
 When spring-boot-actuator is included, HealthIndicator classes in classpath will be loaded. The 'health' command will show all HealthIndicator components.
 
