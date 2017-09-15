@@ -23,11 +23,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import org.apache.sshd.common.Factory;
-import org.apache.sshd.server.Command;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -35,7 +32,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.env.Environment;
 
 /**
  *
@@ -49,21 +45,7 @@ import org.springframework.core.env.Environment;
 class SshdShellAutoConfiguration {
 
     @Autowired
-    private SshdShellProperties properties;
-    @Autowired
     private ApplicationContext appContext;
-    @Autowired
-    private Environment environment;
-
-    @Bean
-    Banner shellBanner() {
-        return new ShellBanner(environment);
-    }
-    
-    @Bean
-    Factory<Command> sshSessionFactory() throws NoSuchMethodException, InterruptedException {
-        return new SshSessionFactory(properties, sshdShellCommands(), environment, shellBanner());
-    }
 
     @Bean
     Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands() throws NoSuchMethodException,
@@ -72,7 +54,6 @@ class SshdShellAutoConfiguration {
         for (Map.Entry<String, Object> entry : appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()) {
             loadSshdShellCommands(sshdShellCommandsMap, entry.getValue());
         }
-        
         return sshdShellCommandsMap;
     }
 

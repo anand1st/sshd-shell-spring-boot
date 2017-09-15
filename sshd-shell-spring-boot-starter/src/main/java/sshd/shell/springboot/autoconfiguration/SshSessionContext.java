@@ -16,12 +16,12 @@
 package sshd.shell.springboot.autoconfiguration;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import org.jline.reader.LineReader;
-import org.springframework.boot.ansi.AnsiColor;
-import org.springframework.boot.ansi.AnsiOutput;
+import org.jline.terminal.Terminal;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
 
 /**
  *
@@ -37,10 +37,10 @@ public enum SshSessionContext {
             return new HashMap<>();
         }
     };
-    
+
     static final String LINE_READER = "__lineReader";
-    static final String TEXT_COLOR = "__textColor";
-    static final String WRITER = "__writer";
+    static final String TEXT_STYLE = "__textStyle";
+    static final String TERMINAL = "__terminal";
 
     public static void put(String key, Object value) {
         THREAD_CONTEXT.get().put(key, value);
@@ -55,11 +55,11 @@ public enum SshSessionContext {
     public static <E> E remove(String key) {
         return (E) THREAD_CONTEXT.get().remove(key);
     }
-    
+
     public static boolean containsKey(String key) {
         return THREAD_CONTEXT.get().containsKey(key);
     }
-    
+
     public static boolean isEmpty() {
         return THREAD_CONTEXT.get().isEmpty();
     }
@@ -67,10 +67,11 @@ public enum SshSessionContext {
     public static void clear() {
         THREAD_CONTEXT.remove();
     }
-    
+
     /**
      * Read input from line with mask. Use null if input is to be echoed. Use 0 if nothing is to be echoed and other
      * characters that get echoed with input
+     *
      * @param text Text to show
      * @param mask mask
      * @return input from user
@@ -78,12 +79,15 @@ public enum SshSessionContext {
      */
     public static String readInput(String text, Character mask) throws IOException {
         LineReader reader = get(LINE_READER);
-        AnsiColor textColor = get(TEXT_COLOR);
-        return reader.readLine(AnsiOutput.encode(textColor) + text + " " + AnsiOutput.encode(AnsiColor.DEFAULT), mask);
+        AttributedStyle textStyle = get(TEXT_STYLE);
+        Terminal terminal = get(TERMINAL);
+        return reader.readLine(new AttributedStringBuilder().style(textStyle).append(text).append(' ')
+                .style(AttributedStyle.DEFAULT).toAnsi(terminal), mask);
     }
-    
+
     /**
      * Read input from line with input echoed.
+     *
      * @param text Text to show
      * @return input from user
      * @throws IOException if any
@@ -91,14 +95,17 @@ public enum SshSessionContext {
     public static String readInput(String text) throws IOException {
         return readInput(text, null);
     }
-    
+
     /**
      * Write output.
+     *
      * @param text Text output
      */
     public static void writeOutput(String text) {
-        PrintWriter writer = get(WRITER);
-        writer.println(AnsiOutput.encode(get(TEXT_COLOR)) + text + AnsiOutput.encode(AnsiColor.DEFAULT));
-        writer.flush();
+        Terminal terminal = get(TERMINAL);
+        AttributedStyle textStyle = get(TEXT_STYLE);
+        terminal.writer().println(new AttributedStringBuilder().style(textStyle).append(text)
+                .style(AttributedStyle.DEFAULT).toAnsi(terminal));
+        terminal.flush();
     }
 }

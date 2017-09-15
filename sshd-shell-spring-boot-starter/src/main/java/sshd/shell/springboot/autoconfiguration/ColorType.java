@@ -15,15 +15,23 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import org.jline.utils.AttributedStyle;
+
 /**
  *
  * @author anand
  */
-public enum Constants {
-    
-    ;
-    public static final String HELP = "help";
-    public static final String USER_ROLES = "__userRoles";
-    public static final String USER = "__user";
-    public static final String EXECUTE = "__execute";
+@lombok.AllArgsConstructor
+public enum ColorType {
+
+    BLACK(AttributedStyle.BLACK),
+    RED(AttributedStyle.RED),
+    GREEN(AttributedStyle.GREEN),
+    YELLOW(AttributedStyle.YELLOW),
+    BLUE(AttributedStyle.BLUE),
+    MAGENTA(AttributedStyle.MAGENTA),
+    CYAN(AttributedStyle.CYAN),
+    WHITE(AttributedStyle.WHITE);
+
+    public int value;
 }

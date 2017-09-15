@@ -33,21 +33,22 @@ import sshd.shell.springboot.autoconfiguration.Constants;
 class AuthProviderSshdPasswordAuthenticator implements PasswordAuthenticator {
 
     private final AuthenticationProvider authProvider;
-    
+
     AuthProviderSshdPasswordAuthenticator(AuthenticationProvider authProvider) {
         this.authProvider = authProvider;
     }
-    
+
     @Override
     public boolean authenticate(String username, String password, ServerSession session) throws
             PasswordChangeRequiredException {
         try {
             Authentication auth = authProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
+            session.getIoSession().setAttribute(Constants.USER, username);
             session.getIoSession().setAttribute(Constants.USER_ROLES, auth.getAuthorities().stream()
                     .map(ga -> ga.getAuthority()).collect(Collectors.toSet()));
             return true;
-        } catch(AuthenticationException ex) {
+        } catch (AuthenticationException ex) {
             log.warn(ex.getMessage());
             return false;
         }

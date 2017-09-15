@@ -29,6 +29,7 @@ import org.junit.Test;
  */
 public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
+    //FIXME Figure out why following test case fails on command line but passes on IDE
     @Ignore
     @Test
     public void testExitCommand() throws JSchException, IOException {
@@ -120,6 +121,16 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCall((is, os) -> {
             write(os, "test interactive", "anand");
             verifyResponse(is, "Name: anandHi anand");
+        });
+    }
+    
+    // FIXME Figure out why following test case fails with command line call but passes with IDE
+    @Ignore
+    @Test
+    public void testEmptyUserInput() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "");
+            verifyResponse(is, "app> app>");
         });
     }
 }

@@ -17,6 +17,7 @@ package sshd.shell.springboot.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
@@ -28,11 +29,14 @@ import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
+import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 import static sshd.shell.springboot.autoconfiguration.SshdShellProperties.AuthType.*;
 
@@ -48,9 +52,13 @@ class SshdServer {
     @Autowired
     private SshdShellProperties properties;
     @Autowired
-    private Factory<Command> sshSessionFactory;
-    @Autowired
     private ApplicationContext appContext;
+    @Autowired
+    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
+    @Autowired
+    private Environment environment;
+    @Autowired
+    private Banner shellBanner;
 
     @Bean
     PasswordAuthenticator passwordAuthenticator() {
@@ -72,6 +80,11 @@ class SshdServer {
         }
     }
 
+    @Bean
+    Factory<Command> sshSessionFactory() {
+        return () -> new SshSessionInstance(properties, sshdShellCommands, environment, shellBanner);
+    }
+
     @PostConstruct
     void startServer() throws IOException {
         SshdShellProperties.Shell props = properties.getShell();
@@ -88,7 +101,7 @@ class SshdServer {
         server.setHost(props.getHost());
         server.setPasswordAuthenticator(passwordAuthenticator());
         server.setPort(props.getPort());
-        server.setShellFactory(sshSessionFactory);
+        server.setShellFactory(sshSessionFactory());
         server.start();
         props.setPort(server.getPort()); // In case server port is 0, a random port is assigned.
         log.info("SSH server started on port {}", props.getPort());
