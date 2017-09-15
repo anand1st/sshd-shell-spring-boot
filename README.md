@@ -19,6 +19,13 @@ To import into Maven project, add the following dependency inside pom.xml:
 # Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
+# Version 2.3
+Support for auto-completion of text being typed in console.
+
+# Version 2.2
+Fixed bug with prompt & text color.
+
+# Version 2.1
 Support for role-based access control using spring-security's AuthenticationProvider bean. SshdShellCommand annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command. 
 
 Every user session has a session context which a developer can use to manage state between command invocations
