@@ -6,14 +6,14 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.BUILD-SNAPSHOT, 2.0.0.M3 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
+This starter has been tested with spring-boot 2.0.0.M3 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
 
 To import into Maven project, add the following dependency inside pom.xml:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>2.1</version>
+        <version>2.2</version>
     </dependency>
 
 # Note
@@ -63,8 +63,11 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.host=127.0.0.1		#Allowed IP addresses
     sshd.shell.hostKeyFile=hostKey.ser
     sshd.shell.prompt.title=app
-    sshd.shell.prompt.color=DEFAULT		# See org.springframework.boot.ansi.AnsiColor for more options
-    sshd.shell.text.color=DEFAULT
+    
+    # Supported values for colors: BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,WHITE
+    sshd.shell.prompt.color=
+    sshd.shell.text.color=
+    
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
