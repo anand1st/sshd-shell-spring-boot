@@ -64,7 +64,7 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.hostKeyFile=hostKey.ser
     sshd.shell.prompt.title=app
     
-    # Supported values for colors: BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,WHITE
+    # Supported values for colors: BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,WHITE (leave blank for default)
     sshd.shell.prompt.color=
     sshd.shell.text.color=
     
