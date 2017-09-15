@@ -26,7 +26,7 @@ Support for auto-completion of commands and subcommands using tab.
 Fixed bug with prompt & text color.
 
 ### Version 2.1
-Support for role-based access control using spring-security's AuthenticationProvider bean. SshdShellCommand annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command. 
+Support for role-based access control using spring-security's `AuthenticationProvider` bean. `SshdShellCommand` annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command. 
 
 Every user session has a session context which a developer can use to manage state between command invocations
 
@@ -78,7 +78,7 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
-When spring-boot-actuator is included, HealthIndicator classes in classpath will be loaded. The 'health' command will show all HealthIndicator components.
+When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
