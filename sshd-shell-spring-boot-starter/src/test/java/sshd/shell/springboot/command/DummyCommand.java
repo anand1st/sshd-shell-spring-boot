@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.command;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**
  *
@@ -27,11 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @SshdShellCommand(value = "dummy", description = "dummy description")
-class DummyCommand {
+public class DummyCommand {
     
     @Transactional
     @SshdShellCommand(value = "run", description = "dummy run")
-    String run(String arg) {
+    public String run(String arg) {
         return "dummy run successful";
     }
 }

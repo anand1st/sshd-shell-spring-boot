@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import org.jline.reader.Completer;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -50,10 +51,11 @@ class TerminalProcessor {
     private final OutputStream os;
     private final SshdShellProperties.Shell properties;
     private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
+    private final Completer completer;
 
     void processInputs() {
         try (Terminal terminal = TerminalBuilder.builder().system(false).streams(is, os).build()) {
-            LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
+            LineReader reader = LineReaderBuilder.builder().terminal(terminal).completer(completer).build();
             createDefaultSessionContext(reader, terminal);
             SshSessionContext.writeOutput(SUPPORTED_COMMANDS_MESSAGE);
             processUserInput(reader);
@@ -145,8 +147,8 @@ class TerminalProcessor {
             InterruptedException, ShellException {
         Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(part[0]);
         if (!commandExecutables.containsKey(part[1])) {
-            throw new ShellException("Unknown sub command '" + part[1] + "'. Type '" + part[0]
-                    + " help' for more information");
+            throw new ShellException("Unknown subcommand '" + part[1] + "'. Type '" + part[0]
+                    + "' for supported subcommands");
         }
         CommandExecutableDetails ced = commandMap.get(part[0]).get(part[1]);
         validateExecutableWithUserRole(ced, userRoles);

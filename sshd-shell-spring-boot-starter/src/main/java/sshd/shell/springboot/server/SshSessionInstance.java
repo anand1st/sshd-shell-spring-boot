@@ -27,6 +27,7 @@ import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
+import org.jline.reader.Completer;
 import org.springframework.boot.Banner;
 import org.springframework.core.env.Environment;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
@@ -44,6 +45,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
     private final Environment environment;
     private final Banner shellBanner;
+    private final Completer completer;
     private InputStream is;
     private OutputStream os;
     private ExitCallback callback;
@@ -51,11 +53,12 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     private ChannelSession session;
 
     SshSessionInstance(SshdShellProperties properties, Map<String, Map<String, CommandExecutableDetails>> commandMap,
-            Environment environment, Banner shellBanner) {
+            Environment environment, Banner shellBanner, Completer completer) {
         this.properties = properties.getShell();
         this.commandMap = commandMap;
         this.environment = environment;
         this.shellBanner = shellBanner;
+        this.completer = completer;
     }
 
     @Override
@@ -71,7 +74,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
         try {
-            new TerminalProcessor(is, os, properties, commandMap).processInputs();
+            new TerminalProcessor(is, os, properties, commandMap, completer).processInputs();
         } finally {
             SshSessionContext.clear();
             callback.onExit(0);

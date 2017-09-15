@@ -16,19 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.command;
 
+import java.io.IOException;
 import org.springframework.stereotype.Component;
+import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
+import sshd.shell.springboot.server.SshSessionContext;
 
 /**
  *
  * @author anand
  */
 @Component
-@SshdShellCommand(value = "iae", description = "throws IAE")
-class IAECommand {
+@SshdShellCommand(value = "test", description = "test description", roles = {"USER", "ADMIN"})
+public class TestCommand {
     
-    public void iae(String arg) {
-        throw new IllegalArgumentException("iae");
+    @SshdShellCommand(value = "run", description = "test run", roles = "USER")
+    public String run(String arg) {
+        return "test run " + arg;
+    }
+    
+    @SshdShellCommand(value = "execute", description = "test execute", roles = "ADMIN")
+    public String execute(String arg) {
+        return "test execute successful";
+    }
+    
+    @SshdShellCommand(value = "interactive", description = "test interactive")
+    public String interactive(String arg) throws IOException {
+        String name = SshSessionContext.readInput("Name:");
+        return "Hi " + name;
     }
 }

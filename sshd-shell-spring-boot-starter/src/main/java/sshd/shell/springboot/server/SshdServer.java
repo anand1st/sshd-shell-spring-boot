@@ -85,7 +85,7 @@ class SshdServer {
 
     @Bean
     Factory<Command> sshSessionFactory() {
-        return () -> new SshSessionInstance(properties, sshdShellCommands, environment, shellBanner());
+        return new SshSessionFactory(sshdShellCommands, environment, properties, shellBanner());
     }
 
     @PostConstruct

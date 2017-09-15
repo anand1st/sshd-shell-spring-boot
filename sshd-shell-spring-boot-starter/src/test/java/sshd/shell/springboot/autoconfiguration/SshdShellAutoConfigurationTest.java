@@ -59,7 +59,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testUnsupportedSubCommand() throws JSchException, IOException {
         sshCall((is, os) -> {
             write(os, "test nonexistent");
-            verifyResponse(is, "Unknown sub command 'nonexistent'. Type 'test help' for more information");
+            verifyResponse(is, "Unknown subcommand 'nonexistent'. Type 'test' for supported subcommands");
         });
     }
 
