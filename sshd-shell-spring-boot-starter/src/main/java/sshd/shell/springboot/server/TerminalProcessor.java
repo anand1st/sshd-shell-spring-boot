@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.server;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +29,10 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
+import sshd.shell.springboot.autoconfiguration.ColorType;
+import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
+import sshd.shell.springboot.autoconfiguration.Constants;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 
 /**
  *
@@ -36,7 +40,7 @@ import org.jline.utils.AttributedStyle;
  */
 @lombok.AllArgsConstructor
 @lombok.extern.slf4j.Slf4j
-public class TerminalProcessor {
+class TerminalProcessor {
 
     private static final String SUPPORTED_COMMANDS_MESSAGE = "Enter '" + Constants.HELP
             + "' for a list of supported commands";
@@ -47,7 +51,7 @@ public class TerminalProcessor {
     private final SshdShellProperties.Shell properties;
     private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
 
-    public void processInputs() {
+    void processInputs() {
         try (Terminal terminal = TerminalBuilder.builder().system(false).streams(is, os).build()) {
             LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
             createDefaultSessionContext(reader, terminal);
@@ -125,7 +129,7 @@ public class TerminalProcessor {
     private void handleSingleTokenUserInput(String command, Collection<String> userRoles) throws InterruptedException {
         CommandExecutableDetails ced = commandMap.get(command).get(Constants.EXECUTE);
         SshSessionContext.writeOutput(Objects.isNull(ced.getCommandExecutor())
-                ? unknownSubcommandMessage(command, userRoles) : ced.getCommandExecutor().get(null));
+                ? unknownSubcommandMessage(command, userRoles) : ced.executeWithArg(null));
     }
 
     private String unknownSubcommandMessage(String command, Collection<String> userRoles) {
@@ -146,7 +150,7 @@ public class TerminalProcessor {
         }
         CommandExecutableDetails ced = commandMap.get(part[0]).get(part[1]);
         validateExecutableWithUserRole(ced, userRoles);
-        SshSessionContext.writeOutput(ced.getCommandExecutor().get(part.length == 2 ? null : part[2]));
+        SshSessionContext.writeOutput(ced.executeWithArg(part.length == 2 ? null : part[2]));
     }
 
     private static class ShellException extends Exception {

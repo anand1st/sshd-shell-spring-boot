@@ -46,4 +46,8 @@ public class CommandExecutableDetails {
         }
         return CollectionUtils.containsAny(roles, userRoles);
     }
+    
+    public String executeWithArg(String arg) throws InterruptedException {
+        return commandExecutor.get(arg);
+    }
 }

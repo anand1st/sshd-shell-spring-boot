@@ -31,9 +31,7 @@ import org.springframework.boot.Banner;
 import org.springframework.core.env.Environment;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
-import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
-import sshd.shell.springboot.autoconfiguration.TerminalProcessor;
 
 /**
  *
@@ -62,7 +60,8 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
 
     @Override
     public void start(org.apache.sshd.server.Environment env) throws IOException {
-        sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession().getAttribute(Constants.USER));
+        sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession()
+                .getAttribute(SshSessionContext.USER));
         sshThread.start();
     }
 

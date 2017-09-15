@@ -2,7 +2,7 @@ package demo;
 
 import java.io.IOException;
 import org.springframework.stereotype.Component;
-import sshd.shell.springboot.autoconfiguration.SshSessionContext;
+import sshd.shell.springboot.server.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**

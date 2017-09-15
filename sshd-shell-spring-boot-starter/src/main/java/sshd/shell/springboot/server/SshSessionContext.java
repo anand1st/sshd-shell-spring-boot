@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.server;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,6 +41,7 @@ public enum SshSessionContext {
     static final String LINE_READER = "__lineReader";
     static final String TEXT_STYLE = "__textStyle";
     static final String TERMINAL = "__terminal";
+    static final String USER = "__user";
 
     public static void put(String key, Object value) {
         THREAD_CONTEXT.get().put(key, value);

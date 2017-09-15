@@ -38,7 +38,7 @@ class SimpleSshdPasswordAuthenticator implements PasswordAuthenticator {
     public boolean authenticate(String username, String password, ServerSession session) throws
             PasswordChangeRequiredException {
         session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
-        session.getIoSession().setAttribute(Constants.USER, username);
+        session.getIoSession().setAttribute(SshSessionContext.USER, username);
         return username.equals(props.getUsername()) && password.equals(props.getPassword());
     }
 }
