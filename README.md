@@ -20,7 +20,7 @@ To import into Maven project, add the following dependency inside pom.xml:
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
 ### Version 2.3
-Support for auto-completion of commands and subcommands using <tab>.
+Support for auto-completion of commands and subcommands using tab.
 
 ### Version 2.2
 Fixed bug with prompt & text color.
