@@ -46,7 +46,7 @@ class SshdShellAutoConfiguration {
 
     @Autowired
     private ApplicationContext appContext;
-
+    
     @Bean
     Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands() throws NoSuchMethodException,
             InterruptedException {

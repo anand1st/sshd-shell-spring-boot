@@ -57,8 +57,11 @@ class SshdServer {
     private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
     @Autowired
     private Environment environment;
-    @Autowired
-    private Banner shellBanner;
+
+    @Bean
+    Banner shellBanner() {
+        return new ShellBanner(environment);
+    }
 
     @Bean
     PasswordAuthenticator passwordAuthenticator() {
@@ -82,7 +85,7 @@ class SshdServer {
 
     @Bean
     Factory<Command> sshSessionFactory() {
-        return () -> new SshSessionInstance(properties, sshdShellCommands, environment, shellBanner);
+        return () -> new SshSessionInstance(properties, sshdShellCommands, environment, shellBanner());
     }
 
     @PostConstruct
