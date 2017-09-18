@@ -52,9 +52,10 @@ class TerminalProcessor {
     private final SshdShellProperties.Shell properties;
     private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
     private final Completer completer;
+    private final String terminalType;
 
     void processInputs() {
-        try (Terminal terminal = TerminalBuilder.builder().system(false).streams(is, os).build()) {
+        try (Terminal terminal = TerminalBuilder.builder().system(false).type(terminalType).streams(is, os).build()) {
             LineReader reader = LineReaderBuilder.builder().terminal(terminal).completer(completer).build();
             createDefaultSessionContext(reader, terminal);
             SshSessionContext.writeOutput(SUPPORTED_COMMANDS_MESSAGE);

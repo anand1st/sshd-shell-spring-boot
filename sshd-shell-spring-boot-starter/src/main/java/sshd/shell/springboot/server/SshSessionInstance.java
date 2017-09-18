@@ -51,6 +51,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     private ExitCallback callback;
     private Thread sshThread;
     private ChannelSession session;
+    private String terminalType;
 
     SshSessionInstance(SshdShellProperties properties, Map<String, Map<String, CommandExecutableDetails>> commandMap,
             Environment environment, Banner shellBanner, Completer completer) {
@@ -63,6 +64,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
 
     @Override
     public void start(org.apache.sshd.server.Environment env) throws IOException {
+        terminalType = env.getEnv().get("TERM");
         sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession()
                 .getAttribute(SshSessionContext.USER));
         sshThread.start();
@@ -74,7 +76,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
         try {
-            new TerminalProcessor(is, os, properties, commandMap, completer).processInputs();
+            new TerminalProcessor(is, os, properties, commandMap, completer, terminalType).processInputs();
         } finally {
             SshSessionContext.clear();
             callback.onExit(0);
