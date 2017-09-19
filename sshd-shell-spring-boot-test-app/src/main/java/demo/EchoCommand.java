@@ -2,8 +2,9 @@ package demo;
 
 import java.io.IOException;
 import org.springframework.stereotype.Component;
-import sshd.shell.springboot.server.SshSessionContext;
+import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
+import sshd.shell.springboot.console.ConsoleIO;
 
 /**
  *
@@ -15,7 +16,7 @@ public class EchoCommand {
     
     @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
     public String bobSays(String arg) throws IOException {
-        String name = SshSessionContext.readInput("What's your name?");
+        String name = ConsoleIO.readInput("What's your name?");
         SshSessionContext.put("name", name);
         return "bob echoes " + arg + " and your name is " + name;
     }
