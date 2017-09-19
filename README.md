@@ -13,11 +13,14 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>2.3</version>
+        <version>2.4</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 2.4
+Upgraded to jline-3.4.0. Refactored I/O related activity from SshSessionContext to ConsoleIO. Separated console processing into separate packages from SSH server packages.
 
 ### Version 2.3
 Support for auto-completion of commands and subcommands using tab.
@@ -39,8 +42,8 @@ All the developer needs to do it to create a class similar to below and make sur
     
         @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
         public String bobSays(String arg) throws IOException {
-	        SshSessionContext.writeOutput("Need user info");
-            String name = SshSessionContext.readInput("What's your name?");
+	        ConsoleIO.writeOutput("Need user info");
+            String name = ConsoleIO.readInput("What's your name?");
             SshSessionContext.put("name", name);
             return "bob echoes " + arg + " and your name is " + name;
         }
@@ -78,7 +81,7 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
-When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components.
+When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading. It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the application.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
