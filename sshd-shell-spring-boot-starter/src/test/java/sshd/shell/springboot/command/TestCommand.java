@@ -21,7 +21,7 @@ package sshd.shell.springboot.command;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.server.SshSessionContext;
+import sshd.shell.springboot.console.ConsoleIO;
 
 /**
  *
@@ -43,7 +43,7 @@ public class TestCommand {
     
     @SshdShellCommand(value = "interactive", description = "test interactive")
     public String interactive(String arg) throws IOException {
-        String name = SshSessionContext.readInput("Name:");
+        String name = ConsoleIO.readInput("Name:");
         return "Hi " + name;
     }
 }

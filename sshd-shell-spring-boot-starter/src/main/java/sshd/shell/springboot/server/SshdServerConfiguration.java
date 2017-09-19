@@ -17,18 +17,16 @@ package sshd.shell.springboot.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
-import org.apache.sshd.common.Factory;
-import org.apache.sshd.server.Command;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
@@ -36,9 +34,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
-import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
-import static sshd.shell.springboot.autoconfiguration.SshdShellProperties.AuthType.*;
+import sshd.shell.springboot.console.TerminalProcessor;
 
 /**
  *
@@ -47,26 +44,24 @@ import static sshd.shell.springboot.autoconfiguration.SshdShellProperties.AuthTy
 @Configuration
 @ConditionalOnProperty(name = "sshd.shell.enabled", havingValue = "true")
 @lombok.extern.slf4j.Slf4j
-class SshdServer {
+class SshdServerConfiguration {
 
     @Autowired
     private SshdShellProperties properties;
     @Autowired
     private ApplicationContext appContext;
     @Autowired
-    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
-    @Autowired
     private Environment environment;
-
-    @Bean
-    Banner shellBanner() {
-        return new ShellBanner(environment);
-    }
-
+    @Autowired
+    private TerminalProcessor terminalProcessor;
+    @Qualifier("__shellBanner")
+    @Autowired
+    private Banner shellBanner;
+    
     @Bean
     PasswordAuthenticator passwordAuthenticator() {
         SshdShellProperties.Shell.Auth props = properties.getShell().getAuth();
-        switch (properties.getShell().getAuth().getAuthType()) {
+        switch (props.getAuthType()) {
             case SIMPLE:
                 return new SimpleSshdPasswordAuthenticator(properties);
             case AUTH_PROVIDER:
@@ -81,11 +76,6 @@ class SshdServer {
             default:
                 throw new IllegalArgumentException("Invalid/Unsupported auth type");
         }
-    }
-
-    @Bean
-    Factory<Command> sshSessionFactory() {
-        return new SshSessionFactory(sshdShellCommands, environment, properties, shellBanner());
     }
 
     @PostConstruct
@@ -104,7 +94,7 @@ class SshdServer {
         server.setHost(props.getHost());
         server.setPasswordAuthenticator(passwordAuthenticator());
         server.setPort(props.getPort());
-        server.setShellFactory(sshSessionFactory());
+        server.setShellFactory(() -> new SshSessionInstance(environment, shellBanner, terminalProcessor));
         server.start();
         props.setPort(server.getPort()); // In case server port is 0, a random port is assigned.
         log.info("SSH server started on port {}", props.getPort());

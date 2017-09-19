@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.server;
+package sshd.shell.springboot.console;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.sshd.common.Factory;
-import org.apache.sshd.server.Command;
-import org.jline.builtins.Completers.TreeCompleter;
-import org.jline.builtins.Completers.TreeCompleter.Node;
+import org.jline.builtins.Completers;
 import static org.jline.builtins.Completers.TreeCompleter.node;
-import org.jline.reader.Completer;
-import org.springframework.boot.Banner;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
@@ -34,31 +32,23 @@ import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
  *
  * @author anand
  */
-class SshSessionFactory implements Factory<Command> {
+@Configuration
+@ConditionalOnProperty(name = "sshd.shell.enabled", havingValue = "true")
+class ConsoleConfiguration {
 
-    private final SshdShellProperties properties;
-    private final Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
-    private final Environment environment;
-    private final Banner banner;
-    private final Completer completer;
+    @Autowired
+    private SshdShellProperties properties;
+    @Autowired
+    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
 
-    SshSessionFactory(Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands, Environment environment,
-            SshdShellProperties properties, Banner banner) {
-        this.properties = properties;
-        this.sshdShellCommands = sshdShellCommands;
-        this.environment = environment;
-        this.banner = banner;
-        List<Node> nodes = new ArrayList<>();
+    @Bean
+    TerminalProcessor terminalProcessor() {
+        List<Completers.TreeCompleter.Node> nodes = new ArrayList<>();
         sshdShellCommands.entrySet().stream().forEach(entry -> {
             Object[] subCommands = entry.getValue().keySet().stream().filter(s -> !s.equals(Constants.EXECUTE))
                     .toArray(Object[]::new);
             nodes.add(subCommands.length == 0 ? node(entry.getKey()) : node(entry.getKey(), node(subCommands)));
         });
-        this.completer = new TreeCompleter(nodes);
-    }
-
-    @Override
-    public Command create() {
-        return new SshSessionInstance(properties, sshdShellCommands, environment, banner, completer);
+        return new TerminalProcessor(properties.getShell(), sshdShellCommands, new Completers.TreeCompleter(nodes));
     }
 }

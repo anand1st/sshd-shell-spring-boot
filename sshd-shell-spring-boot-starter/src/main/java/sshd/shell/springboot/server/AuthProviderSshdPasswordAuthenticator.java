@@ -44,7 +44,7 @@ class AuthProviderSshdPasswordAuthenticator implements PasswordAuthenticator {
         try {
             Authentication auth = authProvider.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
-            session.getIoSession().setAttribute(SshSessionContext.USER, username);
+            session.getIoSession().setAttribute(Constants.USER, username);
             session.getIoSession().setAttribute(Constants.USER_ROLES, auth.getAuthorities().stream()
                     .map(ga -> ga.getAuthority()).collect(Collectors.toSet()));
             return true;

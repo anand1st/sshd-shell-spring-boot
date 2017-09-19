@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
-import sshd.shell.springboot.server.SshSessionContext;
+import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**

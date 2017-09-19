@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.server;
+package sshd.shell.springboot.console;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import org.jline.reader.Completer;
-import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
@@ -33,32 +32,30 @@ import org.jline.utils.AttributedStyle;
 import sshd.shell.springboot.autoconfiguration.ColorType;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
+import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 
 /**
  *
  * @author anand
  */
-@lombok.AllArgsConstructor
+@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 @lombok.extern.slf4j.Slf4j
-class TerminalProcessor {
+public class TerminalProcessor {
 
     private static final String SUPPORTED_COMMANDS_MESSAGE = "Enter '" + Constants.HELP
             + "' for a list of supported commands";
     private static final String UNSUPPORTED_COMMANDS_MESSAGE = "Unknown command. " + SUPPORTED_COMMANDS_MESSAGE;
 
-    private final InputStream is;
-    private final OutputStream os;
     private final SshdShellProperties.Shell properties;
     private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
     private final Completer completer;
-    private final String terminalType;
 
-    void processInputs() {
+    public void processInputs(InputStream is, OutputStream os, String terminalType) {
         try (Terminal terminal = TerminalBuilder.builder().system(false).type(terminalType).streams(is, os).build()) {
             LineReader reader = LineReaderBuilder.builder().terminal(terminal).completer(completer).build();
             createDefaultSessionContext(reader, terminal);
-            SshSessionContext.writeOutput(SUPPORTED_COMMANDS_MESSAGE);
+            ConsoleIO.writeOutput(SUPPORTED_COMMANDS_MESSAGE);
             processUserInput(reader);
         } catch (IOException ex) {
             log.error("Error building terminal instance", ex);
@@ -66,9 +63,9 @@ class TerminalProcessor {
     }
 
     private void createDefaultSessionContext(LineReader reader, Terminal terminal) {
-        SshSessionContext.put(SshSessionContext.LINE_READER, reader);
-        SshSessionContext.put(SshSessionContext.TEXT_STYLE, getStyle(properties.getText().getColor()));
-        SshSessionContext.put(SshSessionContext.TERMINAL, terminal);
+        SshSessionContext.put(ConsoleIO.LINE_READER, reader);
+        SshSessionContext.put(ConsoleIO.TEXT_STYLE, getStyle(properties.getText().getColor()));
+        SshSessionContext.put(ConsoleIO.TERMINAL, terminal);
     }
 
     private AttributedStyle getStyle(ColorType color) {
@@ -77,7 +74,7 @@ class TerminalProcessor {
                 : AttributedStyle.DEFAULT.foreground(color.value);
     }
 
-    private void processUserInput(LineReader reader) throws UserInterruptException, EndOfFileException {
+    private void processUserInput(LineReader reader) throws UserInterruptException {
         String prompt = new AttributedStringBuilder().style(getStyle(properties.getPrompt().getColor()))
                 .append(properties.getPrompt().getTitle()).append("> ").style(AttributedStyle.DEFAULT).toAnsi();
         String line;
@@ -86,10 +83,10 @@ class TerminalProcessor {
                 handleUserInput(line.trim());
             } catch (InterruptedException | UserInterruptException ex) {
                 log.info(ex.getMessage());
-                SshSessionContext.writeOutput(ex.getMessage());
+                ConsoleIO.writeOutput(ex.getMessage());
                 break;
             } catch (ShellException ex) {
-                SshSessionContext.writeOutput(ex.getMessage());
+                ConsoleIO.writeOutput(ex.getMessage());
             }
         }
     }
@@ -131,8 +128,8 @@ class TerminalProcessor {
 
     private void handleSingleTokenUserInput(String command, Collection<String> userRoles) throws InterruptedException {
         CommandExecutableDetails ced = commandMap.get(command).get(Constants.EXECUTE);
-        SshSessionContext.writeOutput(Objects.isNull(ced.getCommandExecutor())
-                ? unknownSubcommandMessage(command, userRoles) : ced.executeWithArg(null));
+        ConsoleIO.writeOutput(Objects.isNull(ced.getCommandExecutor()) ? unknownSubcommandMessage(command, userRoles)
+                : ced.executeWithArg(null));
     }
 
     private String unknownSubcommandMessage(String command, Collection<String> userRoles) {
@@ -153,7 +150,7 @@ class TerminalProcessor {
         }
         CommandExecutableDetails ced = commandMap.get(part[0]).get(part[1]);
         validateExecutableWithUserRole(ced, userRoles);
-        SshSessionContext.writeOutput(ced.executeWithArg(part.length == 2 ? null : part[2]));
+        ConsoleIO.writeOutput(ced.executeWithArg(part.length == 2 ? null : part[2]));
     }
 
     private static class ShellException extends Exception {

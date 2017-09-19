@@ -22,30 +22,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Map;
 import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
-import org.jline.reader.Completer;
 import org.springframework.boot.Banner;
 import org.springframework.core.env.Environment;
-import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
-import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
+import sshd.shell.springboot.autoconfiguration.SshSessionContext;
+import sshd.shell.springboot.console.TerminalProcessor;
 
 /**
  *
  * @author anand
  */
 @lombok.extern.slf4j.Slf4j
+@lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
 
-    private final SshdShellProperties.Shell properties;
-    private final Map<String, Map<String, CommandExecutableDetails>> commandMap;
     private final Environment environment;
     private final Banner shellBanner;
-    private final Completer completer;
+    private final TerminalProcessor terminalProcessor;
     private InputStream is;
     private OutputStream os;
     private ExitCallback callback;
@@ -53,20 +50,11 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     private ChannelSession session;
     private String terminalType;
 
-    SshSessionInstance(SshdShellProperties properties, Map<String, Map<String, CommandExecutableDetails>> commandMap,
-            Environment environment, Banner shellBanner, Completer completer) {
-        this.properties = properties.getShell();
-        this.commandMap = commandMap;
-        this.environment = environment;
-        this.shellBanner = shellBanner;
-        this.completer = completer;
-    }
-
     @Override
     public void start(org.apache.sshd.server.Environment env) throws IOException {
         terminalType = env.getEnv().get("TERM");
         sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession()
-                .getAttribute(SshSessionContext.USER));
+                .getAttribute(Constants.USER));
         sshThread.start();
     }
 
@@ -76,7 +64,7 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
         try {
-            new TerminalProcessor(is, os, properties, commandMap, completer, terminalType).processInputs();
+            terminalProcessor.processInputs(is, os, terminalType);
         } finally {
             SshSessionContext.clear();
             callback.onExit(0);

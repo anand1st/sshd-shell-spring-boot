@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.server;
+package sshd.shell.springboot.autoconfiguration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.ImageBanner;
 import org.springframework.boot.ResourceBanner;
@@ -29,13 +30,15 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 /**
  *
  * @author anand
  */
-@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
+@Component(value = "__shellBanner")
+@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE, onConstructor = @__(@Autowired))
 class ShellBanner implements Banner {
 
     private static final String[] SUPPORTED_IMAGES = {"gif", "jpg", "png"};

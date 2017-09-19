@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.server;
+package sshd.shell.springboot.autoconfiguration;
 
 import java.io.IOException;
 import static org.junit.Assert.assertEquals;
