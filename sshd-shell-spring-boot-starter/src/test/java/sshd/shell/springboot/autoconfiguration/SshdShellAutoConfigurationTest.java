@@ -43,7 +43,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testIAECommand() throws JSchException, IOException {
         sshCall((is, os) -> {
             write(os, "iae");
-            verifyResponse(is, "Error performing method invocation\r\r\njava.lang.IllegalArgumentException: iae");
+            verifyResponse(is, "Error performing method invocation\r\r\nPlease check server logs for more information");
         });
     }
 
