@@ -32,7 +32,6 @@ public enum ConsoleIO {
     static final String LINE_READER = "__lineReader";
     static final String TEXT_STYLE = "__textStyle";
     static final String TERMINAL = "__terminal";
-    static final String USER = "__user";
         
     /**
      * Read input from line with mask. Use null if input is to be echoed. Use 0 if nothing is to be echoed and other
