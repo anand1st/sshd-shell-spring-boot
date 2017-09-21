@@ -20,9 +20,11 @@ package sshd.shell.springboot.autoconfiguration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -46,7 +48,7 @@ class SshdShellAutoConfiguration {
 
     @Autowired
     private ApplicationContext appContext;
-    
+
     @Bean
     Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands() throws NoSuchMethodException,
             InterruptedException {
@@ -54,7 +56,10 @@ class SshdShellAutoConfiguration {
         for (Map.Entry<String, Object> entry : appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()) {
             loadSshdShellCommands(sshdShellCommandsMap, entry.getValue());
         }
-        return sshdShellCommandsMap;
+        return Collections.unmodifiableMap(sshdShellCommandsMap.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, e -> Collections.unmodifiableMap(e.getValue()), (v1, v2) -> {
+                    throw new IllegalStateException();
+                }, TreeMap::new)));
     }
 
     private void loadSshdShellCommands(Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap,
@@ -68,10 +73,10 @@ class SshdShellAutoConfiguration {
     private Map<String, CommandExecutableDetails> getSupplierMap(SshdShellCommand annotation,
             Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap) {
         Map<String, CommandExecutableDetails> map = sshdShellCommandsMap.get(annotation.value());
-        if (Objects.isNull(map)) {
-            map = new TreeMap<>();
-            sshdShellCommandsMap.put(annotation.value(), map);
+        if (!Objects.isNull(map)) {
+            throw new IllegalArgumentException("Duplicate commands in different classes are not allowed");
         }
+        sshdShellCommandsMap.put(annotation.value(), map = new TreeMap<>());
         return map;
     }
 
@@ -103,18 +108,17 @@ class SshdShellAutoConfiguration {
                 if (ex.getCause() instanceof InterruptedException) {
                     throw (InterruptedException) ex.getCause();
                 } else {
-                    return getErrorInfo(ex.getCause());
+                    return printAndGetErrorInfo(ex.getCause());
                 }
             } catch (IllegalAccessException | IllegalArgumentException ex) {
-                return getErrorInfo(ex);
+                return printAndGetErrorInfo(ex);
             }
         });
     }
 
-    private String getErrorInfo(Throwable ex) {
+    private String printAndGetErrorInfo(Throwable ex) {
         log.error("Error performing method invocation", ex);
-        return "Error performing method invocation\r\n" + (log.isDebugEnabled() ? ex
-                : "Please check server logs for more information");
+        return "Error performing method invocation\r\nPlease check server logs for more information";
     }
 
     private void loadMethodLevelCommandSupplier(Class<?> clazz, Map<String, CommandExecutableDetails> map, Object obj)
