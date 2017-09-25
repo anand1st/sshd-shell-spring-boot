@@ -20,6 +20,8 @@ package sshd.shell.springboot.autoconfiguration;
 
 import com.jcraft.jsch.JSchException;
 import java.io.IOException;
+import java.util.Locale;
+import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -68,7 +70,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCall((is, os) -> {
             write(os, "test");
             verifyResponse(is, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive"
-                + "\t\ttest interactive\r\n\rrun\t\ttest run");
+                    + "\t\ttest interactive\r\n\rrun\t\ttest run");
         });
     }
 
@@ -76,46 +78,16 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testHelp() throws JSchException, IOException {
         sshCall((is, os) -> {
             write(os, "help");
-            verifyResponse(is, "Supported Commands\r\n\rdummy\t\tdummy description\r\n\rexit\t\tExit shell"
-                + "\r\n\rhealth\t\tHealth of services\r\n\rhelp\t\tShow list of help commands\r\n\riae\t\tthrows IAE"
-                + "\r\n\rtest\t\ttest description");
+            StringBuilder format = new StringBuilder("Supported Commands");
+            for (int i = 0; i < 6; i++) {
+                format.append("\r\n%-16s%s");
+            }
+            verifyResponse(is, String.format(Locale.ENGLISH, format.toString(), "dummy", "dummy description",
+                    "endpoint", "Invoke actuator endpoints", "exit", "Exit shell", "help", "Show list of help commands",
+                    "iae", "throws IAE", "test", "test description"));
         });
     }
 
-    @Test
-    public void testHealthCommandNoArg() throws JSchException, IOException {
-        sshCall((is, os) -> {
-            write(os, "health show");
-            verifyResponse(is, "Supported health indicators below:\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\r"
-                + "Usage: health show <health indicator>");
-        });
-    }
-
-    @Test
-    public void testHealthCommandUnsupportedHealthIndicator() throws JSchException, IOException {
-        sshCall((is, os) -> {
-            write(os, "health show unknown");
-            verifyResponse(is, "Unsupported health indicator unknown\r\n\rSupported health indicators "
-                + "below:\r\n\r\tdiskspace\r\n\r\theapmemory\r\n\rUsage: health show <health indicator>");
-        });
-    }
-
-    @Test
-    public void testHealthCommandValidHealthIndicator() throws JSchException, IOException {
-        sshCall((is, os) -> {
-            write(os, "health show diskspace");
-            verifyResponse(is, "{\"status\":\"UP\",\"diskspace\":{");
-        });
-    }
-
-    @Test
-    public void testHealthCommandHeapMemoryHealthIndicator() throws JSchException, IOException {
-        sshCall((is, os) -> {
-            write(os, "health show heapmemory");
-            verifyResponse(is, "{\"heapmemory\":{");
-        });
-    }
-    
     @Test
     public void testInteractive() throws JSchException, IOException {
         sshCall((is, os) -> {
@@ -123,7 +95,64 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Name: anandHi anand");
         });
     }
+
+    @Test
+    public void testEndpointList() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "endpoint list");
+            verifyResponse(is, getEndpointList());
+        });
+    }
+
+    private String getEndpointList() {
+        String[] endpoints = {"autoconfig", "beans", "configprops", "dump", "env", "health", "info", "loggers",
+            "metrics", "trace", "shutdown"};
+        String[] enabled = {"true", "true", "true", "true", "true", "true", "true", "true", "true", "true", "false"};
+        StringBuilder sb = new StringBuilder(String.format(Locale.ENGLISH, "%-16s%s\r\n", "Endpoints",
+                "Is Enabled?")).append("---------       -----------");
+        assertEquals(endpoints.length, enabled.length);
+        for (int i = 0; i < endpoints.length; i++) {
+            sb.append(String.format(Locale.ENGLISH, "\r\n%-16s%s", endpoints[i], enabled[i]));
+        }
+        return sb.toString();
+    }
+
+    @Test
+    public void testEndpointNullArg() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "endpoint invoke");
+            String response = "Null or unknown endpoint\r\n" + getEndpointList() 
+                    + "\r\nUsage: endpoint invoke <endpoint>";
+            verifyResponse(is, response);
+        });
+    }
     
+    @Test
+    public void testEndpointInvalid() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "endpoint invoke invalid");
+            String response = "Null or unknown endpoint\r\n" + getEndpointList() 
+                    + "\r\nUsage: endpoint invoke <endpoint>";
+            verifyResponse(is, response);
+        });
+    }
+    
+    @Test
+    public void testEndpointDisabled() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "endpoint invoke shutdown");
+            verifyResponse(is, "Endpoint shutdown is not enabled");
+        });
+    }
+    
+    @Test
+    public void testEndpointInvokeSuccess() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "endpoint invoke info");
+            verifyResponse(is, "{ }");
+        });
+    }
+
     // FIXME Figure out why following test case fails with command line call but passes with IDE
     @Ignore
     @Test
