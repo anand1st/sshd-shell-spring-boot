@@ -59,6 +59,8 @@ public class TerminalProcessor {
             processUserInput(reader);
         } catch (IOException ex) {
             log.error("Error building terminal instance", ex);
+        } catch (UserInterruptException ex) {
+            log.info(ex.getMessage());
         }
     }
 
@@ -74,7 +76,7 @@ public class TerminalProcessor {
                 : AttributedStyle.DEFAULT.foreground(color.value);
     }
 
-    private void processUserInput(LineReader reader) throws UserInterruptException {
+    private void processUserInput(LineReader reader) {
         String prompt = new AttributedStringBuilder().style(getStyle(properties.getPrompt().getColor()))
                 .append(properties.getPrompt().getTitle()).append("> ").style(AttributedStyle.DEFAULT).toAnsi();
         String line;
