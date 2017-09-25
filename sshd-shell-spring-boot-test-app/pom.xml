@@ -51,6 +51,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <mainClass>demo.Main</mainClass>
                     <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1045</jvmArguments>
