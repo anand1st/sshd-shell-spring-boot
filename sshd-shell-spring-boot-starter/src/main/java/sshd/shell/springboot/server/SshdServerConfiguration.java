@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
@@ -57,7 +58,7 @@ class SshdServerConfiguration {
     @Qualifier("__shellBanner")
     @Autowired
     private Banner shellBanner;
-    
+
     @Bean
     PasswordAuthenticator passwordAuthenticator() {
         SshdShellProperties.Shell.Auth props = properties.getShell().getAuth();
@@ -77,9 +78,9 @@ class SshdServerConfiguration {
                 throw new IllegalArgumentException("Invalid/Unsupported auth type");
         }
     }
-
-    @PostConstruct
-    void startServer() throws IOException {
+    
+    @Bean
+    SshServer sshServer() {
         SshdShellProperties.Shell props = properties.getShell();
         if (Objects.isNull(props.getPassword())) {
             props.setPassword(UUID.randomUUID().toString());
@@ -95,8 +96,20 @@ class SshdServerConfiguration {
         server.setPasswordAuthenticator(passwordAuthenticator());
         server.setPort(props.getPort());
         server.setShellFactory(() -> new SshSessionInstance(environment, shellBanner, terminalProcessor));
+        return server;
+    }
+
+    @PostConstruct
+    void startServer() throws IOException {
+        SshServer server = sshServer();
         server.start();
-        props.setPort(server.getPort()); // In case server port is 0, a random port is assigned.
-        log.info("SSH server started on port {}", props.getPort());
+        properties.getShell().setPort(server.getPort()); // In case server port is 0, a random port is assigned.
+        log.info("SSH server started on port {}", properties.getShell().getPort());
+    }
+    
+    @PreDestroy
+    void stopServer() throws IOException {
+        sshServer().stop();
+        log.info("SSH server stopped");
     }
 }
