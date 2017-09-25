@@ -26,6 +26,7 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
  * @author anand
  */
 @Component
+@lombok.NoArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 @SshdShellCommand(value = "exit", description = "Exit shell")
 public final class ExitCommand {
     

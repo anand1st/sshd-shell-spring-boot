@@ -16,6 +16,7 @@
 package sshd.shell.springboot.command;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -30,6 +31,7 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
  * @author anand
  */
 @Component
+@lombok.NoArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 @SshdShellCommand(value = Constants.HELP, description = "Show list of help commands")
 public final class HelpCommand {
 
@@ -42,8 +44,12 @@ public final class HelpCommand {
         Collection<String> roles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
         sshdShellCommands.entrySet().stream()
                 .filter(e -> e.getValue().get(Constants.EXECUTE).matchesRole(roles))
-                .forEach(e -> sb.append("\n\r").append(e.getKey()).append("\t\t")
-                .append(e.getValue().get(Constants.EXECUTE).getDescription()));
+                .forEachOrdered(e -> sb.append(formatString(e)));
         return sb.toString();
+    }
+    
+    private String formatString(Map.Entry<String, Map<String, CommandExecutableDetails>> entry) {
+        return String.format(Locale.ENGLISH, "%n%-16s%s", entry.getKey(),
+                entry.getValue().get(Constants.EXECUTE).getDescription());
     }
 }
