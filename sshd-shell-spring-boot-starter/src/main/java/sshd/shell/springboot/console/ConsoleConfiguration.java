@@ -40,6 +40,8 @@ class ConsoleConfiguration {
     private SshdShellProperties properties;
     @Autowired
     private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
+    @Autowired
+    private List<BaseUserInputProcessor> userInputProcessors;
 
     @Bean
     TerminalProcessor terminalProcessor() {
@@ -49,6 +51,6 @@ class ConsoleConfiguration {
                     .toArray(Object[]::new);
             nodes.add(subCommands.length == 0 ? node(entry.getKey()) : node(entry.getKey(), node(subCommands)));
         });
-        return new TerminalProcessor(properties.getShell(), sshdShellCommands, new Completers.TreeCompleter(nodes));
+        return new TerminalProcessor(properties.getShell(), new Completers.TreeCompleter(nodes), userInputProcessors);
     }
 }

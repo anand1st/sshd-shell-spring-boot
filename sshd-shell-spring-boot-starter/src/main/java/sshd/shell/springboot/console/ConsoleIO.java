@@ -16,6 +16,7 @@
 package sshd.shell.springboot.console;
 
 import java.io.IOException;
+import java.util.Objects;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
@@ -32,7 +33,8 @@ public enum ConsoleIO {
     static final String LINE_READER = "__lineReader";
     static final String TEXT_STYLE = "__textStyle";
     static final String TERMINAL = "__terminal";
-        
+    static final String HIGHLIGHT_COLOR = "__highlightColor";
+
     /**
      * Read input from line with mask. Use null if input is to be echoed. Use 0 if nothing is to be echoed and other
      * characters that get echoed with input
@@ -49,7 +51,7 @@ public enum ConsoleIO {
         return reader.readLine(new AttributedStringBuilder().style(textStyle).append(text).append(' ')
                 .style(AttributedStyle.DEFAULT).toAnsi(terminal), mask);
     }
-    
+
     /**
      * Read input from line with input echoed.
      *
@@ -64,13 +66,27 @@ public enum ConsoleIO {
     /**
      * Write output.
      *
-     * @param text Text output
+     * @param output Text output
      */
-    public static void writeOutput(String text) {
+    public static void writeOutput(String output) {
+        writeOutput(output, null);
+    }
+
+    public static void writeOutput(String output, String textToHighlight) {
         Terminal terminal = SshSessionContext.<Terminal>get(TERMINAL);
         AttributedStyle textStyle = SshSessionContext.<AttributedStyle>get(TEXT_STYLE);
-        terminal.writer().println(new AttributedStringBuilder().style(textStyle).append(text)
-                .style(AttributedStyle.DEFAULT).toAnsi(terminal));
+        AttributedStringBuilder builder = new AttributedStringBuilder().style(textStyle);
+        if (!Objects.isNull(textToHighlight)) {
+            String[] split = output.split(textToHighlight);
+            for (int i = 0; i < split.length - 1; i++) {
+                builder.append(split[i]).style(SshSessionContext.<AttributedStyle>get(HIGHLIGHT_COLOR))
+                        .append(textToHighlight).style(textStyle);
+            }
+            builder.append(split[split.length - 1]);
+        } else {
+            builder.append(output);
+        }
+        terminal.writer().println(builder.style(AttributedStyle.DEFAULT).toAnsi(terminal));
         terminal.flush();
     }
 }
