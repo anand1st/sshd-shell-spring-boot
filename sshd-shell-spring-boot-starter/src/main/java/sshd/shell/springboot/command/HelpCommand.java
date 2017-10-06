@@ -16,6 +16,7 @@
 package sshd.shell.springboot.command;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
+import sshd.shell.springboot.console.BaseUserInputProcessor;
 
 /**
  *
@@ -38,18 +41,25 @@ public final class HelpCommand {
     @Autowired
     @Lazy
     private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
+    @Autowired
+    private List<BaseUserInputProcessor> processors;
+    @Autowired
+    private SshdShellProperties properties;
 
     public String help(String arg) {
         StringBuilder sb = new StringBuilder("Supported Commands");
         Collection<String> roles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
-        sshdShellCommands.entrySet().stream()
-                .filter(e -> e.getValue().get(Constants.EXECUTE).matchesRole(roles))
-                .forEachOrdered(e -> sb.append(formatString(e)));
+        String format = properties.getShell().getText().getUsageInfoFormat();
+        sshdShellCommands.entrySet().stream().filter(e -> e.getValue().get(Constants.EXECUTE).matchesRole(roles))
+                .forEachOrdered(e -> {
+                    sb.append(String.format(Locale.ENGLISH, format, e.getKey(),
+                            e.getValue().get(Constants.EXECUTE).getDescription()));
+                });
+        sb.append("\nSupported post processors for output");
+        processors.stream().filter(p -> p.getUsageInfo().isPresent()).forEachOrdered(p -> {
+            p.getUsageInfo().get().getRows().forEach(r -> sb.append(String.format(Locale.ENGLISH, format, r.getUsage(),
+                    r.getDescription())));
+        });
         return sb.toString();
-    }
-    
-    private String formatString(Map.Entry<String, Map<String, CommandExecutableDetails>> entry) {
-        return String.format(Locale.ENGLISH, "%n%-16s%s", entry.getKey(),
-                entry.getValue().get(Constants.EXECUTE).getDescription());
     }
 }
