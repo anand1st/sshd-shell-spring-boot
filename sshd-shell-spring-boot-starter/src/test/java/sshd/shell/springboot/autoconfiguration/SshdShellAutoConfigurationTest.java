@@ -23,7 +23,6 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.jcraft.jsch.JSchException;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -35,6 +34,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.util.SocketUtils;
 
 /**
  *
@@ -186,9 +186,9 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testMailProcessor() throws JSchException, IOException {
-        int smtpPort = new ServerSocket(0).getLocalPort();
+        int smtpPort = SocketUtils.findAvailableTcpPort();
         ServerSetup setup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
-        setup.setServerStartupTimeout(1000);
+        setup.setServerStartupTimeout(5000);
         GreenMail mailServer = new GreenMail(setup);
         mailServer.start();
         ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
