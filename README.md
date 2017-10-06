@@ -128,7 +128,39 @@ The following are sample inputs/outputs from the shell command if a non-admin us
     bob echoes hi and your name is Jake
     app> echo alice hi
     alice says hi, Name Jake exists
-    
+    app> endpoint list
+    Endpoints       Is Enabled?
+    ---------       -----------
+    autoconfig      true
+    beans           true
+    configprops     true
+    dump            true
+    env             true
+    health          true
+    info            true
+    loggers         true
+    metrics         true
+    shutdown        true
+    trace           true
+    app> endpoint invoke health
+    {
+      "status" : "UP",
+      "mail" : {
+        "status" : "UP",
+	"location" : "smtp.gmail.com:465"
+      },
+      "diskSpace" : {
+        "status" : "UP",
+	"total" : 120108089344,
+	"free" : 26252050432,
+	"threshold" : 10485760
+      },
+      "db" : {
+        "status" : "UP",
+	"database" : "H2",
+	"hello" : 1
+      }
+    }
     app> admin manage
     Permission denied
 
