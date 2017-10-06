@@ -6,18 +6,21 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.M3 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
+This starter has been tested with spring-boot 1.5.x.RELEASE and upto 2.0.0.M3. In theory however, it should work with any older releases.
 
 To import into Maven project, add the following dependency inside pom.xml:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>2.4</version>
+        <version>2.5</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 2.5
+Upgraded to jline-3.5.1. Added post processor functionality to support searching and mailing of output. HealthIndicators are removed as spring-boot-actuator endpoints support them directly by an implementation in `EndpointCommand`. See examples below.
 
 ### Version 2.4
 Upgraded to jline-3.4.0. Refactored I/O related activity from SshSessionContext to ConsoleIO. Separated console processing into separate packages from SSH server packages.
@@ -81,8 +84,13 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
-When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading. It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the application.
-
+    # Configuration to send output mail to end users.
+    spring.mail.host=
+    spring.mail.port=
+    spring.mail.protocol=
+    spring.mail.username=
+    spring.mail.password=
+    
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
     ssh -p <port> <username>@<host>
@@ -96,19 +104,31 @@ The following are sample inputs/outputs from the shell command if a non-admin us
     app> help
     Supported Commands
     echo		Echo by users. Type 'echo help' for supported subcommands
+    endpoint            Invoke actuator endpoints
     health		Display health services
     exit		Exit shell
+    help                Show list of help commands
+    Supported post processors for output
+    h <arg>             Highlights <arg> in response output of command execution
+                        Example usage: help | h exit
+    m <emailId>         Send response output of command execution to <emailId>
+                        Example usage: help | m bob@hope.com
     app> echo
     Supported subcommand for echo
             alice    Alice's echo. Usage: echo alice <arg>
             bob      Bob's echo. Usage: echo bob <arg>
     app> echo alice hi
     alice says hi
+    app> echo alice hi | h alice
+    alice says hi            ### alice is highlighted but colors can't be shown on markdown :-)
+    app> echo alice hi | m bob@hope.com
+    Output response sent to bob@hope.com
     app> echo bob hi
     What's your name? Jake
     bob echoes hi and your name is Jake
     app> echo alice hi
     alice says hi, Name Jake exists
+    
     app> admin manage
     Permission denied
 
@@ -118,6 +138,7 @@ For an admin user, the following extras can be seen in the help and echo subcomm
     Supported Commands
     admin		Admin functionality. Type 'admin' for supported subcommands
     echo		Echo by users. Type 'echo' for supported subcommands
+    endpoint            Invoke actuator endpoints
     exit		Exit shell
     health		Health of services
     help		Show list of help commands
