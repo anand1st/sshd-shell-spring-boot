@@ -60,6 +60,8 @@ public class SshdShellProperties {
         public static class Text {
 
             private ColorType color = ColorType.BLACK;
+            private ColorType highlightColor = ColorType.YELLOW;
+            private String usageInfoFormat = "%n%-20s%s";
         }
 
         @lombok.Data
