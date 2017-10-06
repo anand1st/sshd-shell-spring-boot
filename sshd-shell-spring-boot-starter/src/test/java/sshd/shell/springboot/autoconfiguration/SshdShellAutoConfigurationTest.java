@@ -18,18 +18,32 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 import com.jcraft.jsch.JSchException;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Locale;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 /**
  *
  * @author anand
  */
 public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     //FIXME Figure out why following test case fails on command line but passes on IDE
     @Ignore
@@ -38,6 +52,16 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCall((is, os) -> {
             write(os, "exit");
             verifyResponse(is, "Exiting shell");
+        });
+    }
+    
+    // FIXME Figure out why following test case fails with command line call but passes with IDE
+    @Ignore
+    @Test
+    public void testEmptyUserInput() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "");
+            verifyResponse(is, "app> app>");
         });
     }
 
@@ -80,8 +104,15 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             write(os, "help");
             StringBuilder format = new StringBuilder("Supported Commands");
             for (int i = 0; i < 6; i++) {
-                format.append("\r\n%-16s%s");
+                format.append("\r\n%-20s%s");
             }
+            format.append("\r\nSupported post processors for output")
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "h <arg>",
+                            "Highlights <arg> in response output of command execution"))
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "", "Example usage: help | h exit"))
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "m <emailId>",
+                            "Send response output of command execution to <emailId>"))
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "", "Example usage: help | m bob@hope.com"));
             verifyResponse(is, String.format(Locale.ENGLISH, format.toString(), "dummy", "dummy description",
                     "endpoint", "Invoke actuator endpoints", "exit", "Exit shell", "help", "Show list of help commands",
                     "iae", "throws IAE", "test", "test description"));
@@ -121,22 +152,22 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testEndpointNullArg() throws JSchException, IOException {
         sshCall((is, os) -> {
             write(os, "endpoint invoke");
-            String response = "Null or unknown endpoint\r\n" + getEndpointList() 
+            String response = "Null or unknown endpoint\r\n" + getEndpointList()
                     + "\r\nUsage: endpoint invoke <endpoint>";
             verifyResponse(is, response);
         });
     }
-    
+
     @Test
     public void testEndpointInvalid() throws JSchException, IOException {
         sshCall((is, os) -> {
             write(os, "endpoint invoke invalid");
-            String response = "Null or unknown endpoint\r\n" + getEndpointList() 
+            String response = "Null or unknown endpoint\r\n" + getEndpointList()
                     + "\r\nUsage: endpoint invoke <endpoint>";
             verifyResponse(is, response);
         });
     }
-    
+
     @Test
     public void testEndpointDisabled() throws JSchException, IOException {
         sshCall((is, os) -> {
@@ -144,7 +175,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Endpoint shutdown is not enabled");
         });
     }
-    
+
     @Test
     public void testEndpointInvokeSuccess() throws JSchException, IOException {
         sshCall((is, os) -> {
@@ -153,13 +184,78 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    // FIXME Figure out why following test case fails with command line call but passes with IDE
-    @Ignore
     @Test
-    public void testEmptyUserInput() throws JSchException, IOException {
+    public void testMailProcessor() throws JSchException, IOException {
+        int smtpPort = new ServerSocket(0).getLocalPort();
+        ServerSetup setup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
+        setup.setServerStartupTimeout(1000);
+        GreenMail mailServer = new GreenMail(setup);
+        mailServer.start();
+        ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
+        assertEquals(0, mailServer.getReceivedMessages().length);
         sshCall((is, os) -> {
-            write(os, "");
-            verifyResponse(is, "app> app>");
+            write(os, "help | m anand@test.com");
+            verifyResponse(is, "Output response sent to anand@test.com");
+            assertTrue(mailServer.waitForIncomingEmail(5000, 1));
+            MimeMessage message = mailServer.getReceivedMessages()[0];
+            try {
+                assertEquals("help", message.getSubject());
+            } catch (MessagingException ex) {
+                fail("Messaging exception");
+            } finally {
+                try {
+                    mailServer.purgeEmailFromAllMailboxes();
+                } catch (FolderException ex) {
+                    // Ignore
+                } finally {
+                    mailServer.stop();
+                }
+            }
         });
     }
-}
+    
+    @Test
+    public void testMailProcessorFail() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "help | m anand@test.com");
+            verifyResponse(is, "Error sending mail, please check logs for more info");
+        });
+    }
+    
+    @Test
+    public void testHighlightProcessor() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "help | h <emailId>");
+            StringBuilder format = new StringBuilder("Supported Commands");
+            for (int i = 0; i < 6; i++) {
+                format.append("\r\n%-20s%s");
+            }
+            format.append("\r\nSupported post processors for output")
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "h <arg>",
+                            "Highlights <arg> in response output of command execution"))
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "", "Example usage: help | h exit"))
+                    .append(String.format(Locale.ENGLISH, "\r\n%-29s%s", "m \u001B[43m<emailId>\u001B[0m",
+                            "Send response output of command execution to \u001B[43m<emailId>\u001B[0m"))
+                    .append(String.format(Locale.ENGLISH, "\r\n%-20s%s", "", "Example usage: help | m bob@hope.com"));
+            verifyResponse(is, String.format(Locale.ENGLISH, format.toString(), "dummy", "dummy description",
+                    "endpoint", "Invoke actuator endpoints", "exit", "Exit shell", "help", "Show list of help commands",
+                    "iae", "throws IAE", "test", "test description"));
+        });
+    }
+    
+    @Test
+    public void testInvalidCommand() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "help | h bob@hope.com | m bob@hope.com");
+            verifyResponse(is, "Invalid command");
+        });
+    }
+    
+    @Test
+    public void testInvalidCommand2() throws JSchException, IOException {
+        sshCall((is, os) -> {
+            write(os, "help | x");
+            verifyResponse(is, "Invalid command");
+        });
+    }
+ }
