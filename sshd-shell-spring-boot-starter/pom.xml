@@ -51,8 +51,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <spring-boot.version>2.0.0.M3</spring-boot.version>
-        <jline.version>3.4.0</jline.version>
+        <spring-boot.version>1.5.7.RELEASE</spring-boot.version>
+        <jline.version>3.5.1</jline.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -78,6 +78,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -143,6 +148,12 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>3.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.5.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
