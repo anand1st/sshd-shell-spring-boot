@@ -25,10 +25,10 @@ Added support for spring boot 2.0.0.M4 endpoint infrastructure which is very dif
 
 ### Version 2.5
 Supports spring versions from 1.5.x till 2.0.0.M3 (tested for these versions only).
-Upgraded to jline-3.5.1
+Upgraded to jline-3.5.1.
 Added support for highlighting of response output based on searched text using postprocessors (highlighting tested on OSX).
 Added support for the emailing response output using postprocessors.
-Examples of post processors can be seen below
+Examples of post processors can be seen below.
 
 ### Version 2.4
 Upgraded to jline-3.4.0. Refactored I/O related activity from SshSessionContext to ConsoleIO. Separated console processing into separate packages from SSH server packages.
