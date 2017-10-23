@@ -44,6 +44,13 @@ public class TestCommand {
     @SshdShellCommand(value = "interactive", description = "test interactive")
     public String interactive(String arg) throws IOException {
         String name = ConsoleIO.readInput("Name:");
+        ConsoleIO.writeJsonOutput(new X(name));
         return "Hi " + name;
+    }
+    
+    @lombok.AllArgsConstructor
+    @lombok.Getter
+    private static class X {
+        private final String obj;
     }
 }
