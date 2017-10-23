@@ -6,18 +6,29 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.M3 and 1.5.x.RELEASE. In theory however, it should work with any older releases.
+This starter has been tested with spring-boot 2.0.0.M4 with support its new endpoint infrastructure. For supporting the older spring boot versions, please see the git branch 1.5.x which supports 1.5.x right up to 2.0.0.M3 for more information.
 
 To import into Maven project, add the following dependency inside pom.xml:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>2.4</version>
+        <version>3.0</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 3.0
+Only for spring boot versions 2.0.0.M4 and (hopefully) above.
+Added support for spring boot 2.0.0.M4 endpoint infrastructure which is very different from versions below this.
+
+### Version 2.5
+Supports spring versions from 1.5.x till 2.0.0.M3 (tested for these versions only).
+Upgraded to jline-3.5.1
+Added support for highlighting of response output based on searched text using postprocessors (highlighting tested on OSX).
+Added support for the emailing response output using postprocessors.
+Examples of post processors can be seen below
 
 ### Version 2.4
 Upgraded to jline-3.4.0. Refactored I/O related activity from SshSessionContext to ConsoleIO. Separated console processing into separate packages from SSH server packages.
@@ -75,8 +86,9 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.prompt.title=app
     
     # Supported values for colors: BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,WHITE (leave blank for default)
-    sshd.shell.prompt.color=
-    sshd.shell.text.color=
+    sshd.shell.prompt.color=           # Defaults to BLACK
+    sshd.shell.text.color=             # Defaults to BLACK
+    sshd.shell.text.highlightColor=    # Defaults to YELLOW
     
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
@@ -94,16 +106,39 @@ If public key file is used for SSH daemon:
 The following are sample inputs/outputs from the shell command if a non-admin user logs in:
 
     app> help
-    Supported Commands
-    echo		Echo by users. Type 'echo help' for supported subcommands
-    health		Display health services
-    exit		Exit shell
+    admin                              Admin functionality. Type 'admin' for supported subcommands
+    auditEvents                        Event auditing
+    autoConfigurationReport            Autoconfiguration report
+    beans                              List beans
+    configurationPropertiesReport      Configuration properties report
+    echo                               Echo by users. Type 'echo' for supported subcommands
+    environment                        Environment details
+    exit                               Exit shell
+    health                             System health info
+    help                               Show list of help commands
+    info                               System status
+    loggers                            Logging configuration
+    metrics                            Metrics operations
+    requestMapping                     Request mapping information
+    shutdown                           Shutdown application
+    status                             System status
+    threadDump                         Print thread dump
+    traces                             Trace information
+    Supported post processors for output
+    h <arg>                            Highlights <arg> in response output of command execution
+                                       Example usage: help | h exit
+    m <emailId>                        Send response output of command execution to <emailId>
+                                       Example usage: help | m bob@hope.com
     app> echo
     Supported subcommand for echo
             alice    Alice's echo. Usage: echo alice <arg>
             bob      Bob's echo. Usage: echo bob <arg>
     app> echo alice hi
     alice says hi
+    app> echo alice hi | h alice
+    alice says hi             ### alice is highlighted in yellow but colors can't be shown on markdown :-)
+    app> echo alice hi | m bob@hope.com
+    Output response sent to bob@hope.com
     app> echo bob hi
     What's your name? Jake
     bob echoes hi and your name is Jake
@@ -115,12 +150,9 @@ The following are sample inputs/outputs from the shell command if a non-admin us
 For an admin user, the following extras can be seen in the help and echo subcommand as per settings of roles in the annotation:
 
     app> help
-    Supported Commands
+    ...
     admin		Admin functionality. Type 'admin' for supported subcommands
-    echo		Echo by users. Type 'echo' for supported subcommands
-    exit		Exit shell
-    health		Health of services
-    help		Show list of help commands
+    ...
     app> echo
     Supported subcommand for echo
     admin		Admin's echo. Usage: echo admin <arg>
