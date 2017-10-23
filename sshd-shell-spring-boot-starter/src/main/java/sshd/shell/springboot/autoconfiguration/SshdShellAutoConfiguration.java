@@ -101,7 +101,7 @@ class SshdShellAutoConfiguration {
     }
 
     private CommandExecutableDetails getMethodSupplier(SshdShellCommand annotation, Method method, Object obj) {
-        return new CommandExecutableDetails(annotation, arg -> {
+        return new CommandExecutableDetails(annotation, (arg) -> {
             try {
                 return (String) method.invoke(obj, arg);
             } catch (InvocationTargetException ex) {
