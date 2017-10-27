@@ -18,7 +18,6 @@ package sshd.shell.springboot.autoconfiguration;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import java.io.IOException;
 import java.util.Properties;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSupport {
     
     @Test
-    public void testDaoAuthWithoutRightPermission() throws JSchException, IOException {
+    public void testDaoAuthWithoutRightPermission() {
         sshCall((is, os) -> {
             write(os, "test run bob");
             verifyResponse(is, "Permission denied");
@@ -40,7 +39,7 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
     }
     
     @Test
-    public void testDaoAuthWithoutRightPermission2() throws JSchException, IOException {
+    public void testDaoAuthWithoutRightPermission2() {
         // See ConfigTest.java for why username is alice
         sshCall("alice", "alice", (is, os ) -> {
             write(os, "test run");
@@ -49,7 +48,7 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
     }
     
     @Test
-    public void testDaoAuthWithRightPermission() throws JSchException, IOException {
+    public void testDaoAuthWithRightPermission() {
         sshCall((is, os) -> {
             write(os, "test execute bob");
             verifyResponse(is, "test execute successful");

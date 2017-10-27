@@ -42,16 +42,16 @@ public final class AuditEventsCommand {
 
     @SshdShellCommand(value = "list", description = "List events")
     public String auditEvents(String arg) {
+        if (StringUtils.isEmpty(arg)) {
+            return "Usage: auditEvents list {\"principal\":\"<user>\",\"after\":\"<yyyy-MM-dd HH:mm>\","
+                    + "\"type\":\"<type>\"}";
+        }
         try {
-            if (StringUtils.isEmpty(arg)) {
-                return "Usage: auditEvents list {\"principal\":\"<user>\",\"after\":\"<yyyy-MM-dd HH:mm>\","
-                        + "\"type\":\"<type>\"}";
-            }
             Event event = ConsoleIO.stringToObject(arg, Event.class);
             return ConsoleIO.asJson(auditEventsEndpoint.eventsWithPrincipalDateAfterAndType(event.principal,
                     event.after, event.type));
         } catch (IOException ex) {
-            log.error("Invalid json", ex);
+            log.warn("Invalid json", ex);
             return "Expected valid json as argument";
         }
     }

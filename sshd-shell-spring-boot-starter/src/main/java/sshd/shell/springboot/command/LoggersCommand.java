@@ -51,7 +51,7 @@ public final class LoggersCommand {
 
     @SshdShellCommand(value = "configure", description = "Configure log level for logger name")
     public String configureLogLevel(String arg) {
-        if (arg == null) {
+        if (StringUtils.isEmpty(arg)) {
             return "Usage: loggers configure {\"name\":\"<loggerName>\",\"configuredLevel\":"
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}";
         }
@@ -60,7 +60,7 @@ public final class LoggersCommand {
             loggersEndpoint.configureLogLevel(logConfig.name, logConfig.configuredLevel);
             return "Changed log level for " + logConfig.name + " to " + logConfig.configuredLevel.name();
         } catch (IOException | IllegalArgumentException ex) {
-            log.error("Invalid json", ex);
+            log.warn("Invalid json", ex);
             return "Expected valid json as argument";
         }
     }

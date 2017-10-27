@@ -15,6 +15,10 @@
  */
 package sshd.shell.springboot.command;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.IOException;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -30,6 +34,7 @@ import sshd.shell.springboot.console.ConsoleIO;
 @Component
 @ConditionalOnClass(MetricsEndpoint.class)
 @SshdShellCommand(value = "metrics", description = "Metrics operations")
+@lombok.extern.slf4j.Slf4j
 public class MetricsCommand {
 
     @Autowired
@@ -42,7 +47,24 @@ public class MetricsCommand {
 
     @SshdShellCommand(value = "metricName", description = "List metric name")
     public String metricName(String arg) {
-        return StringUtils.isEmpty(arg) ? "Usage: metrics metricName <metricName>"
-                : ConsoleIO.asJson(metricsEndpoint.metric(arg));
+        if (StringUtils.isEmpty(arg)) {
+            return "Usage: metrics metricName {\"name\":\"<metricName>\",\"tags\":[\"<array of tags>\"]}";
+        }
+        try {
+            MetricTags mt = ConsoleIO.stringToObject(arg, MetricTags.class);
+            return ConsoleIO.asJson(metricsEndpoint.metric(mt.name, mt.tags));
+        } catch (IOException ex) {
+            log.warn("Invalid json", ex);
+            return "Expected valid json as argument";
+        }
+    }
+    
+    @lombok.AllArgsConstructor
+    private static class MetricTags {
+        
+        @JsonProperty(required = true)
+        private final String name;
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        private final List<String> tags;
     }
 }

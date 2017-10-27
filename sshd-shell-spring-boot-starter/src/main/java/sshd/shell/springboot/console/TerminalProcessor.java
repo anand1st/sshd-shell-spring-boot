@@ -57,8 +57,6 @@ public class TerminalProcessor {
             processUserInput(reader);
         } catch (IOException ex) {
             log.error("Error building terminal instance", ex);
-        } catch (UserInterruptException ex) {
-            log.info(ex.getMessage());
         }
     }
 
