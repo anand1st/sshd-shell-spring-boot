@@ -13,11 +13,14 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>2.5</version>
+        <version>2.6</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 2.6
+In addition to SSH shell, SSH exec is now supported.
 
 ### Version 2.5
 Upgraded to jline-3.5.1. Added post processor functionality to support searching and mailing of output. HealthIndicators are removed as spring-boot-actuator endpoints support them directly by an implementation in `EndpointCommand`. See examples below.

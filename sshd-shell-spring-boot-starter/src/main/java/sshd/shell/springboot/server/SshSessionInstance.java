@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.ExitCallback;
@@ -38,7 +39,7 @@ import sshd.shell.springboot.console.TerminalProcessor;
  */
 @lombok.extern.slf4j.Slf4j
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PACKAGE)
-class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
+class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAware, Runnable {
 
     private final Environment environment;
     private final Banner shellBanner;
@@ -98,5 +99,10 @@ class SshSessionInstance implements Command, ChannelSessionAware, Runnable {
     @Override
     public void setChannelSession(ChannelSession session) {
         this.session = session;
+    }
+
+    @Override
+    public Command create() {
+        return this;
     }
 }

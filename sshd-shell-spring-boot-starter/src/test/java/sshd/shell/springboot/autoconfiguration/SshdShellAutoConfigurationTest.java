@@ -49,7 +49,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Ignore
     @Test
     public void testExitCommand() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "exit");
             verifyResponse(is, "Exiting shell");
         });
@@ -59,7 +59,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Ignore
     @Test
     public void testEmptyUserInput() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "");
             verifyResponse(is, "app> app>");
         });
@@ -67,7 +67,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testIAECommand() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "iae");
             verifyResponse(is, "Error performing method invocation\r\r\nPlease check server logs for more information");
         });
@@ -75,7 +75,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testUnsupportedCommand() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "xxx");
             verifyResponse(is, "Unknown command. Enter 'help' for a list of supported commands");
         });
@@ -83,7 +83,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testUnsupportedSubCommand() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test nonexistent");
             verifyResponse(is, "Unknown subcommand 'nonexistent'. Type 'test' for supported subcommands");
         });
@@ -91,7 +91,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testSubcommand() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test");
             verifyResponse(is, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive"
                     + "\t\ttest interactive\r\n\rrun\t\ttest run");
@@ -100,7 +100,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testHelp() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help");
             StringBuilder format = new StringBuilder("Supported Commands");
             for (int i = 0; i < 6; i++) {
@@ -121,7 +121,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testInteractive() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test interactive", "anand");
             verifyResponse(is, "Name: anandHi anand");
         });
@@ -129,7 +129,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testEndpointList() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "endpoint list");
             verifyResponse(is, getEndpointList());
         });
@@ -150,7 +150,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testEndpointNullArg() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "endpoint invoke");
             String response = "Null or unknown endpoint\r\n" + getEndpointList()
                     + "\r\nUsage: endpoint invoke <endpoint>";
@@ -160,7 +160,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testEndpointInvalid() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "endpoint invoke invalid");
             String response = "Null or unknown endpoint\r\n" + getEndpointList()
                     + "\r\nUsage: endpoint invoke <endpoint>";
@@ -170,7 +170,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testEndpointDisabled() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "endpoint invoke shutdown");
             verifyResponse(is, "Endpoint shutdown is not enabled");
         });
@@ -178,7 +178,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testEndpointInvokeSuccess() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "endpoint invoke info");
             verifyResponse(is, "{ }");
         });
@@ -193,7 +193,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         mailServer.start();
         ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
         assertEquals(0, mailServer.getReceivedMessages().length);
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
             verifyResponse(is, "Output response sent to anand@test.com");
             assertTrue(mailServer.waitForIncomingEmail(5000, 1));
@@ -216,7 +216,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testMailProcessorFail() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
             verifyResponse(is, "Error sending mail, please check logs for more info");
         });
@@ -224,7 +224,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testHighlightProcessor() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | h <emailId>");
             StringBuilder format = new StringBuilder("Supported Commands");
             for (int i = 0; i < 6; i++) {
@@ -245,7 +245,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testInvalidCommand() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | h bob@hope.com | m bob@hope.com");
             verifyResponse(is, "Invalid command");
         });
@@ -253,7 +253,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testInvalidCommand2() throws JSchException, IOException {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | x");
             verifyResponse(is, "Invalid command");
         });
