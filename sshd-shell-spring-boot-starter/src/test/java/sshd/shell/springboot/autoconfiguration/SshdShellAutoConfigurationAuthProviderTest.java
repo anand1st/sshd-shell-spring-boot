@@ -32,7 +32,7 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
     
     @Test
     public void testDaoAuthWithoutRightPermission() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test run bob");
             verifyResponse(is, "Permission denied");
         });
@@ -44,12 +44,12 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
         sshCall("alice", "alice", (is, os ) -> {
             write(os, "test run");
             verifyResponse(is, "Permission denied");
-        });
+        }, "exec");
     }
     
     @Test
     public void testDaoAuthWithRightPermission() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test execute bob");
             verifyResponse(is, "test execute successful");
         });

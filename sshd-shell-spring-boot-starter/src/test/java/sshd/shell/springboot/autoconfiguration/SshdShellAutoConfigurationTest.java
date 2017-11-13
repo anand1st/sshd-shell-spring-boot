@@ -48,7 +48,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Ignore
     @Test
     public void testExitCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "exit");
             verifyResponse(is, "Exiting shell");
         });
@@ -56,7 +56,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testEmptyUserInput() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "");
             verifyResponse(is, "\r\r\n");
         });
@@ -64,7 +64,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testIAECommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "iae");
             verifyResponse(is, "Error performing method invocation\r\r\nPlease check server logs for more information");
         });
@@ -72,7 +72,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testUnsupportedCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "xxx");
             verifyResponse(is, "Unknown command. Enter 'help' for a list of supported commands");
         });
@@ -80,7 +80,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testUnsupportedSubCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test nonexistent");
             verifyResponse(is, "Unknown subcommand 'nonexistent'. Type 'test' for supported subcommands");
         });
@@ -88,7 +88,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testSubcommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test");
             verifyResponse(is, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive"
                     + "\t\ttest interactive\r\n\rrun\t\ttest run");
@@ -97,7 +97,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testHelp() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             String format = "\r\n%-35s%s"; // must be same with usageInfoFormat in SshdShellProperties.java
             write(os, "help");
             StringBuilder sb = new StringBuilder("Supported Commands");
@@ -124,7 +124,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testInteractive() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "test interactive", "anand");
             verifyResponse(is, "Name: anand{\r\n  \"obj\" : \"anand\"\r\n}\r\nHi anand");
         });
@@ -139,7 +139,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         mailServer.start();
         ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
         assertEquals(0, mailServer.getReceivedMessages().length);
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
             verifyResponse(is, "Output response sent to anand@test.com");
             assertTrue(mailServer.waitForIncomingEmail(5000, 1));
@@ -162,7 +162,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testMailProcessorFail() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
             verifyResponse(is, "Error sending mail, please check logs for more info");
         });
@@ -170,7 +170,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testHighlightProcessor() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             String format = "\r\n%-35s%s"; // must be same with usageInfoFormat in SshdShellProperties.java
             write(os, "help | h <emailId>");
             StringBuilder sb = new StringBuilder("Supported Commands");
@@ -197,7 +197,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testInvalidCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | h bob@hope.com | m bob@hope.com");
             verifyResponse(is, "Invalid command");
         });
@@ -205,7 +205,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testInvalidCommand2() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "help | x");
             verifyResponse(is, "Invalid command");
         });
@@ -213,7 +213,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Test
     public void testAuditEventsCommandNullArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "auditEvents list");
             verifyResponse(is, "Usage: auditEvents list {\"principal\":\"<user>\",\"after\":\"<yyyy-MM-dd HH:mm>\","
                     + "\"type\":\"<type>\"}");
@@ -222,7 +222,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testAuditEventsCommandInvalidJson() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "auditEvents list xxx");
             verifyResponse(is, "Expected valid json as argument");
         });
@@ -230,7 +230,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testAuditEventsCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "auditEvents list {}");
             verifyResponse(is, "{\r\n  \"events\" : [ ]\r\n}");
         });
@@ -238,7 +238,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testAutoConfigurationReportCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "autoConfigurationReport");
             verifyResponse(is, "{\r\n  \"positiveMatches\" : {");
         });
@@ -246,7 +246,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testBeansCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "beans");
             verifyResponse(is, "{\r\n  \"id\" : ");
         });
@@ -254,7 +254,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testConfigurationPropertiesReportCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "configurationPropertiesReport");
             verifyResponse(is, "{\r\n  \"beans\" : {");
         });
@@ -262,7 +262,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testEnvironmentPatternCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
            write(os, "environment pattern");
            verifyResponse(is, "{\r\n  \"activeProfiles\"");
         });
@@ -270,7 +270,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testEnvironmentEntryCommandValidArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "environment entry server.port");
             verifyResponse(is, "{\r\n  \"property\"");
         });
@@ -278,7 +278,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testEnvironmentEntryCommandInvalidArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "environment entry");
             verifyResponse(is, "Usage: environment entry <stringToMatch>");
         });
@@ -292,7 +292,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         GreenMail mailServer = new GreenMail(setup);
         mailServer.start();
         ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "health");
             verifyResponse(is, "{\r\n  \"status\" : \"UP\"");
             mailServer.stop();
@@ -301,7 +301,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testInfoCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "info");
             verifyResponse(is, "{ }");
         });
@@ -309,7 +309,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testLoggersCommandInfo() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "loggers info");
             verifyResponse(is, "{\r\n  \"levels\" : [ \"OFF\", \"ERROR\", \"WARN\", \"INFO\", \"DEBUG\", \"TRACE\" ]");
         });
@@ -317,7 +317,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testLoggersCommandLoggerLevelsNullArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "loggers level");
             verifyResponse(is, "Usage: loggers level <loggerName>");
         });
@@ -325,7 +325,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testLoggersCommandLoggerLevelsValidArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "loggers level ROOT");
             verifyResponse(is, "{\r\n  \"configuredLevel\" : \"INFO\",\r\n  \"effectiveLevel\" : \"INFO\"\r\n}");
         });
@@ -333,7 +333,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testLoggersCommandConfigureNullArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "loggers configure");
             verifyResponse(is, "Usage: loggers configure {\"name\":\"<loggerName>\",\"configuredLevel\":"
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}");
@@ -342,7 +342,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testLoggersCommandConfigureValidArg() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "loggers configure {\"name\":\"ROOT\",\"configuredLevel\":\"INFO\"}");
             verifyResponse(is, "Changed log level for ROOT to INFO");
         });
@@ -350,7 +350,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testLoggersCommandConfigureInvalidJson() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "loggers configure {}");
             verifyResponse(is, "Expected valid json as argument");
         });
@@ -358,7 +358,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testMetricsCommandListNames() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "metrics listNames");
             verifyResponse(is, "{\r\n  \"names\" : [");
         });
@@ -366,7 +366,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testMetricsCommandNullMetricName() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "metrics metricName");
             verifyResponse(is, "Usage: metrics metricName {\"name\":\"<metricName>\",\"tags\":[\"<array of tags>\"]}");
         });
@@ -374,7 +374,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testMetricsCommandValidMetricName() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "metrics metricName {\"name\":\"jvm.memory.used\"}");
             verifyResponse(is, "{\r\n  \"name\" : \"jvm.memory.used");
         });
@@ -382,7 +382,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testMetricsInvalidJson() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "metrics metricName {}");
             verifyResponse(is, "Expected valid json as argument");
         });
@@ -390,7 +390,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testRequestMappingCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "requestMapping");
             verifyResponse(is, "{\r\n  \"/webjars/**\"");
         });
@@ -399,7 +399,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Test
     @DirtiesContext
     public void testShutdownCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "shutdown");
             verifyResponse(is, "{\r\n  \"message\" : \"Shutting down, bye...\"\r\n}");
         });
@@ -413,7 +413,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         GreenMail mailServer = new GreenMail(setup);
         mailServer.start();
         ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "status");
             verifyResponse(is, "{\r\n  \"status\" : \"UP\"\r\n}");
             mailServer.stop();
@@ -422,7 +422,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testThreadDumpCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "threadDump");
             verifyResponse(is, "{\r\n  \"threads\" : [ {");
         });
@@ -430,7 +430,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     
     @Test
     public void testTracesCommand() {
-        sshCall((is, os) -> {
+        sshCallShell((is, os) -> {
             write(os, "traces");
             verifyResponse(is, "{\r\n  \"traces\" : [ ]\r\n}");
         });
