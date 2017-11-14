@@ -27,6 +27,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 /**
  *
@@ -36,9 +37,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 @lombok.extern.slf4j.Slf4j
 public class ConfigTest {
 
+    @SuppressWarnings("deprecation")
     @Bean
     public AuthenticationProvider authProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
         authProvider.setUserDetailsService(username -> new UserDetails() {
             private static final long serialVersionUID = 1L;
 
