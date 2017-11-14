@@ -27,7 +27,7 @@ Only for spring boot versions 2.0.0.M4 and (hopefully) above.
 Added support for spring boot 2.0.0.M4 endpoint infrastructure which is very different from versions below this.
 
 ### Version 2.5
-Supports spring versions from 1.5.x till 2.0.0.M3 (tested for these versions only).
+Supports spring boot versions from 1.5.x till 2.0.0.M3 (tested for these versions only).
 Upgraded to jline-3.5.1.
 Added support for highlighting of response output based on searched text using postprocessors (highlighting tested on OSX).
 Added support for the emailing response output using postprocessors.
