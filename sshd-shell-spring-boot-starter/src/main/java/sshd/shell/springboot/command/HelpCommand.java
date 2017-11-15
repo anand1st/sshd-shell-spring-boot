@@ -38,8 +38,8 @@ import sshd.shell.springboot.console.BaseUserInputProcessor;
 @SshdShellCommand(value = Constants.HELP, description = "Show list of help commands")
 public final class HelpCommand {
 
-    @Autowired
     @Lazy
+    @Autowired
     private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
     @Autowired
     private List<BaseUserInputProcessor> processors;
