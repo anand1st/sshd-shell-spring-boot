@@ -19,7 +19,7 @@ package sshd.shell.springboot.console;
  *
  * @author anand
  */
-class ShellException extends Exception {
+public class ShellException extends Exception {
     
     private static final long serialVersionUID = 7114130906989289480L;
 

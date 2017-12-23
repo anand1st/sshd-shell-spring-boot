@@ -49,7 +49,7 @@ public abstract class BaseUserInputProcessor {
                 : handleUserInputWithMoreTokens(part, userRoles);
     }
     
-    String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts) throws ShellException {
+    public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts) throws ShellException {
         String[] part = userInput.split(regex);
         if (part.length != expectedNumberOfParts) {
             throw new ShellException("Invalid command");
