@@ -15,19 +15,21 @@
  */
 package sshd.shell.springboot.console;
 
+import lombok.AccessLevel;
+
 import java.util.List;
 
 /**
  *
  * @author anand
  */
-@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
+@lombok.AllArgsConstructor(access = AccessLevel.PUBLIC)
 @lombok.Getter
 public class UsageInfo {
 
     private final List<Row> rows;
     
-    @lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
+    @lombok.AllArgsConstructor(access = AccessLevel.PUBLIC)
     @lombok.Getter
     public static class Row {
 
