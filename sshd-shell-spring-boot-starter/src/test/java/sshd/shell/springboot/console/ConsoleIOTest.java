@@ -31,6 +31,6 @@ public class ConsoleIOTest {
     
     @lombok.AllArgsConstructor
     private static class X {
-        private final String x;
+        final String x;
     }
 }
