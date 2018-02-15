@@ -111,14 +111,26 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     .append(String.format(Locale.ENGLISH, format, "m <emailId>",
                             "Send response output of command execution to <emailId>"))
                     .append(String.format(Locale.ENGLISH, format, "", "Example usage: help | m bob@hope.com"));
-            verifyResponse(is, String.format(Locale.ENGLISH, sb.toString(), "auditEvents", "Event auditing",
-                    "autoConfigurationReport", "Autoconfiguration report", "beans", "List beans",
-                    "configurationPropertiesReport", "Configuration properties report", "dummy", "dummy description",
-                    "environment", "Environment details", "exit", "Exit shell", "health", "System health info", "help",
-                    "Show list of help commands", "iae", "throws IAE", "info", "System status", "loggers",
-                    "Logging configuration", "metrics", "Metrics operations", "requestMapping",
-                    "Request mapping information", "shutdown", "Shutdown application", "status", "System status",
-                    "test", "test description", "threadDump", "Print thread dump", "traces", "Trace information"));
+            verifyResponse(is, String.format(Locale.ENGLISH, sb.toString(),
+                    "auditEvents", "Event auditing",
+                    "beans", "List beans",
+                    "conditionsReport", "Conditions report",
+                    "configurationPropertiesReport", "Configuration properties report",
+                    "dummy", "dummy description",
+                    "environment", "Environment details",
+                    "exit", "Exit shell",
+                    "health", "System health info",
+                    "help", "Show list of help commands",
+                    "httpTrace", "Http trace information",
+                    "iae", "throws IAE",
+                    "info", "System status", 
+                    "loggers", "Logging configuration",
+                    "mappings", "List http request mappings",
+                    "metrics", "Metrics operations",
+                    "scheduledTasks", "Scheduled tasks",
+                    "shutdown", "Shutdown application",
+                    "test", "test description",
+                    "threadDump", "Print thread dump"));
         });
     }
 
@@ -171,27 +183,9 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Test
     public void testHighlightProcessor() {
         sshCallShell((is, os) -> {
-            String format = "\r\n%-35s%s"; // must be same with usageInfoFormat in SshdShellProperties.java
-            write(os, "help | h <emailId>");
-            StringBuilder sb = new StringBuilder("Supported Commands");
-            for (int i = 0; i < 19; i++) {
-                sb.append(format);
-            }
-            sb.append("\r\nSupported post processors for output")
-                    .append(String.format(Locale.ENGLISH, format, "h <arg>",
-                            "Highlights <arg> in response output of command execution"))
-                    .append(String.format(Locale.ENGLISH, format, "", "Example usage: help | h exit"))
-                    .append(String.format(Locale.ENGLISH, "\r\n%-44s%s", "m \u001B[43m<emailId>\u001B[0m",
-                            "Send response output of command execution to \u001B[43m<emailId>\u001B[0m"))
-                    .append(String.format(Locale.ENGLISH, format, "", "Example usage: help | m bob@hope.com"));
-            verifyResponse(is, String.format(Locale.ENGLISH, sb.toString(), "auditEvents", "Event auditing",
-                    "autoConfigurationReport", "Autoconfiguration report", "beans", "List beans",
-                    "configurationPropertiesReport", "Configuration properties report", "dummy", "dummy description",
-                    "environment", "Environment details", "exit", "Exit shell", "health", "System health info", "help",
-                    "Show list of help commands", "iae", "throws IAE", "info", "System status", "loggers",
-                    "Logging configuration", "metrics", "Metrics operations", "requestMapping",
-                    "Request mapping information", "shutdown", "Shutdown application", "status", "System status",
-                    "test", "test description", "threadDump", "Print thread dump", "traces", "Trace information"));
+            write(os, "test | h subcommand");
+            verifyResponse(is, "Supported \u001B[43msubcommand\u001B[0m for test\r\n\rexecute\t\ttest execute\r\n\rinteractive"
+                    + "\t\ttest interactive\r\n\rrun\t\ttest run");
         });
     }
 
@@ -237,18 +231,10 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     }
     
     @Test
-    public void testAutoConfigurationReportCommand() {
-        sshCallShell((is, os) -> {
-            write(os, "autoConfigurationReport");
-            verifyResponse(is, "{\r\n  \"positiveMatches\" : {");
-        });
-    }
-    
-    @Test
     public void testBeansCommand() {
         sshCallShell((is, os) -> {
             write(os, "beans");
-            verifyResponse(is, "{\r\n  \"id\" : ");
+            verifyResponse(is, "{\r\n  \"contexts\" : {");
         });
     }
     
@@ -256,7 +242,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testConfigurationPropertiesReportCommand() {
         sshCallShell((is, os) -> {
             write(os, "configurationPropertiesReport");
-            verifyResponse(is, "{\r\n  \"beans\" : {");
+            verifyResponse(is, "{\r\n  \"contexts\" : {");
         });
     }
     
@@ -383,16 +369,8 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Test
     public void testMetricsInvalidJson() {
         sshCallShell((is, os) -> {
-            write(os, "metrics metricName {}");
+            write(os, "metrics metricName {\"help\":\"invalid\"}");
             verifyResponse(is, "Expected valid json as argument");
-        });
-    }
-    
-    @Test
-    public void testRequestMappingCommand() {
-        sshCallShell((is, os) -> {
-            write(os, "requestMapping");
-            verifyResponse(is, "{\r\n  \"/webjars/**\"");
         });
     }
     
@@ -406,21 +384,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     }
     
     @Test
-    public void testStatusCommand() {
-        int smtpPort = SocketUtils.findAvailableTcpPort();
-        ServerSetup setup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
-        setup.setServerStartupTimeout(5000);
-        GreenMail mailServer = new GreenMail(setup);
-        mailServer.start();
-        ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
-        sshCallShell((is, os) -> {
-            write(os, "status");
-            verifyResponse(is, "{\r\n  \"status\" : \"UP\"\r\n}");
-            mailServer.stop();
-        });
-    }
-    
-    @Test
     public void testThreadDumpCommand() {
         sshCallShell((is, os) -> {
             write(os, "threadDump");
@@ -429,9 +392,9 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     }
     
     @Test
-    public void testTracesCommand() {
+    public void testHttpTraceCommand() {
         sshCallShell((is, os) -> {
-            write(os, "traces");
+            write(os, "httpTrace");
             verifyResponse(is, "{\r\n  \"traces\" : [ ]\r\n}");
         });
     }

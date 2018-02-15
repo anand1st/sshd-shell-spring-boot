@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 anand.
+ * Copyright 2018 anand.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.trace.TraceEndpoint;
+import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -27,14 +27,14 @@ import sshd.shell.springboot.console.ConsoleIO;
  * @author anand
  */
 @Component
-@ConditionalOnClass(TraceEndpoint.class)
-@SshdShellCommand(value = "traces", description = "Trace information")
-public final class TracesCommand {
+@ConditionalOnClass(ConditionsReportEndpoint.class)
+@SshdShellCommand(value = "conditionsReport", description = "Conditions report")
+public class ConditionsReportCommand {
     
     @Autowired
-    private TraceEndpoint traceEndpoint;
+    private ConditionsReportEndpoint conditionsReportEndpoint;
     
-    public String traces(String arg) {
-        return ConsoleIO.asJson(traceEndpoint.traces());
+    public String conditionsReport(String arg) {
+        return ConsoleIO.asJson(conditionsReportEndpoint.applicationConditionEvaluation());
     }
 }

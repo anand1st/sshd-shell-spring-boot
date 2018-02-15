@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 anand.
+ * Copyright 2018 anand.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.StatusEndpoint;
+import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -27,14 +27,14 @@ import sshd.shell.springboot.console.ConsoleIO;
  * @author anand
  */
 @Component
-@ConditionalOnClass(StatusEndpoint.class)
-@SshdShellCommand(value = "status", description = "System status")
-public final class StatusCommand {
+@ConditionalOnClass(ScheduledTasksEndpoint.class)
+@SshdShellCommand(value = "scheduledTasks", description = "Scheduled tasks")
+public class ScheduledTasksCommand {
     
     @Autowired
-    private StatusEndpoint statusEndpoint;
+    private ScheduledTasksEndpoint scheduledTasksEndpoint;
     
-    public String status(String arg) {
-        return ConsoleIO.asJson(statusEndpoint.health());
+    public String scheduledTasks(String arg) {
+        return ConsoleIO.asJson(scheduledTasksEndpoint.scheduledTasks());
     }
 }

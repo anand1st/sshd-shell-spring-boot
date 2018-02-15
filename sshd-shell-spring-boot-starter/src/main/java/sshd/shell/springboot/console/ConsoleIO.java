@@ -33,7 +33,7 @@ import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 @lombok.extern.slf4j.Slf4j
 public enum ConsoleIO {
     ;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
     private static final ObjectWriter WRITER = OBJECT_MAPPER.writer().withDefaultPrettyPrinter();
     static final String LINE_READER = "__lineReader";
     static final String TEXT_STYLE = "__textStyle";

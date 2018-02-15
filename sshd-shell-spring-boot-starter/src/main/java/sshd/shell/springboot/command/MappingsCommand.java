@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 anand.
+ * Copyright 2018 anand.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.web.servlet.RequestMappingEndpoint;
+import org.springframework.boot.actuate.web.mappings.MappingsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 import sshd.shell.springboot.console.ConsoleIO;
 
@@ -28,14 +27,14 @@ import sshd.shell.springboot.console.ConsoleIO;
  * @author anand
  */
 @Component
-@ConditionalOnClass({RequestMappingEndpoint.class, AbstractHandlerMapping.class})
-@SshdShellCommand(value = "requestMapping", description = "Request mapping information")
-public final class RequestMappingCommand {
+@ConditionalOnClass(MappingsEndpoint.class)
+@SshdShellCommand(value = "mappings", description = "List http request mappings")
+public class MappingsCommand {
     
     @Autowired
-    private RequestMappingEndpoint reqMappingEndpoint;
+    private MappingsEndpoint mappingsEndpoint;
     
-    public String requestMapping(String arg) {
-        return ConsoleIO.asJson(reqMappingEndpoint.mappings());
+    public String mappings(String arg) {
+        return ConsoleIO.asJson(mappingsEndpoint.mappings());
     }
 }

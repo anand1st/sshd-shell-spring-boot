@@ -15,6 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
@@ -65,10 +66,11 @@ public final class LoggersCommand {
         }
     }
 
-    @lombok.AllArgsConstructor
     private static class LogConfig {
 
-        private final String name;
-        private final LogLevel configuredLevel;
+        @JsonProperty(required = true)
+        String name;
+        @JsonProperty(required = true)
+        LogLevel configuredLevel;
     }
 }

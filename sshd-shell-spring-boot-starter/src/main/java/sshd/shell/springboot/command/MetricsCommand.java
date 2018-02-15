@@ -59,12 +59,11 @@ public class MetricsCommand {
         }
     }
     
-    @lombok.AllArgsConstructor
     private static class MetricTags {
         
         @JsonProperty(required = true)
-        private final String name;
+        String name;
         @JsonIgnoreProperties(ignoreUnknown = true)
-        private final List<String> tags;
+        List<String> tags;
     }
 }
