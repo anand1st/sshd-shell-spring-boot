@@ -67,6 +67,8 @@ abstract class AbstractSshSupport {
                 pos.close();
                 channel.disconnect();
                 session.disconnect();
+                // Random failures happen if thread returns immediately.
+                await().atLeast(Duration.FIVE_HUNDRED_MILLISECONDS);
             }
         } catch (JSchException | IOException ex) {
             fail(ex.toString());
@@ -92,8 +94,6 @@ abstract class AbstractSshSupport {
             });
         } finally {
             System.out.println(sb.toString());
-            // Random failures happen if thread returns immediately.
-            await().atLeast(Duration.FIVE_HUNDRED_MILLISECONDS);
         }
     }
 
