@@ -33,7 +33,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
@@ -101,9 +100,7 @@ class SshdServerConfiguration {
         return server;
     }
     
-    @Bean
-    @Scope("prototype")
-    SshSessionInstance sshSessionInstance() {
+    private SshSessionInstance sshSessionInstance() {
         return new SshSessionInstance(environment, shellBanner, terminalProcessor);
     }
 

@@ -28,7 +28,7 @@ import sshd.shell.springboot.autoconfiguration.Constants;
  */
 class SshdAuthorizedKeysAuthenticator extends AuthorizedKeysAuthenticator {
     
-    public SshdAuthorizedKeysAuthenticator(File file) {
+    SshdAuthorizedKeysAuthenticator(File file) {
         super(file);
     }
 

@@ -398,4 +398,28 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"traces\" : [ ]\r\n}");
         });
     }
+    
+    @Test
+    public void testConditionsReportCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "conditionsReport");
+            verifyResponse(is, "{\r\n  \"contexts\" : {");
+        });
+    }
+    
+    @Test
+    public void testMappingsCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "mappings");
+            verifyResponse(is, "{\r\n  \"contexts\" : {");
+        });
+    }
+    
+    @Test
+    public void testScheduledTasksCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "scheduledTasks");
+            verifyResponse(is, "{\r\n  \"cron\" :");
+        });
+    }
 }
