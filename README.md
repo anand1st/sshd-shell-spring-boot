@@ -13,16 +13,18 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.2</version>
+        <version>3.2.1</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
-### Version 3.2
+### Version 3.2.1
 Support for spring boot 2.0.0.RC1
 Upgraded to jline 3.6.0, sshd-core 1.7.0
 Minor code fixes and refactorings.
+
+### Please do not use version 3.2 as there seems to be some Jackson incompatibilities on Linux. Version 3.2.1 fixes these issues.
 
 ### Version 3.1
 Added support for SSH exec in addition to SSH shell.
