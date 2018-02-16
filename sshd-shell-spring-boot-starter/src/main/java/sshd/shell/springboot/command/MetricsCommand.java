@@ -62,8 +62,8 @@ public class MetricsCommand {
     private static class MetricTags {
         
         @JsonProperty(required = true)
-        String name;
+        public String name;
         @JsonIgnoreProperties(ignoreUnknown = true)
-        List<String> tags;
+        public List<String> tags;
     }
 }

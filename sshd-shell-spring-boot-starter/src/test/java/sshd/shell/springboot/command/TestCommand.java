@@ -49,8 +49,7 @@ public class TestCommand {
     }
     
     @lombok.AllArgsConstructor
-    @lombok.Getter
     private static class X {
-        private final String obj;
+        public final String obj;
     }
 }

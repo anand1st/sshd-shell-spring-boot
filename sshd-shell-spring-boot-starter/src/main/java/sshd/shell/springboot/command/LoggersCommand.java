@@ -69,8 +69,8 @@ public final class LoggersCommand {
     private static class LogConfig {
 
         @JsonProperty(required = true)
-        String name;
+        public String name;
         @JsonProperty(required = true)
-        LogLevel configuredLevel;
+        public LogLevel configuredLevel;
     }
 }

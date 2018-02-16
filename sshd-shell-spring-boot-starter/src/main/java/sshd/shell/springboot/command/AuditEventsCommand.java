@@ -58,9 +58,9 @@ public final class AuditEventsCommand {
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class Event {
 
-        String principal;
+        public String principal;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-        OffsetDateTime after;
-        String type;
+        public OffsetDateTime after;
+        public String type;
     }
 }
