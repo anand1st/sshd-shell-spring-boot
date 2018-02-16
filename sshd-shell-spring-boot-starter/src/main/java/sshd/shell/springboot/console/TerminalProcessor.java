@@ -82,6 +82,7 @@ public class TerminalProcessor {
             try {
                 handleUserInput(line.trim());
             } catch (InterruptedException | UserInterruptException ex) {
+                Thread.interrupted();
                 log.info(ex.getMessage());
                 ConsoleIO.writeOutput(ex.getMessage());
                 break;
