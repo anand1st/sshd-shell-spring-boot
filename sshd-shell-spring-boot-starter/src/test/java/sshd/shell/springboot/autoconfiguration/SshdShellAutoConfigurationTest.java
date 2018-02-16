@@ -44,6 +44,14 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Test
+    public void testMappingsCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "mappings");
+            verifyResponse(is, "{\r\n  \"contexts\" : {");
+        });
+    }
+
     //FIXME Figure out why following test case fails when run as part of test suite but passes when run as focused test
     @Ignore
     @Test
@@ -123,7 +131,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     "help", "Show list of help commands",
                     "httpTrace", "Http trace information",
                     "iae", "throws IAE",
-                    "info", "System status", 
+                    "info", "System status",
                     "loggers", "Logging configuration",
                     "mappings", "List http request mappings",
                     "metrics", "Metrics operations",
@@ -213,7 +221,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     + "\"type\":\"<type>\"}");
         });
     }
-    
+
     @Test
     public void testAuditEventsCommandInvalidJson() {
         sshCallShell((is, os) -> {
@@ -221,7 +229,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Expected valid json as argument");
         });
     }
-    
+
     @Test
     public void testAuditEventsCommand() {
         sshCallShell((is, os) -> {
@@ -229,7 +237,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"events\" : [ ]\r\n}");
         });
     }
-    
+
     @Test
     public void testBeansCommand() {
         sshCallShell((is, os) -> {
@@ -237,7 +245,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"contexts\" : {");
         });
     }
-    
+
     @Test
     public void testConfigurationPropertiesReportCommand() {
         sshCallShell((is, os) -> {
@@ -245,15 +253,15 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"contexts\" : {");
         });
     }
-    
+
     @Test
     public void testEnvironmentPatternCommand() {
         sshCallShell((is, os) -> {
-           write(os, "environment pattern");
-           verifyResponse(is, "{\r\n  \"activeProfiles\"");
+            write(os, "environment pattern");
+            verifyResponse(is, "{\r\n  \"activeProfiles\"");
         });
     }
-    
+
     @Test
     public void testEnvironmentEntryCommandValidArg() {
         sshCallShell((is, os) -> {
@@ -261,7 +269,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"property\"");
         });
     }
-    
+
     @Test
     public void testEnvironmentEntryCommandInvalidArg() {
         sshCallShell((is, os) -> {
@@ -269,7 +277,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Usage: environment entry <stringToMatch>");
         });
     }
-    
+
     @Test
     public void testHealthCommand() {
         int smtpPort = SocketUtils.findAvailableTcpPort();
@@ -284,7 +292,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             mailServer.stop();
         });
     }
-    
+
     @Test
     public void testInfoCommand() {
         sshCallShell((is, os) -> {
@@ -292,7 +300,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{ }");
         });
     }
-    
+
     @Test
     public void testLoggersCommandInfo() {
         sshCallShell((is, os) -> {
@@ -300,7 +308,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"levels\" : [ \"OFF\", \"ERROR\", \"WARN\", \"INFO\", \"DEBUG\", \"TRACE\" ]");
         });
     }
-    
+
     @Test
     public void testLoggersCommandLoggerLevelsNullArg() {
         sshCallShell((is, os) -> {
@@ -308,7 +316,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Usage: loggers level <loggerName>");
         });
     }
-    
+
     @Test
     public void testLoggersCommandLoggerLevelsValidArg() {
         sshCallShell((is, os) -> {
@@ -316,7 +324,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"configuredLevel\" : \"INFO\",\r\n  \"effectiveLevel\" : \"INFO\"\r\n}");
         });
     }
-    
+
     @Test
     public void testLoggersCommandConfigureNullArg() {
         sshCallShell((is, os) -> {
@@ -325,7 +333,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}");
         });
     }
-    
+
     @Test
     public void testLoggersCommandConfigureValidArg() {
         sshCallShell((is, os) -> {
@@ -333,7 +341,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Changed log level for ROOT to INFO");
         });
     }
-    
+
     @Test
     public void testLoggersCommandConfigureInvalidJson() {
         sshCallShell((is, os) -> {
@@ -341,7 +349,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Expected valid json as argument");
         });
     }
-    
+
     @Test
     public void testMetricsCommandListNames() {
         sshCallShell((is, os) -> {
@@ -349,7 +357,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"names\" : [");
         });
     }
-    
+
     @Test
     public void testMetricsCommandNullMetricName() {
         sshCallShell((is, os) -> {
@@ -357,7 +365,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Usage: metrics metricName {\"name\":\"<metricName>\",\"tags\":[\"<array of tags>\"]}");
         });
     }
-    
+
     @Test
     public void testMetricsCommandValidMetricName() {
         sshCallShell((is, os) -> {
@@ -365,7 +373,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"name\" : \"jvm.memory.used");
         });
     }
-    
+
     @Test
     public void testMetricsInvalidJson() {
         sshCallShell((is, os) -> {
@@ -373,7 +381,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "Expected valid json as argument");
         });
     }
-    
+
     @Test
     @DirtiesContext
     public void testShutdownCommand() {
@@ -382,7 +390,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"message\" : \"Shutting down, bye...\"\r\n}");
         });
     }
-    
+
     @Test
     public void testThreadDumpCommand() {
         sshCallShell((is, os) -> {
@@ -390,7 +398,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"threads\" : [ {");
         });
     }
-    
+
     @Test
     public void testHttpTraceCommand() {
         sshCallShell((is, os) -> {
@@ -398,7 +406,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"traces\" : [ ]\r\n}");
         });
     }
-    
+
     @Test
     public void testConditionsReportCommand() {
         sshCallShell((is, os) -> {
@@ -406,15 +414,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponse(is, "{\r\n  \"contexts\" : {");
         });
     }
-    
-    @Test
-    public void testMappingsCommand() {
-        sshCallShell((is, os) -> {
-            write(os, "mappings");
-            verifyResponse(is, "{\r\n  \"contexts\" : {");
-        });
-    }
-    
+
     @Test
     public void testScheduledTasksCommand() {
         sshCallShell((is, os) -> {
