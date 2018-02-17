@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.SocketUtils;
 
 /**
@@ -382,14 +381,14 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @Test
-    @DirtiesContext
-    public void testShutdownCommand() {
-        sshCallShell((is, os) -> {
-            write(os, "shutdown");
-            verifyResponse(is, "{\r\n  \"message\" : \"Shutting down, bye...\"\r\n}");
-        });
-    }
+//    @Test
+//    @DirtiesContext
+//    public void testShutdownCommand() {
+//        sshCallShell((is, os) -> {
+//            write(os, "shutdown");
+//            verifyResponse(is, "{\r\n  \"message\" : \"Shutting down, bye...\"\r\n}");
+//        });
+//    }
 
     @Test
     public void testThreadDumpCommand() {
