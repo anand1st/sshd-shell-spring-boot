@@ -63,8 +63,13 @@ abstract class AbstractSshSupport {
             try {
                 executor.execute(pis, pos);
             } finally {
-                // Random failures happen if thread returns immediately.
-                await().atLeast(Duration.FIVE_HUNDRED_MILLISECONDS);
+                try {
+                    // Random failures happen if thread returns immediately.
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Thread.interrupted();
+                    fail(ex.toString());
+                }
                 pis.close();
                 pos.close();
                 channel.disconnect();
