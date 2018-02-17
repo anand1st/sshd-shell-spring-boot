@@ -44,13 +44,13 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Autowired
     private JavaMailSender mailSender;
 
-//    @Test
-//    public void testMappingsCommand() {
-//        sshCallShell((is, os) -> {
-//            write(os, "mappings");
-//            verifyResponse(is, "{\r\n  \"contexts\" : {");
-//        });
-//    }
+    @Test
+    public void testMappingsCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "mappings");
+            verifyResponse(is, "{\r\n  \"contexts\" : {");
+        });
+    }
 
     //FIXME Figure out why following test case fails when run as part of test suite but passes when run as focused test
     @Ignore

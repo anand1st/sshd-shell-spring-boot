@@ -58,26 +58,6 @@ class SshdServerConfiguration {
     @Qualifier("__shellBanner")
     @Autowired
     private Banner shellBanner;
-
-    @Bean
-    PasswordAuthenticator passwordAuthenticator() {
-        SshdShellProperties.Shell.Auth props = properties.getShell().getAuth();
-        switch (props.getAuthType()) {
-            case SIMPLE:
-                return new SimpleSshdPasswordAuthenticator(properties);
-            case AUTH_PROVIDER:
-                try {
-                    AuthenticationProvider authProvider = Objects.isNull(props.getAuthProviderBeanName())
-                            ? appContext.getBean(AuthenticationProvider.class)
-                            : appContext.getBean(props.getAuthProviderBeanName(), AuthenticationProvider.class);
-                    return new AuthProviderSshdPasswordAuthenticator(authProvider);
-                } catch (BeansException ex) {
-                    throw new IllegalArgumentException("Expected a default or valid AuthenticationProvider bean", ex);
-                }
-            default:
-                throw new IllegalArgumentException("Invalid/Unsupported auth type");
-        }
-    }
     
     @Bean
     SshServer sshServer() {
@@ -99,7 +79,26 @@ class SshdServerConfiguration {
         server.setCommandFactory(command -> sshSessionInstance());
         return server;
     }
-    
+
+    private PasswordAuthenticator passwordAuthenticator() {
+        SshdShellProperties.Shell.Auth props = properties.getShell().getAuth();
+        switch (props.getAuthType()) {
+            case SIMPLE:
+                return new SimpleSshdPasswordAuthenticator(properties);
+            case AUTH_PROVIDER:
+                try {
+                    AuthenticationProvider authProvider = Objects.isNull(props.getAuthProviderBeanName())
+                            ? appContext.getBean(AuthenticationProvider.class)
+                            : appContext.getBean(props.getAuthProviderBeanName(), AuthenticationProvider.class);
+                    return new AuthProviderSshdPasswordAuthenticator(authProvider);
+                } catch (BeansException ex) {
+                    throw new IllegalArgumentException("Expected a default or valid AuthenticationProvider bean", ex);
+                }
+            default:
+                throw new IllegalArgumentException("Invalid/Unsupported auth type");
+        }
+    }
+
     private SshSessionInstance sshSessionInstance() {
         return new SshSessionInstance(environment, shellBanner, terminalProcessor);
     }
@@ -111,7 +110,7 @@ class SshdServerConfiguration {
         properties.getShell().setPort(server.getPort()); // In case server port is 0, a random port is assigned.
         log.info("SSH server started on port {}", properties.getShell().getPort());
     }
-    
+
     @PreDestroy
     void stopServer() throws IOException {
         sshServer().stop();
