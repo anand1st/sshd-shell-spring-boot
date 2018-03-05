@@ -52,7 +52,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
-        <jline.version>3.6.0</jline.version>
+        <jline.version>3.6.1</jline.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -109,18 +109,6 @@
             <groupId>org.jline</groupId>
             <artifactId>jline-builtins</artifactId>
             <version>${jline.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jna</artifactId>
-            <version>${jline.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jansi</artifactId>
-            <version>${jline.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

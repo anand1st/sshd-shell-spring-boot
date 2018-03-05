@@ -154,7 +154,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testInteractive() {
         sshCallShell((is, os) -> {
             write(os, "test interactive", "anand");
-            verifyResponse(is, "Name: anand{\r\n  \"obj\" : \"anand\"\r\n}\r\nHi anand");
+            verifyResponse(is, "{\r\n  \"obj\" : \"anand\"\r\n}\r\nHi anand");
         });
     }
 
