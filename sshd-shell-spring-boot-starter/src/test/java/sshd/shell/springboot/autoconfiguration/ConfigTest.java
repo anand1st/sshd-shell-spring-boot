@@ -18,8 +18,12 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import java.util.Arrays;
 import java.util.Collection;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -37,6 +41,12 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 @lombok.extern.slf4j.Slf4j
 public class ConfigTest {
 
+    public ConfigTest() {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Level.INFO);
+    }
+    
     @SuppressWarnings("deprecation")
     @Bean
     public AuthenticationProvider authProvider() {
