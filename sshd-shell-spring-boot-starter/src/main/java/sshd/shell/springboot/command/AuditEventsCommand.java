@@ -22,6 +22,7 @@ import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEventsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -33,6 +34,7 @@ import sshd.shell.springboot.console.ConsoleIO;
  */
 @Component
 @ConditionalOnClass(AuditEventsEndpoint.class)
+@ConditionalOnProperty(name = "management.endpoint.auditevents.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "auditEvents", description = "Event auditing")
 @lombok.extern.slf4j.Slf4j
 public final class AuditEventsCommand {

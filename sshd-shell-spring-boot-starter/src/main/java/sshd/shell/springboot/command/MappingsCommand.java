@@ -18,6 +18,7 @@ package sshd.shell.springboot.command;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.web.mappings.MappingsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 import sshd.shell.springboot.console.ConsoleIO;
@@ -28,6 +29,7 @@ import sshd.shell.springboot.console.ConsoleIO;
  */
 @Component
 @ConditionalOnClass(MappingsEndpoint.class)
+@ConditionalOnProperty(name = "management.endpoint.mappings.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "mappings", description = "List http request mappings")
 public class MappingsCommand {
     
