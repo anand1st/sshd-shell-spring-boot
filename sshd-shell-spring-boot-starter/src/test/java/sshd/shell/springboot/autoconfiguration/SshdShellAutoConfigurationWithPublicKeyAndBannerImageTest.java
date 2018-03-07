@@ -35,8 +35,10 @@ import org.springframework.boot.test.context.SpringBootTest;
  *
  * @author anand
  */
-@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
-    "banner.image.location=banner.png"})
+@SpringBootTest(classes = ConfigTest.class, properties = {
+    "sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
+    "banner.image.location=banner.png"
+})
 public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends AbstractSshSupport {
 
     @Autowired

@@ -21,7 +21,11 @@ import org.springframework.boot.test.context.SpringBootTest;
  *
  * @author anand
  */
-@SpringBootTest(classes = ConfigTest.class, properties = {"sshd.shell.auth.authType=AUTH_PROVIDER",
-    "sshd.shell.username=bob", "sshd.shell.password=bob", "sshd.shell.auth.authProviderBeanName=authProvider"})
+@SpringBootTest(classes = ConfigTest.class, properties = {
+    "sshd.shell.auth.authType=AUTH_PROVIDER",
+    "sshd.shell.username=bob",
+    "sshd.shell.password=bob",
+    "sshd.shell.auth.authProviderBeanName=authProvider"
+})
 public class SshdShellAutoConfigurationAuthProviderBeanTest extends SshdShellAutoConfigurationAuthProviderTest {
 }
