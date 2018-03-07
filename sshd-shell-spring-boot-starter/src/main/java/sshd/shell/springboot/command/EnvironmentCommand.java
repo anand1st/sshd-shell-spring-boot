@@ -18,6 +18,7 @@ package sshd.shell.springboot.command;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -29,6 +30,7 @@ import sshd.shell.springboot.console.ConsoleIO;
  */
 @Component
 @ConditionalOnClass(EnvironmentEndpoint.class)
+@ConditionalOnProperty(name = "management.endpoint.env.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "environment", description = "Environment details")
 public final class EnvironmentCommand {
 

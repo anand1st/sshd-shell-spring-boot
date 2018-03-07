@@ -16,8 +16,10 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 import sshd.shell.springboot.console.ConsoleIO;
@@ -28,6 +30,7 @@ import sshd.shell.springboot.console.ConsoleIO;
  */
 @Component
 @ConditionalOnClass(HealthEndpoint.class)
+@ConditionalOnProperty(name = "management.endpoint.health.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "health", description = "System health info")
 public final class HealthCommand {
     
