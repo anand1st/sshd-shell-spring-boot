@@ -20,7 +20,7 @@ To import into Maven project, add the following dependency inside pom.xml:
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
 ### Version 3.3
-Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the command enabled/disabled according to this setting.
+Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the ssh command likewise is enabled/disabled according to this setting.
 
 ### Version 3.2.1
 Support for spring boot 2.0.0.RC1, 2.0.0.RC2 and 2.0.0.RELEASE.
