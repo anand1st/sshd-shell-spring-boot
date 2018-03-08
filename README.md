@@ -13,11 +13,14 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.2.1</version>
+        <version>3.3</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 3.3
+Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the command enabled/disabled according to this setting.
 
 ### Version 3.2.1
 Support for spring boot 2.0.0.RC1, 2.0.0.RC2 and 2.0.0.RELEASE.
