@@ -13,12 +13,18 @@ To import into Maven project, add the following dependency inside pom.xml:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.3</version>
+        <version>3.4</version>
     </dependency>
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
+### Version 3.4
+Support for SFTP and SCP with configurable Root File System. Upgraded jline to 3.7.0. See Usage section below for properties to be set. Tested with OSX only. Usage:
+
+    sftp -P 8022 admin@localhost
+    scp -P 8022 <localFile> admin@localhost:<filename> 
+	
 ### Version 3.3
 Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the ssh command likewise is enabled/disabled according to this setting.
 
@@ -106,6 +112,8 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     
+    sshd.filetransfer.enabled=true     # Defaults to false. Must be enabled for SCP and SFTP functionality
+    sshd.filesystem.base.dir=/home/app # Defaults to 'user.home' property
 When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading. It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the application.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
