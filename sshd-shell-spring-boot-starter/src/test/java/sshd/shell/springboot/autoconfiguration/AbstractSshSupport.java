@@ -47,13 +47,7 @@ abstract class AbstractSshSupport {
 
     protected void sshCall(String username, String password, SshExecutor executor, String channelType) {
         try {
-            JSch jsch = new JSch();
-            Session session = jsch.getSession(username, props.getShell().getHost(), props.getShell().getPort());
-            session.setPassword(password);
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.connect();
+            Session session = openSession(username, password);
             Channel channel = session.openChannel(channelType);
             PipedInputStream pis = new PipedInputStream();
             PipedOutputStream pos = new PipedOutputStream();
@@ -71,6 +65,17 @@ abstract class AbstractSshSupport {
         } catch (JSchException | IOException ex) {
             fail(ex.toString());
         }
+    }
+
+    protected Session openSession(String username, String password) throws JSchException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(username, props.getShell().getHost(), props.getShell().getPort());
+        session.setPassword(password);
+        Properties config = new Properties();
+        config.put("StrictHostKeyChecking", "no");
+        session.setConfig(config);
+        session.connect();
+        return session;
     }
 
     protected void sshCallShell(SshExecutor executor) {
