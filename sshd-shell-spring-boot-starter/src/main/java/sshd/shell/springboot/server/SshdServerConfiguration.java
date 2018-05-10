@@ -17,17 +17,35 @@ package sshd.shell.springboot.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.file.FileSystemFactory;
+import org.apache.sshd.common.file.nativefs.NativeFileSystemFactory;
+import org.apache.sshd.common.file.root.RootedFileSystem;
+import org.apache.sshd.common.file.root.RootedFileSystemProvider;
+import org.apache.sshd.common.session.Session;
+import org.apache.sshd.server.Command;
+import org.apache.sshd.server.CommandFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+import org.apache.sshd.server.scp.ScpCommandFactory;
+import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
@@ -58,7 +76,11 @@ class SshdServerConfiguration {
     @Qualifier("__shellBanner")
     @Autowired
     private Banner shellBanner;
-    
+    @Value("${sshd.filesystem.base.dir:#{systemProperties['user.home']}}")
+    private String filesystemBaseDir;
+    @Value("${sshd.filetransfer.enabled:false}")
+    private boolean isFileTransferEnabled;
+
     @Bean
     SshServer sshServer() {
         SshdShellProperties.Shell props = properties.getShell();
@@ -76,7 +98,17 @@ class SshdServerConfiguration {
         server.setPasswordAuthenticator(passwordAuthenticator());
         server.setPort(props.getPort());
         server.setShellFactory(() -> sshSessionInstance());
-        server.setCommandFactory(command -> sshSessionInstance());
+        if (isFileTransferEnabled) {
+            server.setCommandFactory(sshAndScpCommandFactory());
+            server.setFileSystemFactory(fileSystemFactory());
+            server.setSubsystemFactories(Arrays.<NamedFactory<Command>>asList(
+                    new SftpSubsystemFactory.Builder()
+                            .withShutdownOnExit(true)
+                            .withExecutorService(Executors.newFixedThreadPool(4))
+                            .build()));
+        } else {
+            server.setCommandFactory(sshCommandFactory());
+        }
         return server;
     }
 
@@ -101,6 +133,34 @@ class SshdServerConfiguration {
 
     private SshSessionInstance sshSessionInstance() {
         return new SshSessionInstance(environment, shellBanner, terminalProcessor);
+    }
+
+    private CommandFactory sshAndScpCommandFactory() {
+        ScpCommandFactory scpCommandFactory = new ScpCommandFactory();
+        scpCommandFactory.setDelegateCommandFactory(sshCommandFactory());
+        return scpCommandFactory;
+    }
+
+    private CommandFactory sshCommandFactory() {
+        return (command) -> sshSessionInstance();
+    }
+
+    private FileSystemFactory fileSystemFactory() {
+        RootedFileSystemProvider fileSystemProvider = new RootedFileSystemProvider();
+        return new NativeFileSystemFactory() {
+            @Override
+            public FileSystem createFileSystem(Session session) throws IOException {
+                Path sessionUserDir = Paths.get(filesystemBaseDir, session.getUsername());
+                if (Files.exists(sessionUserDir)) {
+                    if (!Files.isDirectory(sessionUserDir)) {
+                        throw new NotDirectoryException(sessionUserDir.toString());
+                    }
+                } else {
+                    log.info("Session user directory created: {}", Files.createDirectories(sessionUserDir));
+                }
+                return new RootedFileSystem(fileSystemProvider, sessionUserDir, null);
+            }
+        };
     }
 
     @PostConstruct
