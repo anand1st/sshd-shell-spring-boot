@@ -108,12 +108,11 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.prompt.color=           # Defaults to BLACK
     sshd.shell.text.color=             # Defaults to BLACK
     sshd.shell.text.highlightColor=    # Defaults to YELLOW
-    
     sshd.shell.auth.authType=SIMPLE		# Possible values: SIMPLE, AUTH_PROVIDER
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
+    sshd.filetransfer.enabled=true          # Defaults to false. Must be enabled for SCP and SFTP functionality
+    sshd.filesystem.base.dir=/home/app      # Defaults to 'user.home' property
     
-    sshd.filetransfer.enabled=true     # Defaults to false. Must be enabled for SCP and SFTP functionality
-    sshd.filesystem.base.dir=/home/app # Defaults to 'user.home' property
 When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading. It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the application.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
