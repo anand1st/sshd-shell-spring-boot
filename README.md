@@ -8,13 +8,19 @@ The motivation for this starter was due to the fact that spring-boot had officia
 
 This starter has been tested with spring-boot 2.0.0.M4 till 2.0.0.RELEASE with support its new endpoint infrastructure. For supporting the older spring boot versions, please see the git branch 1.5.x which supports 1.5.x right up to 2.0.0.M3 for more information.
 
-To import into Maven project, add the following dependency inside pom.xml:
+To import into Maven project, add the following dependency inside `pom.xml`:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
         <version>3.4</version>
     </dependency>
+    
+For Gradle users, add these lines inside `build.gradle`:
+
+    dependencies {
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.4'
+    }
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
