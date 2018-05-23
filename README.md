@@ -13,17 +13,20 @@ To import into Maven project, add the following dependency inside `pom.xml`:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.4</version>
+        <version>3.5</version>
     </dependency>
     
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
-        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.4'
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.5'
     }
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 3.5
+Modified SshdShellProperties to add the properties sshd.filetransfer.enabled and sshd.filesystem.base.dir properties. Added also username into SshSessionContext that can be accessed via SshSessionContext.get(Constants.USER). With these changes, one can now figure out the rooted filesystem for a session user by autowiring SshdShellProperties into the custom command classes and accessing the sshd.filesystem.base.dir property and by the session username. 
 
 ### Version 3.4
 Support for SFTP and SCP with configurable Root File System. Upgraded jline to 3.7.0. See Usage section below for properties to be set. Tested with OSX only. Usage:
