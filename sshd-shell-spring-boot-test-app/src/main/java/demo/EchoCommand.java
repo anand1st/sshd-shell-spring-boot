@@ -1,9 +1,13 @@
 package demo;
 
+import java.io.File;
 import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 import sshd.shell.springboot.console.ConsoleIO;
 
 /**
@@ -14,11 +18,15 @@ import sshd.shell.springboot.console.ConsoleIO;
 @SshdShellCommand(value = "echo", description = "Echo by users. Type 'echo' for supported subcommands")
 public class EchoCommand {
     
+    @Autowired
+    private SshdShellProperties props;
+    
     @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
     public String bobSays(String arg) throws IOException {
         String name = ConsoleIO.readInput("What's your name?");
         SshSessionContext.put("name", name);
-        return "bob echoes " + arg + " and your name is " + name;
+        return "bob echoes " + arg + " and your name is " + name + ", rooted filesystem path is "
+                + new File(props.getFilesystem().getBase().getDir(), SshSessionContext.get(Constants.USER)).toString();
     }
     
     @SshdShellCommand(value = "alice", description = "Alice's echo. Usage: echo alice <arg>")
