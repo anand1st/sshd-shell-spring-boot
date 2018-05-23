@@ -33,6 +33,28 @@ public class SshdShellProperties {
         AUTH_PROVIDER
     }
 
+    private final FileTransfer filetransfer = new FileTransfer();
+
+    @lombok.Data
+    public static class FileTransfer {
+
+        private boolean enabled = false;
+    }
+
+    private final Filesystem filesystem = new Filesystem();
+
+    @lombok.Data
+    public static class Filesystem {
+
+        private final Base base = new Base();
+
+        @lombok.Data
+        public static class Base {
+
+            private String dir = System.getProperty("user.home");
+        }
+    }
+
     private final Shell shell = new Shell();
 
     @lombok.Data
