@@ -27,14 +27,18 @@ import sshd.shell.springboot.autoconfiguration.Constants;
  * @author anand
  */
 class SshdAuthorizedKeysAuthenticator extends AuthorizedKeysAuthenticator {
-    
+
     SshdAuthorizedKeysAuthenticator(File file) {
         super(file);
     }
 
     @Override
     public boolean authenticate(String username, PublicKey key, ServerSession session) {
-        session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
-        return super.authenticate(username, key, session);
+        if (super.authenticate(username, key, session)) {
+            session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
+            session.getIoSession().setAttribute(Constants.USER, username);
+            return true;
+        }
+        return false;
     }
 }

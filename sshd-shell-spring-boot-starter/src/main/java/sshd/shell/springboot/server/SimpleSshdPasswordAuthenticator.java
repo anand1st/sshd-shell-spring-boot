@@ -29,7 +29,7 @@ import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 class SimpleSshdPasswordAuthenticator implements PasswordAuthenticator {
 
     private final SshdShellProperties.Shell props;
-    
+
     SimpleSshdPasswordAuthenticator(SshdShellProperties properties) {
         props = properties.getShell();
     }
@@ -37,8 +37,11 @@ class SimpleSshdPasswordAuthenticator implements PasswordAuthenticator {
     @Override
     public boolean authenticate(String username, String password, ServerSession session) throws
             PasswordChangeRequiredException {
-        session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
-        session.getIoSession().setAttribute(Constants.USER, username);
-        return username.equals(props.getUsername()) && password.equals(props.getPassword());
+        if (username.equals(props.getUsername()) && password.equals(props.getPassword())) {
+            session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
+            session.getIoSession().setAttribute(Constants.USER, username);
+            return true;
+        }
+        return false;
     }
 }

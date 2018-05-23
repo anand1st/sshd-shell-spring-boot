@@ -64,6 +64,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
+        SshSessionContext.put(Constants.USER, session.getSession().getIoSession().getAttribute(Constants.USER));
         try {
             terminalProcessor.processInputs(is, os, terminalType);
         } finally {

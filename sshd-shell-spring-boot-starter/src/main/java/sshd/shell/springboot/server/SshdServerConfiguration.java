@@ -45,7 +45,6 @@ import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
@@ -76,10 +75,6 @@ class SshdServerConfiguration {
     @Qualifier("__shellBanner")
     @Autowired
     private Banner shellBanner;
-    @Value("${sshd.filesystem.base.dir:#{systemProperties['user.home']}}")
-    private String filesystemBaseDir;
-    @Value("${sshd.filetransfer.enabled:false}")
-    private boolean isFileTransferEnabled;
 
     @Bean
     SshServer sshServer() {
@@ -98,7 +93,7 @@ class SshdServerConfiguration {
         server.setPasswordAuthenticator(passwordAuthenticator());
         server.setPort(props.getPort());
         server.setShellFactory(() -> sshSessionInstance());
-        if (isFileTransferEnabled) {
+        if (properties.getFiletransfer().isEnabled()) {
             server.setCommandFactory(sshAndScpCommandFactory());
             server.setFileSystemFactory(fileSystemFactory());
             server.setSubsystemFactories(Arrays.<NamedFactory<Command>>asList(
@@ -150,7 +145,7 @@ class SshdServerConfiguration {
         return new NativeFileSystemFactory() {
             @Override
             public FileSystem createFileSystem(Session session) throws IOException {
-                Path sessionUserDir = Paths.get(filesystemBaseDir, session.getUsername());
+                Path sessionUserDir = Paths.get(properties.getFilesystem().getBase().getDir(), session.getUsername());
                 if (Files.exists(sessionUserDir)) {
                     if (!Files.isDirectory(sessionUserDir)) {
                         throw new NotDirectoryException(sessionUserDir.toString());
