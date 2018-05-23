@@ -6,7 +6,7 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.M4 till 2.0.0.RELEASE with support its new endpoint infrastructure. For supporting the older spring boot versions, please see the git branch 1.5.x which supports 1.5.x right up to 2.0.0.M3 for more information.
+This starter has been tested with spring-boot 2.0.0.M4 till 2.0.2.RELEASE with support its new endpoint infrastructure. For supporting the older spring boot versions, please see the git branch 1.5.x which supports 1.5.x right up to 2.0.0.M3 for more information.
 
 To import into Maven project, add the following dependency inside `pom.xml`:
 
@@ -26,7 +26,14 @@ For Gradle users, add these lines inside `build.gradle`:
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
 ### Version 3.5
-Modified SshdShellProperties to add the properties sshd.filetransfer.enabled and sshd.filesystem.base.dir properties. Added also username into SshSessionContext that can be accessed via SshSessionContext.get(Constants.USER). With these changes, one can now figure out the rooted filesystem for a session user by autowiring SshdShellProperties into the custom command classes and accessing the sshd.filesystem.base.dir property and by the session username. 
+Modified SshdShellProperties to add the properties 
+
+    sshd.filetransfer.enabled
+    sshd.filesystem.base.dir
+Added also username into SshSessionContext that can be accessed via
+
+    SshSessionContext.get(Constants.USER)
+With these changes, one can now figure out the rooted filesystem for a session user by autowiring SshdShellProperties into the custom command classes to access the sshd.filesystem.base.dir property and by the session username.
 
 ### Version 3.4
 Support for SFTP and SCP with configurable Root File System. Upgraded jline to 3.7.0. See Usage section below for properties to be set. Tested with OSX only. Usage:
