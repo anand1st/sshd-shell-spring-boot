@@ -15,8 +15,10 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  *
@@ -32,6 +34,8 @@ public enum SshSessionContext {
             return new HashMap<>();
         }
     };
+    
+    private static final ThreadLocal<Supplier<File>> USER_DIR_CONTEXT = new ThreadLocal<Supplier<File>>();
 
     public static void put(String key, Object value) {
         THREAD_CONTEXT.get().put(key, value);
@@ -57,5 +61,14 @@ public enum SshSessionContext {
 
     public static void clear() {
         THREAD_CONTEXT.remove();
+        USER_DIR_CONTEXT.remove();
+    }
+    
+    public static void setUserDir(Supplier<File> userDirSupplier) {
+        USER_DIR_CONTEXT.set(userDirSupplier);
+    }
+    
+    public static File getUserDir() {
+        return USER_DIR_CONTEXT.get().get();
     }
 }
