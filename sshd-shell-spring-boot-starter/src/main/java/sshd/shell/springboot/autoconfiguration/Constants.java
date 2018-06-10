@@ -16,6 +16,7 @@
 package sshd.shell.springboot.autoconfiguration;
 
 /**
+ * For internal use only.
  *
  * @author anand
  */
@@ -26,4 +27,5 @@ public enum Constants {
     public static final String HELP = "help";
     public static final String USER_ROLES = "__userRoles";
     public static final String EXECUTE = "__execute";
+    public static final String SHELL_BANNER = "__shellBanner";
 }

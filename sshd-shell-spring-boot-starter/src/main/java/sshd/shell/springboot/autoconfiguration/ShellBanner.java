@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  *
  * @author anand
  */
-@Component(value = "__shellBanner")
+@Component(value = Constants.SHELL_BANNER)
 @lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE, onConstructor = @__(@Autowired))
 class ShellBanner implements Banner {
 
