@@ -24,12 +24,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.common.file.FileSystemFactory;
 import org.apache.sshd.common.file.nativefs.NativeFileSystemFactory;
 import org.apache.sshd.common.file.root.RootedFileSystem;
 import org.apache.sshd.common.file.root.RootedFileSystemProvider;
@@ -52,7 +52,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
+import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell.Auth;
 import sshd.shell.springboot.console.TerminalProcessor;
 
 /**
@@ -72,7 +74,7 @@ class SshdServerConfiguration {
     private Environment environment;
     @Autowired
     private TerminalProcessor terminalProcessor;
-    @Qualifier("__shellBanner")
+    @Qualifier(Constants.SHELL_BANNER)
     @Autowired
     private Banner shellBanner;
 
@@ -95,7 +97,7 @@ class SshdServerConfiguration {
         server.setShellFactory(() -> sshSessionInstance());
         if (properties.getFiletransfer().isEnabled()) {
             server.setCommandFactory(sshAndScpCommandFactory());
-            server.setFileSystemFactory(fileSystemFactory());
+            server.setFileSystemFactory(new MyNativeFileSystemFactory(properties.getFilesystem().getBase().getDir()));
             server.setSubsystemFactories(Arrays.<NamedFactory<Command>>asList(
                     new SftpSubsystemFactory.Builder()
                             .withShutdownOnExit(true)
@@ -108,26 +110,36 @@ class SshdServerConfiguration {
     }
 
     private PasswordAuthenticator passwordAuthenticator() {
-        SshdShellProperties.Shell.Auth props = properties.getShell().getAuth();
+        Auth props = properties.getShell().getAuth();
         switch (props.getAuthType()) {
             case SIMPLE:
                 return new SimpleSshdPasswordAuthenticator(properties);
             case AUTH_PROVIDER:
-                try {
-                    AuthenticationProvider authProvider = Objects.isNull(props.getAuthProviderBeanName())
-                            ? appContext.getBean(AuthenticationProvider.class)
-                            : appContext.getBean(props.getAuthProviderBeanName(), AuthenticationProvider.class);
-                    return new AuthProviderSshdPasswordAuthenticator(authProvider);
-                } catch (BeansException ex) {
-                    throw new IllegalArgumentException("Expected a default or valid AuthenticationProvider bean", ex);
-                }
+                return authProviderAuthenticator(props);
             default:
                 throw new IllegalArgumentException("Invalid/Unsupported auth type");
         }
     }
 
+    private PasswordAuthenticator authProviderAuthenticator(Auth props) throws IllegalArgumentException {
+        try {
+            AuthenticationProvider authProvider = Objects.isNull(props.getAuthProviderBeanName())
+                    ? appContext.getBean(AuthenticationProvider.class)
+                    : appContext.getBean(props.getAuthProviderBeanName(), AuthenticationProvider.class);
+            return new AuthProviderSshdPasswordAuthenticator(authProvider);
+        } catch (BeansException ex) {
+            throw new IllegalArgumentException("Expected a default or valid AuthenticationProvider bean", ex);
+        }
+    }
+
     private SshSessionInstance sshSessionInstance() {
-        return new SshSessionInstance(environment, shellBanner, terminalProcessor);
+        return new SshSessionInstance(environment, shellBanner, terminalProcessor, getBaseDirectory());
+    }
+
+    private Optional<String> getBaseDirectory() {
+        return properties.getFiletransfer().isEnabled()
+                ? Optional.of(properties.getFilesystem().getBase().getDir())
+                : Optional.empty();
     }
 
     private CommandFactory sshAndScpCommandFactory() {
@@ -138,24 +150,6 @@ class SshdServerConfiguration {
 
     private CommandFactory sshCommandFactory() {
         return (command) -> sshSessionInstance();
-    }
-
-    private FileSystemFactory fileSystemFactory() {
-        RootedFileSystemProvider fileSystemProvider = new RootedFileSystemProvider();
-        return new NativeFileSystemFactory() {
-            @Override
-            public FileSystem createFileSystem(Session session) throws IOException {
-                Path sessionUserDir = Paths.get(properties.getFilesystem().getBase().getDir(), session.getUsername());
-                if (Files.exists(sessionUserDir)) {
-                    if (!Files.isDirectory(sessionUserDir)) {
-                        throw new NotDirectoryException(sessionUserDir.toString());
-                    }
-                } else {
-                    log.info("Session user directory created: {}", Files.createDirectories(sessionUserDir));
-                }
-                return new RootedFileSystem(fileSystemProvider, sessionUserDir, null);
-            }
-        };
     }
 
     @PostConstruct
@@ -170,5 +164,29 @@ class SshdServerConfiguration {
     void stopServer() throws IOException {
         sshServer().stop();
         log.info("SSH server stopped");
+    }
+
+    @lombok.RequiredArgsConstructor
+    private static class MyNativeFileSystemFactory extends NativeFileSystemFactory {
+
+        private final RootedFileSystemProvider fileSystemProvider = new RootedFileSystemProvider();
+        private final String dir;
+
+        @Override
+        public FileSystem createFileSystem(Session session) throws IOException {
+            Path sessionUserDir = Paths.get(dir, session.getUsername());
+            if (Files.exists(sessionUserDir)) {
+                validateSessionUserDir(sessionUserDir);
+            } else {
+                log.info("Session user directory created: {}", Files.createDirectories(sessionUserDir));
+            }
+            return new RootedFileSystem(fileSystemProvider, sessionUserDir, null);
+        }
+
+        private void validateSessionUserDir(Path sessionUserDir) throws NotDirectoryException {
+            if (!Files.isDirectory(sessionUserDir)) {
+                throw new NotDirectoryException(sessionUserDir.toString());
+            }
+        }
     }
 }
