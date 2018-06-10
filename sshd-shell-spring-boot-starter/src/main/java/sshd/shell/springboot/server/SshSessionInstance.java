@@ -18,10 +18,13 @@
  */
 package sshd.shell.springboot.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Command;
@@ -44,6 +47,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     private final Environment environment;
     private final Banner shellBanner;
     private final TerminalProcessor terminalProcessor;
+    private final Optional<String> rootedFileSystemBaseDir;
     private InputStream is;
     private OutputStream os;
     private ExitCallback callback;
@@ -62,15 +66,25 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     @Override
     public void run() {
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
-        SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
-                .getAttribute(Constants.USER_ROLES));
-        SshSessionContext.put(Constants.USER, session.getSession().getIoSession().getAttribute(Constants.USER));
+        populateSessionContext();
         try {
             terminalProcessor.processInputs(is, os, terminalType);
         } finally {
             SshSessionContext.clear();
             callback.onExit(0);
         }
+    }
+
+    private void populateSessionContext() {
+        SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
+                .getAttribute(Constants.USER_ROLES));
+        Supplier<File> userDirSupplier = () -> new File(getRootedBaseDir(),
+                (String) session.getSession().getIoSession().getAttribute(Constants.USER));
+        SshSessionContext.setUserDir(userDirSupplier);
+    }
+
+    private String getRootedBaseDir() {
+        return rootedFileSystemBaseDir.orElseThrow(() -> new IllegalStateException("SCP/SFTP is not enabled"));
     }
 
     @Override
