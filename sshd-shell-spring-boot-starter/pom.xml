@@ -52,7 +52,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
-        <jline.version>3.9.0</jline.version>
+        <sshd.version>2.0.0</sshd.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -101,28 +101,18 @@
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-core</artifactId>
-            <version>2.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-scp</artifactId>
-            <version>2.0.0</version>
+            <version>${sshd.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-sftp</artifactId>
-            <version>2.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline-reader</artifactId>
-            <version>${jline.version}</version>
+            <version>${sshd.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-builtins</artifactId>
-            <version>${jline.version}</version>
+            <version>3.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
