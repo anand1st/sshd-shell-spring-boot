@@ -116,7 +116,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             String format = "\r\n%-35s%s"; // must be same with usageInfoFormat in SshdShellProperties.java
             write(os, "help");
             StringBuilder sb = new StringBuilder("Supported Commands");
-            for (int i = 0; i < 19; i++) {
+            for (int i = 0; i < 20; i++) {
                 sb.append(format);
             }
             sb.append("\r\nSupported post processors for output")
@@ -135,6 +135,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     "environment", "Environment details",
                     "exit", "Exit shell",
                     "health", "System health info",
+                    "heapDump", "Heap dump command",
                     "help", "Show list of help commands",
                     "httpTrace", "Http trace information",
                     "iae", "throws IAE",
@@ -457,6 +458,15 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCallShell((is, os) -> {
             write(os, "scheduledTasks");
             verifyResponse(is, "{\r\n  \"cron\" :");
+        });
+    }
+
+    @DirtiesContext
+    @Test
+    public void testHeapDump() {
+        sshCallShell((is, os) -> {
+            write(os, "heapDump live");
+            verifyResponse(is, "Usage: heapDump live <true|false>");
         });
     }
 }
