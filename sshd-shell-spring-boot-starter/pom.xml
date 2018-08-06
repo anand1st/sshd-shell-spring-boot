@@ -52,7 +52,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
-        <sshd.version>2.0.0</sshd.version>
+        <sshd.version>1.7.0</sshd.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -101,12 +101,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-scp</artifactId>
-            <version>${sshd.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-sftp</artifactId>
+            <artifactId>sshd-core</artifactId>
             <version>${sshd.version}</version>
         </dependency>
         <dependency>
