@@ -27,7 +27,6 @@ import javax.mail.internet.MimeMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,8 +43,8 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Test
     @DirtiesContext
+    @Test
     public void testMappingsCommand() {
         sshCallShell((is, os) -> {
             write(os, "mappings");
@@ -53,8 +52,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    //FIXME Figure out why following test case fails when run as part of test suite but passes when run as focused test
-    @Ignore
+    @DirtiesContext
     @Test
     public void testExitCommand() {
         sshCallShell((is, os) -> {
