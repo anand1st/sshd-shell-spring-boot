@@ -49,7 +49,8 @@ public abstract class BaseUserInputProcessor {
                 : handleUserInputWithMoreTokens(part, userRoles);
     }
     
-    public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts) throws ShellException {
+    public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts) 
+            throws ShellException {
         String[] part = userInput.split(regex);
         if (part.length != expectedNumberOfParts) {
             throw new ShellException("Invalid command");
@@ -73,14 +74,15 @@ public abstract class BaseUserInputProcessor {
         return commandExecutables;
     }
 
-    private void validateExecutableWithUserRole(CommandExecutableDetails ced, Collection<String> userRoles) throws
-            ShellException {
+    private void validateExecutableWithUserRole(CommandExecutableDetails ced, Collection<String> userRoles)
+            throws ShellException {
         if (!ced.matchesRole(userRoles)) {
             throw new ShellException("Permission denied");
         }
     }
 
-    private String handleSingleTokenUserInput(String command, Collection<String> userRoles) throws InterruptedException {
+    private String handleSingleTokenUserInput(String command, Collection<String> userRoles) throws
+            InterruptedException {
         CommandExecutableDetails ced = commandMap.get(command).get(Constants.EXECUTE);
         return Objects.isNull(ced.getCommandExecutor()) ? unknownSubcommandMessage(command, userRoles)
                 : ced.executeWithArg(null);
@@ -95,8 +97,8 @@ public abstract class BaseUserInputProcessor {
         return sb.toString();
     }
 
-    private String handleUserInputWithMoreTokens(String[] part, Collection<String> userRoles) throws
-            InterruptedException, ShellException {
+    private String handleUserInputWithMoreTokens(String[] part, Collection<String> userRoles)
+            throws InterruptedException, ShellException {
         Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(part[0]);
         if (!commandExecutables.containsKey(part[1])) {
             throw new ShellException("Unknown subcommand '" + part[1] + "'. Type '" + part[0]
