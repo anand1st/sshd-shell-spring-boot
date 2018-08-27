@@ -27,9 +27,9 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.ChannelSessionAware;
-import org.apache.sshd.server.Command;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
+import org.apache.sshd.server.command.Command;
 import org.springframework.boot.Banner;
 import org.springframework.core.env.Environment;
 import sshd.shell.springboot.autoconfiguration.Constants;
@@ -68,18 +68,18 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         populateSessionContext();
         try {
-            terminalProcessor.processInputs(is, os, terminalType);
+            terminalProcessor.processInputs(is, os, terminalType, exitCode -> callback.onExit(exitCode));
         } finally {
             SshSessionContext.clear();
-            callback.onExit(0);
         }
     }
 
     private void populateSessionContext() {
+        SshSessionContext.put(Constants.USER, session.getSession().getIoSession().getAttribute(Constants.USER));
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
         Supplier<File> userDirSupplier = () -> new File(getRootedBaseDir(),
-                (String) session.getSession().getIoSession().getAttribute(Constants.USER));
+                SshSessionContext.<String>get(Constants.USER));
         SshSessionContext.setUserDir(userDirSupplier);
     }
 

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.function.IntConsumer;
 import java.util.regex.Matcher;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -49,12 +50,12 @@ public class TerminalProcessor {
     private final Completer completer;
     private final List<BaseUserInputProcessor> userInputProcessors;
 
-    public void processInputs(InputStream is, OutputStream os, String terminalType) {
+    public void processInputs(InputStream is, OutputStream os, String terminalType, IntConsumer exitCallback) {
         try (Terminal terminal = TerminalBuilder.builder().system(false).type(terminalType).streams(is, os).build()) {
             LineReader reader = LineReaderBuilder.builder().terminal(terminal).completer(completer).build();
             createDefaultSessionContext(reader, terminal);
             ConsoleIO.writeOutput(SUPPORTED_COMMANDS_MESSAGE);
-            processUserInput(reader);
+            processInputs(reader, exitCallback);
         } catch (IOException ex) {
             log.error("Error building terminal instance", ex);
         }
@@ -74,17 +75,27 @@ public class TerminalProcessor {
                 : AttributedStyle.DEFAULT.foreground(color.value);
     }
 
-    private void processUserInput(LineReader reader) {
+    private void processInputs(LineReader reader, IntConsumer exitCallback) {
+        try {
+            processUserInput(reader, exitCallback);
+        } catch (UserInterruptException ex) {
+            log.warn("[{}] Ctrl-C interrupt", SshSessionContext.<String>get(Constants.USER));
+            exitCallback.accept(1);
+        }
+    }
+
+    private void processUserInput(LineReader reader, IntConsumer exitCallback) {
         String prompt = new AttributedStringBuilder().style(getStyle(properties.getPrompt().getColor()))
                 .append(properties.getPrompt().getTitle()).append("> ").style(AttributedStyle.DEFAULT).toAnsi();
         String line;
-        while ((line = reader.readLine(prompt)) != null) {
+        while ((line = reader.readLine(prompt)).trim() != null) {
             try {
-                handleUserInput(line.trim());
-            } catch (InterruptedException | UserInterruptException ex) {
+                log.info("[{}] Executed command: {}", SshSessionContext.<String>get(Constants.USER), line);
+                handleUserInput(line);
+            } catch (InterruptedException ex) {
                 Thread.interrupted();
-                log.info(ex.getMessage());
                 ConsoleIO.writeOutput(ex.getMessage());
+                exitCallback.accept(0);
                 break;
             } catch (ShellException ex) {
                 ConsoleIO.writeOutput(ex.getMessage());
