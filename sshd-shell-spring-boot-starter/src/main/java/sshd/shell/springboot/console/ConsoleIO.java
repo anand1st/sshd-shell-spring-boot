@@ -53,8 +53,9 @@ public enum ConsoleIO {
         LineReader reader = SshSessionContext.<LineReader>get(LINE_READER);
         AttributedStyle textStyle = SshSessionContext.<AttributedStyle>get(TEXT_STYLE);
         Terminal terminal = SshSessionContext.<Terminal>get(TERMINAL);
-        return reader.readLine(new AttributedStringBuilder().style(textStyle).append(text).append(' ')
-                .style(AttributedStyle.DEFAULT).toAnsi(terminal), mask);
+        String prompt = new AttributedStringBuilder().style(textStyle).append(text).append(' ')
+                .style(AttributedStyle.DEFAULT).toAnsi(terminal);
+        return reader.readLine(prompt, mask);
     }
 
     /**

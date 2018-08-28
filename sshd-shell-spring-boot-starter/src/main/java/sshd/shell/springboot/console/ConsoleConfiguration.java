@@ -15,10 +15,11 @@
  */
 package sshd.shell.springboot.console;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.jline.builtins.Completers;
+import org.jline.builtins.Completers.TreeCompleter.Node;
 import static org.jline.builtins.Completers.TreeCompleter.node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -45,12 +46,20 @@ class ConsoleConfiguration {
 
     @Bean
     TerminalProcessor terminalProcessor() {
-        List<Completers.TreeCompleter.Node> nodes = new ArrayList<>();
-        sshdShellCommands.entrySet().stream().forEach(entry -> {
-            Object[] subCommands = entry.getValue().keySet().stream().filter(s -> !s.equals(Constants.EXECUTE))
-                    .toArray(Object[]::new);
-            nodes.add(subCommands.length == 0 ? node(entry.getKey()) : node(entry.getKey(), node(subCommands)));
-        });
-        return new TerminalProcessor(properties.getShell(), new Completers.TreeCompleter(nodes), userInputProcessors);
+        return new TerminalProcessor(properties.getShell(), new Completers.TreeCompleter(buildTextCompleters()),
+                userInputProcessors);
+    }
+
+    private List<Node> buildTextCompleters() {
+        return sshdShellCommands.entrySet().stream().map(entry -> buildTextCompleterNode(entry))
+                .collect(Collectors.toList());
+    }
+
+    private Node buildTextCompleterNode(Map.Entry<String, Map<String, CommandExecutableDetails>> entry) {
+        Object[] subCommands = entry.getValue().keySet().stream().filter(s -> !s.equals(Constants.EXECUTE))
+                .toArray(Object[]::new);
+        return subCommands.length == 0
+                ? node(entry.getKey())
+                : node(entry.getKey(), node(subCommands));
     }
 }

@@ -50,7 +50,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     private final Optional<String> rootedFileSystemBaseDir;
     private InputStream is;
     private OutputStream os;
-    private ExitCallback callback;
+    private ExitCallback exitCallback;
     private Thread sshThread;
     private ChannelSession session;
     private String terminalType;
@@ -68,7 +68,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         populateSessionContext();
         try {
-            terminalProcessor.processInputs(is, os, terminalType, exitCode -> callback.onExit(exitCode));
+            terminalProcessor.processInputs(is, os, terminalType, exitCode -> exitCallback.onExit(exitCode));
         } finally {
             SshSessionContext.clear();
         }
@@ -98,7 +98,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
 
     @Override
     public void setExitCallback(ExitCallback ec) {
-        callback = ec;
+        exitCallback = ec;
     }
 
     @Override

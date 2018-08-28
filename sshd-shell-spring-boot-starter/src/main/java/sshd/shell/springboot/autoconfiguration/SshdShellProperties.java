@@ -28,20 +28,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @lombok.Data
 public class SshdShellProperties {
 
-    public static enum AuthType {
-        SIMPLE,
-        AUTH_PROVIDER
-    }
-
     private final FileTransfer filetransfer = new FileTransfer();
+    private final Filesystem filesystem = new Filesystem();
+    private final Shell shell = new Shell();
 
     @lombok.Data
     public static class FileTransfer {
 
         private boolean enabled = false;
+        private int threads = 4;
     }
-
-    private final Filesystem filesystem = new Filesystem();
 
     @lombok.Data
     public static class Filesystem {
@@ -54,8 +50,6 @@ public class SshdShellProperties {
             private String dir = System.getProperty("user.home");
         }
     }
-
-    private final Shell shell = new Shell();
 
     @lombok.Data
     public static class Shell {
@@ -92,5 +86,10 @@ public class SshdShellProperties {
             private AuthType authType = AuthType.SIMPLE;
             private String authProviderBeanName;
         }
+    }
+
+    public static enum AuthType {
+        SIMPLE,
+        AUTH_PROVIDER
     }
 }
