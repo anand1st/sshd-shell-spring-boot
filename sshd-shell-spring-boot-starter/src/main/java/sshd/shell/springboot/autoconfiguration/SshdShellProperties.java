@@ -83,13 +83,13 @@ public class SshdShellProperties {
         @lombok.Data
         public static class Auth {
 
+            public enum AuthType {
+                SIMPLE,
+                AUTH_PROVIDER
+            }
+
             private AuthType authType = AuthType.SIMPLE;
             private String authProviderBeanName;
         }
-    }
-
-    public static enum AuthType {
-        SIMPLE,
-        AUTH_PROVIDER
     }
 }

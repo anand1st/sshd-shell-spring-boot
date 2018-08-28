@@ -29,14 +29,11 @@ import sshd.shell.springboot.autoconfiguration.Constants;
  *
  * @author anand
  */
+@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 @lombok.extern.slf4j.Slf4j
 class AuthProviderSshdPasswordAuthenticator implements PasswordAuthenticator {
 
     private final AuthenticationProvider authProvider;
-
-    AuthProviderSshdPasswordAuthenticator(AuthenticationProvider authProvider) {
-        this.authProvider = authProvider;
-    }
 
     @Override
     public boolean authenticate(String username, String password, ServerSession session) throws

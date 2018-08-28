@@ -20,19 +20,16 @@ import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
 import org.apache.sshd.server.session.ServerSession;
 import sshd.shell.springboot.autoconfiguration.Constants;
-import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell;
 
 /**
  *
  * @author anand
  */
+@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 class SimpleSshdPasswordAuthenticator implements PasswordAuthenticator {
 
-    private final SshdShellProperties.Shell props;
-
-    SimpleSshdPasswordAuthenticator(SshdShellProperties properties) {
-        props = properties.getShell();
-    }
+    private final Shell props;
 
     @Override
     public boolean authenticate(String username, String password, ServerSession session) throws

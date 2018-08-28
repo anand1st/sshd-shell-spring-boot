@@ -53,11 +53,9 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     private ExitCallback exitCallback;
     private Thread sshThread;
     private ChannelSession session;
-    private String terminalType;
 
     @Override
     public void start(org.apache.sshd.server.Environment env) throws IOException {
-        terminalType = env.getEnv().get("TERM");
         sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession()
                 .getAttribute(Constants.USER));
         sshThread.start();
@@ -68,7 +66,8 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         populateSessionContext();
         try {
-            terminalProcessor.processInputs(is, os, terminalType, exitCode -> exitCallback.onExit(exitCode));
+            terminalProcessor.processInputs(is, os, org.apache.sshd.server.Environment.ENV_TERM,
+                    exitCode -> exitCallback.onExit(exitCode));
         } finally {
             SshSessionContext.clear();
         }

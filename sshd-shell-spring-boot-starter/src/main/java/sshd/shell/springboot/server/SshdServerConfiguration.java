@@ -108,7 +108,7 @@ class SshdServerConfiguration {
         Auth authProps = props.getAuth();
         switch (authProps.getAuthType()) {
             case SIMPLE:
-                return new SimpleSshdPasswordAuthenticator(properties);
+                return new SimpleSshdPasswordAuthenticator(props);
             case AUTH_PROVIDER:
                 return authProviderAuthenticator(authProps);
             default:
