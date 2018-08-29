@@ -27,11 +27,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.ChannelSessionAware;
+import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.Command;
 import org.springframework.boot.Banner;
-import org.springframework.core.env.Environment;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.console.TerminalProcessor;
@@ -44,7 +44,7 @@ import sshd.shell.springboot.console.TerminalProcessor;
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAware, Runnable {
 
-    private final Environment environment;
+    private final org.springframework.core.env.Environment environment;
     private final Banner shellBanner;
     private final TerminalProcessor terminalProcessor;
     private final Optional<String> rootedFileSystemBaseDir;
@@ -53,11 +53,12 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     private ExitCallback exitCallback;
     private Thread sshThread;
     private ChannelSession session;
+    private String terminalType;
 
     @Override
-    public void start(org.apache.sshd.server.Environment env) throws IOException {
-        sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession()
-                .getAttribute(Constants.USER));
+    public void start(Environment env) throws IOException {
+        terminalType = env.getEnv().get(Environment.ENV_TERM);
+        sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession().getAttribute(Constants.USER));
         sshThread.start();
     }
 
@@ -66,8 +67,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
         shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
         populateSessionContext();
         try {
-            terminalProcessor.processInputs(is, os, org.apache.sshd.server.Environment.ENV_TERM,
-                    exitCode -> exitCallback.onExit(exitCode));
+            terminalProcessor.processInputs(is, os, terminalType, exitCode -> exitCallback.onExit(exitCode));
         } finally {
             SshSessionContext.clear();
         }

@@ -43,7 +43,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Autowired
     private JavaMailSender mailSender;
 
-    @DirtiesContext
     @Test
     public void testMappingsCommand() {
         sshCallShell((is, os) -> {
@@ -52,7 +51,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testExitCommand() {
         sshCallShell((is, os) -> {
@@ -61,7 +59,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testEmptyUserInput() {
         sshCallShell((is, os) -> {
@@ -70,7 +67,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testIAECommand() {
         sshCallShell((is, os) -> {
@@ -79,7 +75,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testUnsupportedCommand() {
         sshCallShell((is, os) -> {
@@ -88,7 +83,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testUnsupportedSubCommand() {
         sshCallShell((is, os) -> {
@@ -97,7 +91,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testSubcommand() {
         sshCallShell((is, os) -> {
@@ -107,7 +100,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testHelp() {
         sshCallShell((is, os) -> {
@@ -148,7 +140,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testInteractive() {
         sshCallShell((is, os) -> {
@@ -157,7 +148,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testMailProcessor() {
         int smtpPort = SocketUtils.findAvailableTcpPort();
@@ -188,7 +178,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testMailProcessorFail() {
         sshCallShell((is, os) -> {
@@ -197,7 +186,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testHighlightProcessor() {
         sshCallShell((is, os) -> {
@@ -207,7 +195,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testInvalidCommand() {
         sshCallShell((is, os) -> {
@@ -216,7 +203,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testInvalidCommand2() {
         sshCallShell((is, os) -> {
@@ -225,7 +211,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testAuditEventsCommandNullArg() {
         sshCallShell((is, os) -> {
@@ -235,7 +220,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testAuditEventsCommandInvalidJson() {
         sshCallShell((is, os) -> {
@@ -244,7 +228,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testAuditEventsCommand() {
         sshCallShell((is, os) -> {
@@ -253,7 +236,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testBeansCommand() {
         sshCallShell((is, os) -> {
@@ -262,7 +244,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testConfigurationPropertiesReportCommand() {
         sshCallShell((is, os) -> {
@@ -271,7 +252,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testEnvironmentPatternCommand() {
         sshCallShell((is, os) -> {
@@ -280,7 +260,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testEnvironmentEntryCommandValidArg() {
         sshCallShell((is, os) -> {
@@ -289,7 +268,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testEnvironmentEntryCommandInvalidArg() {
         sshCallShell((is, os) -> {
@@ -298,7 +276,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testHealthCommand() {
         int smtpPort = SocketUtils.findAvailableTcpPort();
@@ -314,7 +291,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testInfoCommand() {
         sshCallShell((is, os) -> {
@@ -323,7 +299,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testLoggersCommandInfo() {
         sshCallShell((is, os) -> {
@@ -332,7 +307,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testLoggersCommandLoggerLevelsNullArg() {
         sshCallShell((is, os) -> {
@@ -341,7 +315,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testLoggersCommandLoggerLevelsValidArg() {
         sshCallShell((is, os) -> {
@@ -350,7 +323,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testLoggersCommandConfigureNullArg() {
         sshCallShell((is, os) -> {
@@ -360,7 +332,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testLoggersCommandConfigureValidArg() {
         sshCallShell((is, os) -> {
@@ -369,7 +340,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testLoggersCommandConfigureInvalidJson() {
         sshCallShell((is, os) -> {
@@ -378,7 +348,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testMetricsCommandListNames() {
         sshCallShell((is, os) -> {
@@ -387,7 +356,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testMetricsCommandNullMetricName() {
         sshCallShell((is, os) -> {
@@ -396,7 +364,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testMetricsCommandValidMetricName() {
         sshCallShell((is, os) -> {
@@ -405,7 +372,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testMetricsInvalidJson() {
         sshCallShell((is, os) -> {
@@ -414,8 +380,8 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @Test
     @DirtiesContext
+    @Test
     public void testShutdownCommand() {
         sshCallShell((is, os) -> {
             write(os, "shutdown");
@@ -423,7 +389,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testThreadDumpCommand() {
         sshCallShell((is, os) -> {
@@ -432,7 +397,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testHttpTraceCommand() {
         sshCallShell((is, os) -> {
@@ -441,7 +405,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testConditionsReportCommand() {
         sshCallShell((is, os) -> {
@@ -450,7 +413,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testScheduledTasksCommand() {
         sshCallShell((is, os) -> {
@@ -459,7 +421,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         });
     }
 
-    @DirtiesContext
     @Test
     public void testHeapDump() {
         sshCallShell((is, os) -> {

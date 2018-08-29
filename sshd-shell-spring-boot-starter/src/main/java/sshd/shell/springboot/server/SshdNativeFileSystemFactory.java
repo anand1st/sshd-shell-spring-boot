@@ -31,6 +31,7 @@ import org.apache.sshd.common.session.Session;
  * @author anand
  */
 @lombok.RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 class SshdNativeFileSystemFactory extends NativeFileSystemFactory {
 
     private final RootedFileSystemProvider fileSystemProvider = new RootedFileSystemProvider();

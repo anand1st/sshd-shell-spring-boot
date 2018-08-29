@@ -38,12 +38,12 @@ public final class EndpointCommand {
     @Autowired
     EndpointCommand(ApplicationContext appCtx) {
         appCtx.getBeansWithAnnotation(Endpoint.class).entrySet().stream().forEachOrdered(entry -> {
-            log.info("{} : {}", entry.getKey(), entry.getValue().getClass().getName());
+            log.debug("{} : {}", entry.getKey(), entry.getValue().getClass().getName());
             for (Method m : entry.getValue().getClass().getDeclaredMethods()) {
                 if (m.isAnnotationPresent(ReadOperation.class) || m.isAnnotationPresent(WriteOperation.class)) {
-                    log.info("\tOp: {}", m.getName());
+                    log.debug("\tOp: {}", m.getName());
                     for (Parameter p : m.getParameters()) {
-                        log.info("\t\tParameter {}, {}", p.getName(), p.getType().getName());
+                        log.debug("\t\tParameter {}, {}", p.getName(), p.getType().getName());
                     }
                 }
             }

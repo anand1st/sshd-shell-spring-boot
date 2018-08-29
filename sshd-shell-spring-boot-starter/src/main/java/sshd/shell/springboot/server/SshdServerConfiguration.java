@@ -102,7 +102,7 @@ class SshdServerConfiguration {
                 ? RejectAllPublickeyAuthenticator.INSTANCE
                 : new SshdAuthorizedKeysAuthenticator(new File(props.getPublicKeyFile())));
         server.setPasswordAuthenticator(passwordAuthenticator(props));
-    }
+        }
 
     private PasswordAuthenticator passwordAuthenticator(Shell props) {
         Auth authProps = props.getAuth();

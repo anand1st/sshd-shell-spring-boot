@@ -56,8 +56,8 @@ class ConsoleConfiguration {
     }
 
     private Node buildTextCompleterNode(Map.Entry<String, Map<String, CommandExecutableDetails>> entry) {
-        Object[] subCommands = entry.getValue().keySet().stream().filter(s -> !s.equals(Constants.EXECUTE))
-                .toArray(Object[]::new);
+            Object[] subCommands = entry.getValue().keySet().stream().filter(s -> !s.equals(Constants.EXECUTE))
+                    .toArray(Object[]::new);
         return subCommands.length == 0
                 ? node(entry.getKey())
                 : node(entry.getKey(), node(subCommands));

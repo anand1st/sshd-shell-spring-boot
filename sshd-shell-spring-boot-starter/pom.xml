@@ -250,15 +250,15 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
+<!--            <distributionManagement>
                 <snapshotRepository>
                     <id>ossrh</id>
                     <url>https://oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
-            </distributionManagement>
+            </distributionManagement>-->
         </profile>
     </profiles>
-    <pluginRepositories>
+<!--    <pluginRepositories>
         <pluginRepository>
             <id>spring-milestone</id>
             <name>Spring Milestone Repository</name>
@@ -281,5 +281,5 @@
             <name>Spring Snapshots</name>
             <url>http://repo.spring.io/snapshot</url>
         </repository>
-    </repositories>
+    </repositories>-->
 </project>
