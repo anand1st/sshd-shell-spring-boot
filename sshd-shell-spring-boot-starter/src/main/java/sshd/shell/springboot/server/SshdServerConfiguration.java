@@ -146,7 +146,8 @@ class SshdServerConfiguration {
     }
 
     private SshSessionInstance sshSessionInstance() {
-        return new SshSessionInstance(environment, shellBanner, terminalProcessor, baseDirectory());
+        return new SshSessionInstance(terminalProcessor, baseDirectory(),
+                (clazz, printStream) -> shellBanner.printBanner(environment, clazz, printStream));
     }
 
     private Optional<String> baseDirectory() {

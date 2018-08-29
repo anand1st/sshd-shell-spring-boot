@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.ChannelSessionAware;
@@ -31,7 +32,6 @@ import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.Command;
-import org.springframework.boot.Banner;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.console.TerminalProcessor;
@@ -44,10 +44,9 @@ import sshd.shell.springboot.console.TerminalProcessor;
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAware, Runnable {
 
-    private final org.springframework.core.env.Environment environment;
-    private final Banner shellBanner;
     private final TerminalProcessor terminalProcessor;
     private final Optional<String> rootedFileSystemBaseDir;
+    private final BiConsumer<Class<?>, PrintStream> shellBannerPrinter;
     private InputStream is;
     private OutputStream os;
     private ExitCallback exitCallback;
@@ -64,7 +63,7 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
 
     @Override
     public void run() {
-        shellBanner.printBanner(environment, this.getClass(), new PrintStream(os));
+        shellBannerPrinter.accept(this.getClass(), new PrintStream(os));
         populateSessionContext();
         try {
             terminalProcessor.processInputs(is, os, terminalType, exitCode -> exitCallback.onExit(exitCode));
