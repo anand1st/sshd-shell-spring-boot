@@ -83,9 +83,12 @@ class SshdServerConfiguration {
         if (properties.getFiletransfer().isEnabled()) {
             configureServerForSshAndFileTransfer(server);
         } else {
-            configureServerForSsh(server);
+            configureServerForSshOnly(server);
         }
-        server.setShellFactory(() -> sshSessionInstance());
+        Optional<String> baseDir = properties.getFiletransfer().isEnabled()
+                ? Optional.of(properties.getFilesystem().getBase().getDir())
+                : Optional.empty();
+        server.setShellFactory(() -> sshSessionInstance(baseDir));
         return server;
     }
 
@@ -102,7 +105,7 @@ class SshdServerConfiguration {
                 ? RejectAllPublickeyAuthenticator.INSTANCE
                 : new SshdAuthorizedKeysAuthenticator(new File(props.getPublicKeyFile())));
         server.setPasswordAuthenticator(passwordAuthenticator(props));
-        }
+    }
 
     private PasswordAuthenticator passwordAuthenticator(Shell props) {
         Auth authProps = props.getAuth();
@@ -137,27 +140,22 @@ class SshdServerConfiguration {
 
     private CommandFactory sshAndScpCommandFactory() {
         ScpCommandFactory scpCommandFactory = new ScpCommandFactory();
-        scpCommandFactory.setDelegateCommandFactory(sshCommandFactory());
+        scpCommandFactory.setDelegateCommandFactory(
+                sshCommandFactory(Optional.of(properties.getFilesystem().getBase().getDir())));
         return scpCommandFactory;
     }
 
-    private CommandFactory sshCommandFactory() {
-        return command -> sshSessionInstance();
+    private CommandFactory sshCommandFactory(Optional<String> baseDir) {
+        return command -> sshSessionInstance(baseDir);
     }
 
-    private SshSessionInstance sshSessionInstance() {
-        return new SshSessionInstance(terminalProcessor, baseDirectory(),
+    private SshSessionInstance sshSessionInstance(Optional<String> baseDir) {
+        return new SshSessionInstance(terminalProcessor, baseDir,
                 (clazz, printStream) -> shellBanner.printBanner(environment, clazz, printStream));
     }
 
-    private Optional<String> baseDirectory() {
-        return properties.getFiletransfer().isEnabled()
-                ? Optional.of(properties.getFilesystem().getBase().getDir())
-                : Optional.empty();
-    }
-
-    private void configureServerForSsh(SshServer server) {
-        server.setCommandFactory(sshCommandFactory());
+    private void configureServerForSshOnly(SshServer server) {
+        server.setCommandFactory(sshCommandFactory(Optional.<String>empty()));
     }
 
     @PostConstruct

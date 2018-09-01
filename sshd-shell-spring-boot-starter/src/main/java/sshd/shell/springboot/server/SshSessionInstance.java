@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 import org.apache.sshd.common.Factory;
 import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Environment;
@@ -76,13 +75,12 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
         SshSessionContext.put(Constants.USER, session.getSession().getIoSession().getAttribute(Constants.USER));
         SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
-        Supplier<File> userDirSupplier = () -> new File(getRootedBaseDir(),
-                SshSessionContext.<String>get(Constants.USER));
-        SshSessionContext.setUserDir(userDirSupplier);
+        SshSessionContext.setUserDir(() -> getRootedUserDir());
     }
 
-    private String getRootedBaseDir() {
-        return rootedFileSystemBaseDir.orElseThrow(() -> new IllegalStateException("SCP/SFTP is not enabled"));
+    private File getRootedUserDir() {
+        return new File(rootedFileSystemBaseDir.orElseThrow(() -> new IllegalStateException("SCP/SFTP is not enabled")),
+                SshSessionContext.<String>get(Constants.USER));
     }
 
     @Override
