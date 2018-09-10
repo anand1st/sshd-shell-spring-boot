@@ -34,18 +34,21 @@ import org.apache.sshd.common.session.Session;
 @lombok.extern.slf4j.Slf4j
 class SshdNativeFileSystemFactory extends NativeFileSystemFactory {
 
-    private final RootedFileSystemProvider fileSystemProvider = new RootedFileSystemProvider();
-    private final String dir;
+    private final String baseDir;
 
     @Override
     public FileSystem createFileSystem(Session session) throws IOException {
-        Path sessionUserDir = Paths.get(dir, session.getUsername());
+        Path sessionUserDir = Paths.get(baseDir, session.getUsername());
+        processForSessionUserDirectory(sessionUserDir);
+        return new RootedFileSystem(new RootedFileSystemProvider(), sessionUserDir, null);
+    }
+
+    private void processForSessionUserDirectory(Path sessionUserDir) throws IOException {
         if (Files.exists(sessionUserDir)) {
             validateSessionUserDir(sessionUserDir);
         } else {
             log.info("Session user directory created: {}", Files.createDirectories(sessionUserDir));
         }
-        return new RootedFileSystem(fileSystemProvider, sessionUserDir, null);
     }
 
     private void validateSessionUserDir(Path sessionUserDir) throws NotDirectoryException {
