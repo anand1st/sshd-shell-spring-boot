@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.sshd.common.NamedFactory;
@@ -134,7 +133,6 @@ class SshdServerConfiguration {
         server.setCommandFactory(sshAndScpCommandFactory());
         server.setFileSystemFactory(new SshdNativeFileSystemFactory(properties.getFilesystem().getBase().getDir()));
         server.setSubsystemFactories(Collections.<NamedFactory<Command>>singletonList(new SftpSubsystemFactory.Builder()
-                .withExecutorService(Executors.newFixedThreadPool(properties.getFiletransfer().getThreads()))
                 .withShutdownOnExit(true).build()));
     }
 
