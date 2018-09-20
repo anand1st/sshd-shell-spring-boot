@@ -15,7 +15,12 @@
  */
 package sshd.shell.springboot.command;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -23,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**
@@ -33,17 +39,38 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 @ConditionalOnClass(HeapDumpWebEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.env.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "heapDump", description = "Heap dump command")
+@lombok.extern.slf4j.Slf4j
 public final class HeapDumpCommand {
-    
+
     @Autowired
     private HeapDumpWebEndpoint heapDumpEndpoint;
-    
+
     @SshdShellCommand(value = "live", description = "Get heapdump with live flag")
     public String withLive(String arg) throws IOException {
-        if (StringUtils.isEmpty(arg)) { 
+        if (StringUtils.isEmpty(arg)) {
             return "Usage: heapDump live <true|false>";
         }
-        Resource response = heapDumpEndpoint.heapDump(Boolean.valueOf(arg)).getBody();
-        return response.getFile().getAbsolutePath();
+        Resource heapDumpResource = heapDumpEndpoint.heapDump(Boolean.valueOf(arg)).getBody();
+        try {
+            Path path = sessionUserPathContainingHeapDumpFile(heapDumpResource);
+            return "Resource can be downloaded with SFTP/SCP at " + path.getFileName().toString();
+        } catch (IllegalStateException ex) {
+            log.warn(ex.getMessage());
+            return "Resource can be found at " + heapDumpResource.getFile().getAbsolutePath();
+        }
+    }
+
+    private Path sessionUserPathContainingHeapDumpFile(Resource heapDumpResource) throws IOException {
+        Path userDirFilePath = Paths.get(sessionUserDir().getPath(), heapDumpResource.getFilename());
+        Path heapDumpFilePath = Paths.get(heapDumpResource.getURI());
+        return Files.move(heapDumpFilePath, userDirFilePath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private File sessionUserDir() throws IOException {
+        File sessionUserDir = SshSessionContext.getUserDir();
+        if (!sessionUserDir.exists()) {
+            Files.createDirectories(sessionUserDir.toPath());
+        }
+        return sessionUserDir;
     }
 }
