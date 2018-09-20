@@ -422,10 +422,18 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     }
 
     @Test
-    public void testHeapDump() {
+    public void testHeapDumpNoArg() {
         sshCallShell((is, os) -> {
             write(os, "heapDump live");
             verifyResponse(is, "Usage: heapDump live <true|false>");
+        });
+    }
+    
+    @Test
+    public void testHeapDumpWithSftpDisabled() {
+        sshCallShell((is, os) -> {
+            write(os, "heapDump live true");
+            verifyResponse(is, "Resource can be found at ");
         });
     }
 }

@@ -21,11 +21,22 @@ package sshd.shell.springboot.autoconfiguration;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
+import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,7 +57,7 @@ public class ConfigTest {
         Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
     }
-    
+
     @SuppressWarnings("deprecation")
     @Bean
     public AuthenticationProvider authProvider() {
@@ -92,5 +103,18 @@ public class ConfigTest {
             }
         });
         return authProvider;
+    }
+
+    @Bean
+    public HeapDumpWebEndpoint heapDumpWebEndpoint() throws IOException {
+        Path path = Paths.get("target/banner.txt");
+        if (!path.toFile().exists()) {
+            Files.copy(Paths.get("src/test/resources/banner.txt"), path);
+        }
+        WebEndpointResponse<Resource> webEndpointResponse = new WebEndpointResponse<>(
+                new FileSystemResource("target/banner.txt"));
+        HeapDumpWebEndpoint heapDumpWebEndpoint = mock(HeapDumpWebEndpoint.class);
+        when(heapDumpWebEndpoint.heapDump(anyBoolean())).thenReturn(webEndpointResponse);
+        return heapDumpWebEndpoint;
     }
 }

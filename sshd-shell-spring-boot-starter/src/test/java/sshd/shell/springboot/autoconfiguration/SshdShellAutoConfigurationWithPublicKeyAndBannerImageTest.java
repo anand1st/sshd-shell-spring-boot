@@ -37,7 +37,8 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
     "sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
-    "banner.image.location=banner.png"
+    "banner.image.location=banner.png",
+    "logging.level.sshd.shell=DEBUG"
 })
 public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends AbstractSshSupport {
 
@@ -54,16 +55,14 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends A
         session.setConfig(config);
         session.connect();
         ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        PipedInputStream pis = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream();
-        channel.setInputStream(new PipedInputStream(pos));
-        channel.setOutputStream(new PipedOutputStream(pis));
-        channel.connect();
-        pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
-        pos.flush();
-        verifyResponse(pis, "test run bob");
-        pis.close();
-        pos.close();
+        try (PipedInputStream pis = new PipedInputStream(); PipedOutputStream pos = new PipedOutputStream()) {
+            channel.setInputStream(new PipedInputStream(pos));
+            channel.setOutputStream(new PipedOutputStream(pis));
+            channel.connect();
+            pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
+            pos.flush();
+            verifyResponse(pis, "test run bob");
+        }
         channel.disconnect();
         session.disconnect();
     }

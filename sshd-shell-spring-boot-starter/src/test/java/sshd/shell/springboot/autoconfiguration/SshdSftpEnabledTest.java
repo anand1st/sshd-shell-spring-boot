@@ -18,6 +18,8 @@ package sshd.shell.springboot.autoconfiguration;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +33,7 @@ import org.springframework.test.annotation.DirtiesContext;
     "sshd.filetransfer.enabled=true",
     "sshd.filesystem.base.dir=target/sftp"
 })
-public class SshdSftpTest extends AbstractSshSupport {
+public class SshdSftpEnabledTest extends AbstractSshSupport {
 
     @DirtiesContext
     @Test
@@ -53,5 +55,13 @@ public class SshdSftpTest extends AbstractSshSupport {
         sftp.disconnect();
         session.disconnect();
         assertTrue(new File("target/sftp/admin").exists());
+    }
+
+    @Test
+    public void testHeapDumpWifhSftpEnabled() {
+        sshCallShell((InputStream is, OutputStream os) -> {
+            write(os, "heapDump live true");
+            verifyResponse(is, "Resource can be downloaded with SFTP/SCP at banner.txt");
+        });
     }
 }
