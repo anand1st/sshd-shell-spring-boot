@@ -36,7 +36,6 @@ public class SshdShellProperties {
     public static class FileTransfer {
 
         private boolean enabled = false;
-        private int threads = 4;
     }
 
     @lombok.Data
