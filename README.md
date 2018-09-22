@@ -13,17 +13,24 @@ To import into Maven project, add the following dependency inside `pom.xml`:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.5</version>
+        <version>3.6</version>
     </dependency>
     
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
-        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.5'
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.6'
     }
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 3.6
+Getting a user's root directory for the purposes of SCP/SFTP is now made easier with the following approach:
+
+    SshSessionContext.getUserDir()
+Upgraded jline to 3.9.0 and Apache SSHD version to 2.0.0. 'heapDump' commond now zips the dump and places it into the session user's directory if SCP/SFTP is enabled so that it can be downloaded.
+
 
 ### Version 3.5
 Modified SshdShellProperties to add the properties 
