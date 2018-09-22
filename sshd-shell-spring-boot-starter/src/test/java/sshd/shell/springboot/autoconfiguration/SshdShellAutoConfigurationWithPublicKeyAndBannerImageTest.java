@@ -61,7 +61,7 @@ public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends A
             channel.connect();
             pos.write("test run bob\r".getBytes(StandardCharsets.UTF_8));
             pos.flush();
-            verifyResponse(pis, "test run bob");
+            verifyResponseContains(pis, "test run bob");
         }
         channel.disconnect();
         session.disconnect();

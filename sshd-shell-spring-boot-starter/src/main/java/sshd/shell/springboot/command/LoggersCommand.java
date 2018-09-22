@@ -25,7 +25,7 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.console.ConsoleIO;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -43,13 +43,13 @@ public final class LoggersCommand {
 
     @SshdShellCommand(value = "info", description = "Show logging info")
     public String info(String arg) {
-        return ConsoleIO.asJson(loggersEndpoint.loggers());
+        return JsonUtils.asJson(loggersEndpoint.loggers());
     }
 
     @SshdShellCommand(value = "level", description = "Show log levels for given logger name")
     public String loggerLevels(String arg) {
         return StringUtils.isEmpty(arg) ? "Usage: loggers level <loggerName>"
-                : ConsoleIO.asJson(loggersEndpoint.loggerLevels(arg));
+                : JsonUtils.asJson(loggersEndpoint.loggerLevels(arg));
     }
 
     @SshdShellCommand(value = "configure", description = "Configure log level for logger name")
@@ -59,7 +59,7 @@ public final class LoggersCommand {
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}";
         }
         try {
-            LogConfig logConfig = ConsoleIO.stringToObject(arg, LogConfig.class);
+            LogConfig logConfig = JsonUtils.stringToObject(arg, LogConfig.class);
             loggersEndpoint.configureLogLevel(logConfig.name, logConfig.configuredLevel);
             return "Changed log level for " + logConfig.name + " to " + logConfig.configuredLevel.name();
         } catch (IOException | IllegalArgumentException ex) {

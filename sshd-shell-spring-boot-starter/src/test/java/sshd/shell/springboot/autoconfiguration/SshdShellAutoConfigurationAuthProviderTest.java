@@ -37,7 +37,7 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
     public void testDaoAuthWithoutRightPermission() {
         sshCallShell((is, os) -> {
             write(os, "test run bob");
-            verifyResponse(is, "Permission denied");
+            verifyResponseContains(is, "Permission denied");
         });
     }
     
@@ -46,7 +46,7 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
         // See ConfigTest.java for why username is alice
         sshCall("alice", "alice", (is, os ) -> {
             write(os, "test run");
-            verifyResponse(is, "Permission denied");
+            verifyResponseContains(is, "Permission denied");
         }, "exec");
     }
     
@@ -54,7 +54,7 @@ public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSuppo
     public void testDaoAuthWithRightPermission() {
         sshCallShell((is, os) -> {
             write(os, "test execute bob");
-            verifyResponse(is, "test execute successful");
+            verifyResponseContains(is, "test execute successful");
         });
     }
     

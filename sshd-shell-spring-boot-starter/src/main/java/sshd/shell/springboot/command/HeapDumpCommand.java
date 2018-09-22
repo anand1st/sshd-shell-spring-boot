@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
+import sshd.shell.springboot.util.ZipUtils;
 
 /**
  *
@@ -61,16 +61,15 @@ public final class HeapDumpCommand {
     }
 
     private Path sessionUserPathContainingHeapDumpFile(Resource heapDumpResource) throws IOException {
-        Path userDirFilePath = Paths.get(sessionUserDir().getPath(), heapDumpResource.getFilename());
         Path heapDumpFilePath = Paths.get(heapDumpResource.getURI());
-        return Files.move(heapDumpFilePath, userDirFilePath, StandardCopyOption.REPLACE_EXISTING);
+        return ZipUtils.zipFiles(sessionUserDir(), true, heapDumpFilePath);
     }
 
-    private File sessionUserDir() throws IOException {
+    private Path sessionUserDir() throws IOException {
         File sessionUserDir = SshSessionContext.getUserDir();
         if (!sessionUserDir.exists()) {
             Files.createDirectories(sessionUserDir.toPath());
         }
-        return sessionUserDir;
+        return sessionUserDir.toPath();
     }
 }

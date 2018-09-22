@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.console.ConsoleIO;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -39,12 +39,12 @@ public final class EnvironmentCommand {
 
     @SshdShellCommand(value = "pattern", description = "Get environment details with given pattern")
     public String withPattern(String arg) {
-        return ConsoleIO.asJson(envEndpoint.environment(arg));
+        return JsonUtils.asJson(envEndpoint.environment(arg));
     }
 
     @SshdShellCommand(value = "entry", description = "Get environment details with string to match")
     public String withEntry(String arg) {
         return StringUtils.isEmpty(arg) ? "Usage: environment entry <stringToMatch>"
-                : ConsoleIO.asJson(envEndpoint.environmentEntry(arg));
+                : JsonUtils.asJson(envEndpoint.environmentEntry(arg));
     }
 }

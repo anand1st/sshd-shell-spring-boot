@@ -15,9 +15,6 @@
  */
 package sshd.shell.springboot.console;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.IOException;
 import java.util.Objects;
 import org.jline.reader.LineReader;
@@ -25,6 +22,7 @@ import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -33,8 +31,7 @@ import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 @lombok.extern.slf4j.Slf4j
 public enum ConsoleIO {
     ;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
-    private static final ObjectWriter WRITER = OBJECT_MAPPER.writer().withDefaultPrettyPrinter();
+
     static final String LINE_READER = "__lineReader";
     static final String TEXT_STYLE = "__textStyle";
     static final String TERMINAL = "__terminal";
@@ -107,19 +104,6 @@ public enum ConsoleIO {
     }
 
     public static void writeJsonOutput(Object object, String textToHighlight) {
-        writeOutput(asJson(object), textToHighlight);
-    }
-
-    public static String asJson(Object object) {
-        try {
-            return WRITER.writeValueAsString(object);
-        } catch (JsonProcessingException ex) {
-            log.error("Error processing json output", ex);
-            return "Error processing json output: " + ex.getMessage();
-        }
-    }
-
-    public static <E> E stringToObject(String json, Class<E> clazz) throws IOException {
-        return OBJECT_MAPPER.readValue(json, clazz);
+        writeOutput(JsonUtils.asJson(object), textToHighlight);
     }
 }

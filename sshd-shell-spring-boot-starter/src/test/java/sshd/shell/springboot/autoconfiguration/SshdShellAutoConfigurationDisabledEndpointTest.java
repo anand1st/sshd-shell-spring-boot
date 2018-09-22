@@ -57,7 +57,7 @@ public class SshdShellAutoConfigurationDisabledEndpointTest extends AbstractSshS
                     .append(String.format(Locale.ENGLISH, format, "m <emailId>",
                             "Send response output of command execution to <emailId>"))
                     .append(String.format(Locale.ENGLISH, format, "", "Example usage: help | m bob@hope.com"));
-            verifyResponse(is, String.format(Locale.ENGLISH, sb.toString(),
+            verifyResponseContains(is, String.format(Locale.ENGLISH, sb.toString(),
                     "dummy", "dummy description",
                     "exit", "Exit shell",
                     "help", "Show list of help commands",

@@ -61,7 +61,7 @@ public class SshdSftpEnabledTest extends AbstractSshSupport {
     public void testHeapDumpWifhSftpEnabled() {
         sshCallShell((InputStream is, OutputStream os) -> {
             write(os, "heapDump live true");
-            verifyResponse(is, "Resource can be downloaded with SFTP/SCP at banner.txt");
+            verifyResponseContains(is, "Resource can be downloaded with SFTP/SCP at banner.txt.zip");
         });
     }
 }

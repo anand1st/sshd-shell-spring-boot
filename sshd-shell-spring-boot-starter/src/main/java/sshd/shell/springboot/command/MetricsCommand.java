@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.console.ConsoleIO;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -44,7 +44,7 @@ public class MetricsCommand {
 
     @SshdShellCommand(value = "listNames", description = "List names of all metrics")
     public String listNames(String arg) {
-        return ConsoleIO.asJson(metricsEndpoint.listNames());
+        return JsonUtils.asJson(metricsEndpoint.listNames());
     }
 
     @SshdShellCommand(value = "metricName", description = "List metric name")
@@ -53,8 +53,8 @@ public class MetricsCommand {
             return "Usage: metrics metricName {\"name\":\"<metricName>\",\"tags\":[\"<array of tags>\"]}";
         }
         try {
-            MetricTags mt = ConsoleIO.stringToObject(arg, MetricTags.class);
-            return ConsoleIO.asJson(metricsEndpoint.metric(mt.name, mt.tags));
+            MetricTags mt = JsonUtils.stringToObject(arg, MetricTags.class);
+            return JsonUtils.asJson(metricsEndpoint.metric(mt.name, mt.tags));
         } catch (IOException ex) {
             log.warn("Invalid json", ex);
             return "Expected valid json as argument";

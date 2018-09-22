@@ -82,7 +82,7 @@ abstract class AbstractSshSupport {
         sshCall(props.getShell().getUsername(), props.getShell().getPassword(), executor, "shell");
     }
 
-    protected void verifyResponse(InputStream pis, String response) {
+    protected void verifyResponseContains(InputStream pis, String response) {
         StringBuilder sb = new StringBuilder();
         try {
             await().atMost(Duration.TEN_SECONDS).until(() -> {

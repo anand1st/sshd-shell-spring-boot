@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.console.ConsoleIO;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -37,6 +37,6 @@ public final class InfoCommand {
     private InfoEndpoint infoEndpoint;
     
     public String info(String arg) {
-        return ConsoleIO.asJson(infoEndpoint.info());
+        return JsonUtils.asJson(infoEndpoint.info());
     }
 }

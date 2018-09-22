@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.console.ConsoleIO;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -49,8 +49,8 @@ public final class AuditEventsCommand {
                     + "\"type\":\"<type>\"}";
         }
         try {
-            Event event = ConsoleIO.stringToObject(arg, Event.class);
-            return ConsoleIO.asJson(auditEventsEndpoint.events(event.principal, event.after, event.type));
+            Event event = JsonUtils.stringToObject(arg, Event.class);
+            return JsonUtils.asJson(auditEventsEndpoint.events(event.principal, event.after, event.type));
         } catch (IOException ex) {
             log.warn("Invalid json", ex);
             return "Expected valid json as argument";

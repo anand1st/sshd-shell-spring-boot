@@ -17,6 +17,7 @@ package sshd.shell.springboot.console;
 
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
@@ -26,7 +27,7 @@ public class ConsoleIOTest {
     
     @Test
     public void testConsoleIOAsJsonException() {
-        assertTrue(ConsoleIO.asJson(new X("x")).startsWith("Error processing json output"));
+        assertTrue(JsonUtils.asJson(new X("x")).startsWith("Error processing json output"));
     }
     
     @lombok.AllArgsConstructor
