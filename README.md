@@ -29,7 +29,7 @@ Versions < 2.1 are deprecated and unsupported. The artifact above supports the f
 Getting a user's root directory for the purposes of SCP/SFTP is now made easier with the following approach:
 
     SshSessionContext.getUserDir()
-Upgraded jline to 3.9.0 and Apache SSHD version to 2.0.0. 'heapDump' commond now zips the dump and places it into the session user's directory if SCP/SFTP is enabled so that it can be downloaded.
+Upgraded jline to 3.9.0 and Apache SSHD version to 2.0.0. `heapDump` command now zips the dump and places it into the session user's directory if SCP/SFTP is enabled so that it can be downloaded.
 
 
 ### Version 3.5
