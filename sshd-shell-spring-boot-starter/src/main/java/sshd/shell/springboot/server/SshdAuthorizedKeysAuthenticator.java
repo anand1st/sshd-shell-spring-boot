@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.server;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.security.PublicKey;
 import java.util.Collections;
 import org.apache.sshd.server.config.keys.AuthorizedKeysAuthenticator;
@@ -28,8 +28,8 @@ import sshd.shell.springboot.autoconfiguration.Constants;
  */
 class SshdAuthorizedKeysAuthenticator extends AuthorizedKeysAuthenticator {
 
-    SshdAuthorizedKeysAuthenticator(File file) {
-        super(file);
+    SshdAuthorizedKeysAuthenticator(Path path) {
+        super(path);
     }
 
     @Override

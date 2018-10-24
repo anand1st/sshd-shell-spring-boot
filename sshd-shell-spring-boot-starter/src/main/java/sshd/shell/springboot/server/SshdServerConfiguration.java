@@ -15,8 +15,8 @@
  */
 package sshd.shell.springboot.server;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -99,10 +99,10 @@ class SshdServerConfiguration {
     }
 
     private void configureSecurityPolicies(SshServer server, Shell props) {
-        server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File(props.getHostKeyFile())));
+        server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Paths.get(props.getHostKeyFile())));
         server.setPublickeyAuthenticator(Objects.isNull(props.getPublicKeyFile())
                 ? RejectAllPublickeyAuthenticator.INSTANCE
-                : new SshdAuthorizedKeysAuthenticator(new File(props.getPublicKeyFile())));
+                : new SshdAuthorizedKeysAuthenticator(Paths.get(props.getPublicKeyFile())));
         server.setPasswordAuthenticator(passwordAuthenticator(props));
     }
 
@@ -132,8 +132,8 @@ class SshdServerConfiguration {
     private void configureServerForSshAndFileTransfer(SshServer server) {
         server.setCommandFactory(sshAndScpCommandFactory());
         server.setFileSystemFactory(new SshdNativeFileSystemFactory(properties.getFilesystem().getBase().getDir()));
-        server.setSubsystemFactories(Collections.<NamedFactory<Command>>singletonList(new SftpSubsystemFactory.Builder()
-                .withShutdownOnExit(true).build()));
+        server.setSubsystemFactories(Collections.<NamedFactory<Command>>singletonList(
+                new SftpSubsystemFactory.Builder().build()));
     }
 
     private CommandFactory sshAndScpCommandFactory() {
