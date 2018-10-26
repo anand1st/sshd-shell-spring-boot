@@ -28,14 +28,13 @@ public enum SshSessionContext {
 
     ;
 
+    private static final ThreadLocal<Supplier<File>> USER_DIR_CONTEXT = new ThreadLocal<Supplier<File>>();
     private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT = new ThreadLocal<Map<String, Object>>() {
         @Override
         protected Map<String, Object> initialValue() {
             return new HashMap<>();
         }
     };
-    
-    private static final ThreadLocal<Supplier<File>> USER_DIR_CONTEXT = new ThreadLocal<Supplier<File>>();
 
     public static void put(String key, Object value) {
         THREAD_CONTEXT.get().put(key, value);
@@ -63,11 +62,11 @@ public enum SshSessionContext {
         THREAD_CONTEXT.remove();
         USER_DIR_CONTEXT.remove();
     }
-    
+
     public static void setUserDir(Supplier<File> userDirSupplier) {
         USER_DIR_CONTEXT.set(userDirSupplier);
     }
-    
+
     public static File getUserDir() {
         return USER_DIR_CONTEXT.get().get();
     }

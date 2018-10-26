@@ -64,7 +64,9 @@ class SshdShellAutoConfiguration {
 
     private void loadSshdShellCommands(Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap,
             Object obj) throws SecurityException, NoSuchMethodException, InterruptedException {
-        Class<?> clazz = AopUtils.isAopProxy(obj) ? AopUtils.getTargetClass(obj) : obj.getClass();
+        Class<?> clazz = AopUtils.isAopProxy(obj)
+                ? AopUtils.getTargetClass(obj)
+                : obj.getClass();
         SshdShellCommand annotation = AnnotationUtils.findAnnotation(clazz, SshdShellCommand.class);
         Map<String, CommandExecutableDetails> map = getSupplierMap(annotation, sshdShellCommandsMap);
         loadSshdShellCommandSuppliers(clazz, annotation, map, obj);

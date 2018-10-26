@@ -29,7 +29,6 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
-import sshd.shell.springboot.autoconfiguration.ColorType;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell;
@@ -115,9 +114,7 @@ public class TerminalProcessor {
     private void processUserInput(LineReader reader, IntConsumer exitCallback) {
         while (true) {
             try {
-                String line = reader.readLine(prompt).trim();
-                log.info("[{}] Executed command: {}", SshSessionContext.<String>get(Constants.USER), line);
-                handleUserInput(line);
+                handleUserInput(reader.readLine(prompt).trim());
             } catch (InterruptedException ex) {
                 Thread.interrupted();
                 ConsoleIO.writeOutput(ex.getMessage());
@@ -131,6 +128,7 @@ public class TerminalProcessor {
 
     private void handleUserInput(String userInput) throws InterruptedException, ShellException {
         if (!userInput.isEmpty()) {
+            log.info("[{}] Executed command: {}", SshSessionContext.<String>get(Constants.USER), userInput);
             for (BaseUserInputProcessor userInputProcessor : userInputProcessors) {
                 Matcher matcher = userInputProcessor.getPattern().matcher(userInput);
                 if (matcher.matches()) {

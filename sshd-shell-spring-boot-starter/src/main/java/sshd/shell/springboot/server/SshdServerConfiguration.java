@@ -78,16 +78,8 @@ class SshdServerConfiguration {
                     props.getPassword());
         }
         SshServer server = buildServer(props);
-        configureSecurityPolicies(server, props);
-        if (properties.getFiletransfer().isEnabled()) {
-            configureServerForSshAndFileTransfer(server);
-        } else {
-            configureServerForSshOnly(server);
-        }
-        Optional<String> baseDir = properties.getFiletransfer().isEnabled()
-                ? Optional.of(properties.getFilesystem().getBase().getDir())
-                : Optional.empty();
-        server.setShellFactory(() -> sshSessionInstance(baseDir));
+        configureAuthenticationPolicies(server, props);
+        configureServer(server);
         return server;
     }
 
@@ -98,7 +90,7 @@ class SshdServerConfiguration {
         return server;
     }
 
-    private void configureSecurityPolicies(SshServer server, Shell props) {
+    private void configureAuthenticationPolicies(SshServer server, Shell props) {
         server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Paths.get(props.getHostKeyFile())));
         server.setPublickeyAuthenticator(Objects.isNull(props.getPublicKeyFile())
                 ? RejectAllPublickeyAuthenticator.INSTANCE
@@ -129,6 +121,15 @@ class SshdServerConfiguration {
         }
     }
 
+    private void configureServer(SshServer server) {
+        if (properties.getFiletransfer().isEnabled()) {
+            configureServerForSshAndFileTransfer(server);
+        } else {
+            configureServerForSshOnly(server);
+        }
+        configureShellFactory(server);
+    }
+
     private void configureServerForSshAndFileTransfer(SshServer server) {
         server.setCommandFactory(sshAndScpCommandFactory());
         server.setFileSystemFactory(new SshdNativeFileSystemFactory(properties.getFilesystem().getBase().getDir()));
@@ -138,13 +139,12 @@ class SshdServerConfiguration {
 
     private CommandFactory sshAndScpCommandFactory() {
         ScpCommandFactory scpCommandFactory = new ScpCommandFactory();
-        scpCommandFactory.setDelegateCommandFactory(
-                sshCommandFactory(Optional.of(properties.getFilesystem().getBase().getDir())));
+        scpCommandFactory.setDelegateCommandFactory(sshCommandFactory(properties.getFilesystem().getBase().getDir()));
         return scpCommandFactory;
     }
 
-    private CommandFactory sshCommandFactory(Optional<String> baseDir) {
-        return command -> sshSessionInstance(baseDir);
+    private CommandFactory sshCommandFactory(String baseDir) {
+        return command -> sshSessionInstance(Optional.ofNullable(baseDir));
     }
 
     private SshSessionInstance sshSessionInstance(Optional<String> baseDir) {
@@ -153,7 +153,14 @@ class SshdServerConfiguration {
     }
 
     private void configureServerForSshOnly(SshServer server) {
-        server.setCommandFactory(sshCommandFactory(Optional.<String>empty()));
+        server.setCommandFactory(sshCommandFactory(null));
+    }
+    
+    private void configureShellFactory(SshServer server) {
+        Optional<String> baseDir = properties.getFiletransfer().isEnabled()
+                ? Optional.of(properties.getFilesystem().getBase().getDir())
+                : Optional.empty();
+        server.setShellFactory(() -> sshSessionInstance(baseDir));
     }
 
     @PostConstruct

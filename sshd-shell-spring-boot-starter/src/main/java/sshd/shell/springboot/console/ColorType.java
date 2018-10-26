@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sshd.shell.springboot.autoconfiguration;
+package sshd.shell.springboot.console;
 
 import org.jline.utils.AttributedStyle;
 
