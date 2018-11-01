@@ -17,7 +17,6 @@ package sshd.shell.springboot.command;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
@@ -52,13 +51,10 @@ public class MetricsCommand {
         if (StringUtils.isEmpty(arg)) {
             return "Usage: metrics metricName {\"name\":\"<metricName>\",\"tags\":[\"<array of tags>\"]}";
         }
-        try {
+        return CommandUtils.process(log, () -> {
             MetricTags mt = JsonUtils.stringToObject(arg, MetricTags.class);
             return JsonUtils.asJson(metricsEndpoint.metric(mt.name, mt.tags));
-        } catch (IOException ex) {
-            log.warn("Invalid json", ex);
-            return "Expected valid json as argument";
-        }
+        });
     }
     
     private static class MetricTags {

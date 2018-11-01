@@ -16,7 +16,6 @@
 package sshd.shell.springboot.command;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -58,14 +57,11 @@ public final class LoggersCommand {
             return "Usage: loggers configure {\"name\":\"<loggerName>\",\"configuredLevel\":"
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}";
         }
-        try {
+        return CommandUtils.process(log, () -> {
             LogConfig logConfig = JsonUtils.stringToObject(arg, LogConfig.class);
             loggersEndpoint.configureLogLevel(logConfig.name, logConfig.configuredLevel);
             return "Changed log level for " + logConfig.name + " to " + logConfig.configuredLevel.name();
-        } catch (IOException | IllegalArgumentException ex) {
-            log.warn("Invalid json", ex);
-            return "Expected valid json as argument";
-        }
+        });
     }
 
     private static class LogConfig {

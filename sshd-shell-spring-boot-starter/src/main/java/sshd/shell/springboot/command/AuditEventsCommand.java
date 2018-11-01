@@ -17,7 +17,6 @@ package sshd.shell.springboot.command;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEventsEndpoint;
@@ -48,13 +47,10 @@ public final class AuditEventsCommand {
             return "Usage: auditEvents list {\"principal\":\"<user>\",\"after\":\"<yyyy-MM-dd HH:mm>\","
                     + "\"type\":\"<type>\"}";
         }
-        try {
+        return CommandUtils.process(log, () -> {
             Event event = JsonUtils.stringToObject(arg, Event.class);
             return JsonUtils.asJson(auditEventsEndpoint.events(event.principal, event.after, event.type));
-        } catch (IOException ex) {
-            log.warn("Invalid json", ex);
-            return "Expected valid json as argument";
-        }
+        });
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
