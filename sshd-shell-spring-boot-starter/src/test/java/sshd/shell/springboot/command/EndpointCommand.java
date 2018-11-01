@@ -17,6 +17,7 @@ package sshd.shell.springboot.command;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  *
  * Helper component to discover endpoints and facilitate the creation of said endpoint command by developer.
+ *
  * @author anand
  */
 @Component
@@ -37,16 +39,18 @@ public final class EndpointCommand {
 
     @Autowired
     EndpointCommand(ApplicationContext appCtx) {
-        appCtx.getBeansWithAnnotation(Endpoint.class).entrySet().stream().forEachOrdered(entry -> {
-            log.debug("{} : {}", entry.getKey(), entry.getValue().getClass().getName());
-            for (Method m : entry.getValue().getClass().getDeclaredMethods()) {
-                if (m.isAnnotationPresent(ReadOperation.class) || m.isAnnotationPresent(WriteOperation.class)) {
-                    log.debug("\tOp: {}", m.getName());
-                    for (Parameter p : m.getParameters()) {
-                        log.debug("\t\tParameter {}, {}", p.getName(), p.getType().getName());
+        appCtx.getBeansWithAnnotation(Endpoint.class).entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey()))
+                .forEachOrdered(entry -> {
+                    log.debug("{} : {}", entry.getKey(), entry.getValue().getClass().getName());
+                    for (Method m : entry.getValue().getClass().getDeclaredMethods()) {
+                        if (m.isAnnotationPresent(ReadOperation.class) || m.isAnnotationPresent(WriteOperation.class)) {
+                            log.debug("\tOp: {}", m.getName());
+                            for (Parameter p : m.getParameters()) {
+                                log.debug("\t\tParameter {}, {}", p.getName(), p.getType().getName());
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
     }
 }
