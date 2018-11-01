@@ -2,6 +2,7 @@ package demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
  *
  * @author anand
  */
+@EnableCaching
 @SpringBootApplication
 public class Main extends WebMvcConfigurationSupport {
 
