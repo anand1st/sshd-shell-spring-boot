@@ -37,14 +37,15 @@ import org.springframework.boot.test.context.SpringBootTest;
     "management.endpoint.metrics.enabled=false",
     "management.endpoint.scheduledtasks.enabled=false",
     "management.endpoint.shutdown.enabled=false",
-    "management.endpoint.threaddump.enabled=false"
+    "management.endpoint.threaddump.enabled=false",
+    "management.endpoint.caches.enabled=false"
 })
 public class SshdShellAutoConfigurationDisabledEndpointTest extends AbstractSshSupport {
     
     @Test
     public void testHelp() {
         sshCallShell((is, os) -> {
-            String format = "\r\n%-35s%s"; // must be same with usageInfoFormat in SshdShellProperties.java
+            String format = "\r" + props.getShell().getText().getUsageInfoFormat();
             write(os, "help");
             StringBuilder sb = new StringBuilder("Supported Commands");
             for (int i = 0; i < 5; i++) {

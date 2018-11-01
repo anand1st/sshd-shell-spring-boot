@@ -104,10 +104,10 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Test
     public void testHelp() {
         sshCallShell((is, os) -> {
-            String format = "\r\n%-35s%s"; // must be same with usageInfoFormat in SshdShellProperties.java
+            String format = "\r" + props.getShell().getText().getUsageInfoFormat();
             write(os, "help");
             StringBuilder sb = new StringBuilder("Supported Commands");
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 21; i++) {
                 sb.append(format);
             }
             sb.append("\r\nSupported post processors for output")
@@ -120,6 +120,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponseContains(is, String.format(Locale.ENGLISH, sb.toString(),
                     "auditEvents", "Event auditing",
                     "beans", "List beans",
+                    "caches", "Caches info",
                     "conditionsReport", "Conditions report",
                     "configurationPropertiesReport", "Configuration properties report",
                     "dummy", "dummy description",
@@ -278,7 +279,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     }
 
     @Test
-    public void testHealthCommand() {
+    public void testHealthInfoCommand() {
         int smtpPort = SocketUtils.findAvailableTcpPort();
         ServerSetup setup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
         setup.setServerStartupTimeout(5000);
@@ -286,12 +287,70 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         mailServer.start();
         ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
         sshCallShell((is, os) -> {
-            write(os, "health");
+            write(os, "health info");
             verifyResponseContains(is, "{\r\n  \"status\" : \"UP\"");
             mailServer.stop();
         });
     }
+    
+    @Test
+    public void testHealthComponentEmpty() {
+        sshCallShell((is, os) -> {
+            write(os, "health component");
+            verifyResponseContains(is, "Usage: health component <component>");
+        });
+    }
+    
+    @Test
+    public void testHealthComponentDB() {
+        sshCallShell((is, os) -> {
+            write(os, "health component diskSpace");
+            verifyResponseContains(is, "{\r\n  \"status\" : \"UP\"");
+        });
+    }
+    
+    @Test
+    public void testHealthComponentInstanceEmpty() {
+        sshCallShell((is, os) -> {
+            write(os, "health componentInstance");
+            verifyResponseContains(is, "Usage: health componentInstance {\"component\":\"<component>\",\"instance\":"
+                    + "\"<instance>\"}");
+        });
+    }
+    
+    @Test
+    public void testHealthComponentInstance() {
+        sshCallShell((is, os) -> {
+            write(os, "health componentInstance {\"component\":\"diskSpace\",\"instance\":\"xxx\"}");
+            verifyResponseContains(is, "null");
+        });
+    }
 
+    @Test
+    public void testCachesListCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "caches list");
+            verifyResponseContains(is, "{\r\n  \"cacheManagers");
+        });
+    }
+    
+    @Test
+    public void testCachesShowEmptyCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "caches show");
+            verifyResponseContains(is, "Usage: caches show {\"cache\":\"<cache>\", \"cacheManager\":"
+                    + "\"<cacheManager>\"}");
+        });
+    }
+    
+    @Test
+    public void testCachesShowCommand() {
+        sshCallShell((is, os) -> {
+            write(os, "caches show {\"cache\":\"test\"}");
+            verifyResponseContains(is, "{\r\n  \"target\" : \"com.github.benmanes.caffeine");
+        });
+    }
+    
     @Test
     public void testInfoCommand() {
         sshCallShell((is, os) -> {
