@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.web.WebEndpointResponse;
 import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -49,6 +50,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
  * @author anand
  */
 @SpringBootApplication
+@EnableCaching
 @lombok.extern.slf4j.Slf4j
 public class ConfigTest {
 
