@@ -20,6 +20,7 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 import sshd.shell.springboot.util.JsonUtils;
 
@@ -31,12 +32,39 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(HealthEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.health.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "health", description = "System health info")
+@lombok.extern.slf4j.Slf4j
 public final class HealthCommand {
-    
+
     @Autowired
     private HealthEndpoint healthEndpoint;
-    
-    public String health(String arg) {
+
+    @SshdShellCommand(value = "info", description = "Health info for all components")
+    public String healthInfo(String arg) {
         return JsonUtils.asJson(healthEndpoint.health());
+    }
+
+    @SshdShellCommand(value = "component", description = "Health for component")
+    public String healthForComponent(String arg) {
+        if (StringUtils.isEmpty(arg)) {
+            return "Usage: health component <component>";
+        }
+        return JsonUtils.asJson(healthEndpoint.healthForComponent(arg));
+    }
+
+    @SshdShellCommand(value = "componentInstance", description = "Health for component instance")
+    public String healthForComponentInstance(String arg) {
+        if (StringUtils.isEmpty(arg)) {
+            return "Usage: health componentInstance {\"component\":\"<component>\",\"instance\":\"<instance>\"}";
+        }
+        return CommandUtils.process(log, () -> {
+            ComponentInstance ci = JsonUtils.stringToObject(arg, ComponentInstance.class);
+            return JsonUtils.asJson(healthEndpoint.healthForComponentInstance(ci.component, ci.instance));
+        });
+    }
+
+    private static class ComponentInstance {
+
+        public String component;
+        public String instance;
     }
 }
