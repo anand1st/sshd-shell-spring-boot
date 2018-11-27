@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -50,20 +51,23 @@ class SshdShellAutoConfiguration {
     private ApplicationContext appContext;
 
     @Bean
-    Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands() throws NoSuchMethodException,
-            InterruptedException {
+    Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands() {
+        return Collections.unmodifiableMap(sshdShellCommandsMap().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> Collections.unmodifiableMap(e.getValue()),
+                        (v1, v2) -> {
+                            throw new IllegalStateException();
+                        }, TreeMap::new)));
+    }
+
+    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap() {
         Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap = new TreeMap<>();
-        for (Map.Entry<String, Object> entry : appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()) {
-            loadSshdShellCommands(sshdShellCommandsMap, entry.getValue());
-        }
-        return Collections.unmodifiableMap(sshdShellCommandsMap.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, e -> Collections.unmodifiableMap(e.getValue()), (v1, v2) -> {
-                    throw new IllegalStateException();
-                }, TreeMap::new)));
+        appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()
+                .forEach(entry -> loadSshdShellCommands(sshdShellCommandsMap, entry.getValue()));
+        return sshdShellCommandsMap;
     }
 
     private void loadSshdShellCommands(Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap,
-            Object obj) throws SecurityException, NoSuchMethodException, InterruptedException {
+            Object obj) {
         Class<?> clazz = AopUtils.isAopProxy(obj)
                 ? AopUtils.getTargetClass(obj)
                 : obj.getClass();
@@ -75,22 +79,19 @@ class SshdShellAutoConfiguration {
     private Map<String, CommandExecutableDetails> getSupplierMap(SshdShellCommand annotation,
             Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap) {
         Map<String, CommandExecutableDetails> map = sshdShellCommandsMap.get(annotation.value());
-        if (!Objects.isNull(map)) {
-            throw new IllegalArgumentException("Duplicate commands in different classes are not allowed");
-        }
+        Assert.isTrue(Objects.isNull(map), "Duplicate commands in different classes are not allowed");
         sshdShellCommandsMap.put(annotation.value(), map = new TreeMap<>());
         return map;
     }
 
     private void loadSshdShellCommandSuppliers(Class<?> clazz, SshdShellCommand annotation,
-            Map<String, CommandExecutableDetails> map, Object obj) throws NoSuchMethodException, SecurityException,
-            InterruptedException {
+            Map<String, CommandExecutableDetails> map, Object obj) {
         loadClassLevelCommandSupplier(clazz, annotation, map, obj);
         loadMethodLevelCommandSupplier(clazz, map, obj);
     }
 
     private void loadClassLevelCommandSupplier(Class<?> clazz, SshdShellCommand annotation,
-            Map<String, CommandExecutableDetails> map, Object obj) throws SecurityException, NoSuchMethodException {
+            Map<String, CommandExecutableDetails> map, Object obj) {
         log.debug("Loading class level command supplier for {}", clazz.getName());
         try {
             Method method = clazz.getDeclaredMethod(annotation.value(), String.class);
@@ -103,7 +104,7 @@ class SshdShellAutoConfiguration {
     }
 
     private CommandExecutableDetails getMethodSupplier(SshdShellCommand annotation, Method method, Object obj) {
-        return new CommandExecutableDetails(annotation, (arg) -> {
+        return new CommandExecutableDetails(annotation, arg -> {
             try {
                 return (String) method.invoke(obj, arg);
             } catch (InvocationTargetException ex) {
@@ -123,8 +124,7 @@ class SshdShellAutoConfiguration {
         return "Error performing method invocation\r\nPlease check server logs for more information";
     }
 
-    private void loadMethodLevelCommandSupplier(Class<?> clazz, Map<String, CommandExecutableDetails> map, Object obj)
-            throws NoSuchMethodException, SecurityException, InterruptedException {
+    private void loadMethodLevelCommandSupplier(Class<?> clazz, Map<String, CommandExecutableDetails> map, Object obj) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.isAnnotationPresent(SshdShellCommand.class)) {
                 log.debug("{}.#{} is marked with annotation {}", clazz.getName(), method.getName(),
