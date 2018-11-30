@@ -21,8 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import sshd.shell.springboot.console.UsageInfo.Row;
+import sshd.shell.springboot.util.Assert;
 
 /**
  *

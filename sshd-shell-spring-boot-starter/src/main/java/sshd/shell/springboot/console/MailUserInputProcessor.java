@@ -29,7 +29,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
+import sshd.shell.springboot.util.Assert;
 
 /**
  *

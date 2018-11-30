@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Lazy;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
+import sshd.shell.springboot.util.Assert;
 
 /**
  *
@@ -52,9 +53,7 @@ public abstract class BaseUserInputProcessor {
     public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts) 
             throws ShellException {
         String[] part = userInput.split(regex);
-        if (part.length != expectedNumberOfParts) {
-            throw new ShellException("Invalid command");
-        }
+        Assert.isTrue(part.length == expectedNumberOfParts, "Invalid command");
         return part;
     }
     
@@ -62,29 +61,21 @@ public abstract class BaseUserInputProcessor {
         Collection<String> userRoles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
         Map<String, CommandExecutableDetails> commandExecutables = getCommandExecutables(command);
         CommandExecutableDetails ced = commandExecutables.get(Constants.EXECUTE);
-        validateExecutableWithUserRole(ced, userRoles);
+        Assert.isTrue(ced.matchesRole(userRoles), "Permission denied");
         return userRoles;
     }
 
     private Map<String, CommandExecutableDetails> getCommandExecutables(String command) throws ShellException {
         Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(command);
-        if (Objects.isNull(commandExecutables)) {
-            throw new ShellException(TerminalProcessor.UNSUPPORTED_COMMANDS_MESSAGE);
-        }
+        Assert.isNotNull(commandExecutables, TerminalProcessor.UNSUPPORTED_COMMANDS_MESSAGE);
         return commandExecutables;
-    }
-
-    private void validateExecutableWithUserRole(CommandExecutableDetails ced, Collection<String> userRoles)
-            throws ShellException {
-        if (!ced.matchesRole(userRoles)) {
-            throw new ShellException("Permission denied");
-        }
     }
 
     private String handleSingleTokenUserInput(String command, Collection<String> userRoles) throws
             InterruptedException {
         CommandExecutableDetails ced = commandMap.get(command).get(Constants.EXECUTE);
-        return Objects.isNull(ced.getCommandExecutor()) ? unknownSubcommandMessage(command, userRoles)
+        return Objects.isNull(ced.getCommandExecutor())
+                ? unknownSubcommandMessage(command, userRoles)
                 : ced.executeWithArg(null);
     }
 
@@ -100,12 +91,10 @@ public abstract class BaseUserInputProcessor {
     private String handleUserInputWithMoreTokens(String[] part, Collection<String> userRoles)
             throws InterruptedException, ShellException {
         Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(part[0]);
-        if (!commandExecutables.containsKey(part[1])) {
-            throw new ShellException("Unknown subcommand '" + part[1] + "'. Type '" + part[0]
-                    + "' for supported subcommands");
-        }
+        Assert.isTrue(commandExecutables.containsKey(part[1]),
+                String.format("Unknown subcommand '%s'. Type '%s' for supported subcommands", part[1], part[0]));
         CommandExecutableDetails ced = commandMap.get(part[0]).get(part[1]);
-        validateExecutableWithUserRole(ced, userRoles);
+        Assert.isTrue(ced.matchesRole(userRoles), "Permission denied");
         return ced.executeWithArg(part.length == 2 ? null : part[2]);
     }
 }

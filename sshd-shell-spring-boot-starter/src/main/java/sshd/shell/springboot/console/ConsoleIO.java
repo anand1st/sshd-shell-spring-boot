@@ -50,8 +50,12 @@ public enum ConsoleIO {
         LineReader reader = SshSessionContext.<LineReader>get(LINE_READER);
         AttributedStyle textStyle = SshSessionContext.<AttributedStyle>get(TEXT_STYLE);
         Terminal terminal = SshSessionContext.<Terminal>get(TERMINAL);
-        String prompt = new AttributedStringBuilder().style(textStyle).append(text).append(' ')
-                .style(AttributedStyle.DEFAULT).toAnsi(terminal);
+        String prompt = new AttributedStringBuilder()
+                .style(textStyle)
+                .append(text)
+                .append(' ')
+                .style(AttributedStyle.DEFAULT)
+                .toAnsi(terminal);
         return reader.readLine(prompt, mask);
     }
 
@@ -88,8 +92,10 @@ public enum ConsoleIO {
         if (!Objects.isNull(textToHighlight)) {
             String[] split = output.split(textToHighlight);
             for (int i = 0; i < split.length - 1; i++) {
-                builder.append(split[i]).style(SshSessionContext.<AttributedStyle>get(HIGHLIGHT_COLOR))
-                        .append(textToHighlight).style(textStyle);
+                builder.append(split[i])
+                        .style(SshSessionContext.<AttributedStyle>get(HIGHLIGHT_COLOR))
+                        .append(textToHighlight)
+                        .style(textStyle);
             }
             builder.append(split[split.length - 1]);
         } else {

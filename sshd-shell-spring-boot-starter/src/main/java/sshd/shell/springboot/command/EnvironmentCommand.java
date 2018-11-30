@@ -44,7 +44,8 @@ public final class EnvironmentCommand {
 
     @SshdShellCommand(value = "entry", description = "Get environment details with string to match")
     public String withEntry(String arg) {
-        return StringUtils.isEmpty(arg) ? "Usage: environment entry <stringToMatch>"
+        return StringUtils.isEmpty(arg) 
+                ? "Usage: environment entry <stringToMatch>"
                 : JsonUtils.asJson(envEndpoint.environmentEntry(arg));
     }
 }

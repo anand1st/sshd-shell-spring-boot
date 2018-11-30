@@ -47,7 +47,8 @@ public final class LoggersCommand {
 
     @SshdShellCommand(value = "level", description = "Show log levels for given logger name")
     public String loggerLevels(String arg) {
-        return StringUtils.isEmpty(arg) ? "Usage: loggers level <loggerName>"
+        return StringUtils.isEmpty(arg)
+                ? "Usage: loggers level <loggerName>"
                 : JsonUtils.asJson(loggersEndpoint.loggerLevels(arg));
     }
 

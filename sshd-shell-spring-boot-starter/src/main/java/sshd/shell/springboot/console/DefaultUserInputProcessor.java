@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import sshd.shell.springboot.util.Assert;
 
 /**
  *
@@ -43,9 +44,7 @@ class DefaultUserInputProcessor extends BaseUserInputProcessor {
     @Override
     public void processUserInput(String userInput) throws InterruptedException, ShellException {
         for (String bannedSymbol : bannedSymbols) {
-            if (userInput.contains(bannedSymbol)) {
-                throw new ShellException("Invalid command");
-            }
+            Assert.isTrue(!userInput.contains(bannedSymbol), "Invalid command");
         }
         ConsoleIO.writeOutput(processCommands(userInput));
     }
