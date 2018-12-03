@@ -96,8 +96,13 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testSubcommand() {
         sshCallShell((is, os) -> {
             write(os, "test");
-            verifyResponseContains(is, "Supported subcommand for test\r\n\rexecute\t\ttest execute\r\n\rinteractive"
-                    + "\t\ttest interactive\r\n\rrun\t\ttest run");
+            String format = props.getShell().getText().getUsageInfoFormat();
+            String response = new StringBuilder("Supported subcommand for test")
+                    .append('\r').append(String.format(Locale.ENGLISH, format, "execute", "test execute"))
+                    .append('\r').append(String.format(Locale.ENGLISH, format, "interactive", "test interactive"))
+                    .append('\r').append(String.format(Locale.ENGLISH, format, "run", "test run"))
+                    .toString();
+            verifyResponseContains(is, response);
         });
     }
 
@@ -192,8 +197,13 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testHighlightProcessor() {
         sshCallShell((is, os) -> {
             write(os, "test | h subcommand");
-            verifyResponseContains(is, "Supported \u001B[43msubcommand\u001B[0m for test\r\n\rexecute\t\ttest execute"
-                    + "\r\n\rinteractive\t\ttest interactive\r\n\rrun\t\ttest run");
+            String format = props.getShell().getText().getUsageInfoFormat();
+            String response = new StringBuilder("Supported \u001B[43msubcommand\u001B[0m for test")
+                    .append('\r').append(String.format(Locale.ENGLISH, format, "execute", "test execute"))
+                    .append('\r').append(String.format(Locale.ENGLISH, format, "interactive", "test interactive"))
+                    .append('\r').append(String.format(Locale.ENGLISH, format, "run", "test run"))
+                    .toString();
+            verifyResponseContains(is, response);
         });
     }
 
@@ -292,7 +302,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             mailServer.stop();
         });
     }
-    
+
     @Test
     public void testHealthComponentEmpty() {
         sshCallShell((is, os) -> {
@@ -300,7 +310,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponseContains(is, "Usage: health component <component>");
         });
     }
-    
+
     @Test
     public void testHealthComponentDB() {
         sshCallShell((is, os) -> {
@@ -308,7 +318,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponseContains(is, "{\r\n  \"status\" : \"UP\"");
         });
     }
-    
+
     @Test
     public void testHealthComponentInstanceEmpty() {
         sshCallShell((is, os) -> {
@@ -317,7 +327,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     + "\"<instance>\"}");
         });
     }
-    
+
     @Test
     public void testHealthComponentInstance() {
         sshCallShell((is, os) -> {
@@ -333,7 +343,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponseContains(is, "{\r\n  \"cacheManagers");
         });
     }
-    
+
     @Test
     public void testCachesShowEmptyCommand() {
         sshCallShell((is, os) -> {
@@ -342,7 +352,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     + "\"<cacheManager>\"}");
         });
     }
-    
+
     @Test
     public void testCachesShowCommand() {
         sshCallShell((is, os) -> {
@@ -350,7 +360,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponseContains(is, "{\r\n  \"target\" : \"com.github.benmanes.caffeine");
         });
     }
-    
+
     @Test
     public void testInfoCommand() {
         sshCallShell((is, os) -> {
@@ -491,7 +501,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             verifyResponseContains(is, "Usage: heapDump live <true|false>");
         });
     }
-    
+
     @Test
     public void testHeapDumpWithSftpDisabled() {
         sshCallShell((is, os) -> {

@@ -16,6 +16,7 @@
 package sshd.shell.springboot.console;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Lazy;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
+import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 import sshd.shell.springboot.util.Assert;
 
 /**
@@ -36,27 +38,29 @@ public abstract class BaseUserInputProcessor {
     @Lazy
     @Autowired
     private Map<String, Map<String, CommandExecutableDetails>> commandMap;
-    
+    @Autowired
+    private SshdShellProperties props;
+
     public abstract Optional<UsageInfo> getUsageInfo();
-    
+
     public abstract Pattern getPattern();
-    
+
     public abstract void processUserInput(String userInput) throws InterruptedException, ShellException;
-    
+
     protected final String processCommands(String userInput) throws InterruptedException, ShellException {
         String[] part = userInput.trim().split(" ", 3); // Three parts: command, subcommand, arg
         Collection<String> userRoles = getUserRoles(part[0]);
         return part.length < 2 ? handleSingleTokenUserInput(part[0], userRoles)
                 : handleUserInputWithMoreTokens(part, userRoles);
     }
-    
-    public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts) 
+
+    public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts)
             throws ShellException {
         String[] part = userInput.split(regex);
         Assert.isTrue(part.length == expectedNumberOfParts, "Invalid command");
         return part;
     }
-    
+
     private Collection<String> getUserRoles(String command) throws ShellException {
         Collection<String> userRoles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
         Map<String, CommandExecutableDetails> commandExecutables = getCommandExecutables(command);
@@ -83,8 +87,8 @@ public abstract class BaseUserInputProcessor {
         StringBuilder sb = new StringBuilder("Supported subcommand for ").append(command);
         commandMap.get(command).entrySet().stream()
                 .filter(e -> !e.getKey().equals(Constants.EXECUTE) && e.getValue().matchesRole(userRoles))
-                .forEach(e -> sb.append("\n\r").append(e.getKey()).append("\t\t")
-                .append(e.getValue().getDescription()));
+                .forEach(e -> sb.append(String.format(Locale.ENGLISH, props.getShell().getText().getUsageInfoFormat(),
+                            e.getKey(), e.getValue().getDescription())));
         return sb.toString();
     }
 
