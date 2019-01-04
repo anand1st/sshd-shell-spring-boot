@@ -48,17 +48,19 @@ public abstract class BaseUserInputProcessor {
     public abstract void processUserInput(String userInput) throws InterruptedException, ShellException;
 
     protected final String processCommands(String userInput) throws InterruptedException, ShellException {
-        String[] part = userInput.trim().split(" ", 3); // Three parts: command, subcommand, arg
-        Collection<String> userRoles = getUserRoles(part[0]);
-        return part.length < 2 ? handleSingleTokenUserInput(part[0], userRoles)
-                : handleUserInputWithMoreTokens(part, userRoles);
+        String[] inputTokens = userInput.trim().split(" ", 3); // Three parts: command, subcommand, arg
+        String command = inputTokens[0];
+        Collection<String> userRoles = getUserRoles(command);
+        return inputTokens.length < 2
+                ? handleCommandOnlyUserInput(command, userRoles)
+                : handleUserInputWithMoreTokens(inputTokens, userRoles);
     }
 
-    public String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfParts)
+    protected String[] splitAndValidateCommand(String userInput, String regex, int expectedNumberOfTokens)
             throws ShellException {
-        String[] part = userInput.split(regex);
-        Assert.isTrue(part.length == expectedNumberOfParts, "Invalid command");
-        return part;
+        String[] tokens = userInput.split(regex);
+        Assert.isTrue(tokens.length == expectedNumberOfTokens, "Invalid command");
+        return tokens;
     }
 
     private Collection<String> getUserRoles(String command) throws ShellException {
@@ -75,7 +77,7 @@ public abstract class BaseUserInputProcessor {
         return commandExecutables;
     }
 
-    private String handleSingleTokenUserInput(String command, Collection<String> userRoles) throws
+    private String handleCommandOnlyUserInput(String command, Collection<String> userRoles) throws
             InterruptedException {
         CommandExecutableDetails ced = commandMap.get(command).get(Constants.EXECUTE);
         return Objects.isNull(ced.getCommandExecutor())
