@@ -50,7 +50,7 @@ public abstract class BaseUserInputProcessor {
     protected final String processCommands(String userInput) throws InterruptedException, ShellException {
         String[] inputTokens = userInput.trim().split(" ", 3); // Three parts: command, subcommand, arg
         String command = inputTokens[0];
-        Collection<String> userRoles = getUserRoles(command);
+        Collection<String> userRoles = getValidatedUserRolesForCommand(command);
         return inputTokens.length < 2
                 ? handleCommandOnlyUserInput(command, userRoles)
                 : handleUserInputWithMoreTokens(inputTokens, userRoles);
@@ -63,18 +63,17 @@ public abstract class BaseUserInputProcessor {
         return tokens;
     }
 
-    private Collection<String> getUserRoles(String command) throws ShellException {
+    private Collection<String> getValidatedUserRolesForCommand(String command) throws ShellException {
         Collection<String> userRoles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
-        Map<String, CommandExecutableDetails> commandExecutables = getCommandExecutables(command);
-        CommandExecutableDetails ced = commandExecutables.get(Constants.EXECUTE);
+        CommandExecutableDetails ced = getExecutableForCommand(command);
         Assert.isTrue(ced.matchesRole(userRoles), "Permission denied");
         return userRoles;
     }
 
-    private Map<String, CommandExecutableDetails> getCommandExecutables(String command) throws ShellException {
+    private CommandExecutableDetails getExecutableForCommand(String command) throws ShellException {
         Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(command);
         Assert.isNotNull(commandExecutables, TerminalProcessor.UNSUPPORTED_COMMANDS_MESSAGE);
-        return commandExecutables;
+        return commandExecutables.get(Constants.EXECUTE);
     }
 
     private String handleCommandOnlyUserInput(String command, Collection<String> userRoles) throws
@@ -90,17 +89,29 @@ public abstract class BaseUserInputProcessor {
         commandMap.get(command).entrySet().stream()
                 .filter(e -> !e.getKey().equals(Constants.EXECUTE) && e.getValue().matchesRole(userRoles))
                 .forEach(e -> sb.append(String.format(Locale.ENGLISH, props.getShell().getText().getUsageInfoFormat(),
-                            e.getKey(), e.getValue().getDescription())));
+                e.getKey(), e.getValue().getDescription())));
         return sb.toString();
     }
 
-    private String handleUserInputWithMoreTokens(String[] part, Collection<String> userRoles)
+    private String handleUserInputWithMoreTokens(String[] tokens, Collection<String> userRoles)
             throws InterruptedException, ShellException {
-        Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(part[0]);
-        Assert.isTrue(commandExecutables.containsKey(part[1]),
-                String.format("Unknown subcommand '%s'. Type '%s' for supported subcommands", part[1], part[0]));
-        CommandExecutableDetails ced = commandMap.get(part[0]).get(part[1]);
+        String command = tokens[0];
+        String subCommand = tokens[1];
+        CommandExecutableDetails ced = getSubCommand(command, subCommand);
         Assert.isTrue(ced.matchesRole(userRoles), "Permission denied");
-        return ced.executeWithArg(part.length == 2 ? null : part[2]);
+        return ced.executeWithArg(getArgument(tokens));
+    }
+
+    private CommandExecutableDetails getSubCommand(String command, String subCommand) throws ShellException {
+        Map<String, CommandExecutableDetails> commandExecutables = commandMap.get(command);
+        Assert.isTrue(commandExecutables.containsKey(subCommand),
+                String.format("Unknown subcommand '%s'. Type '%s' for supported subcommands", subCommand, command));
+        return commandMap.get(command).get(subCommand);
+    }
+
+    private String getArgument(String[] tokens) {
+        return tokens.length == 2
+                ? null
+                : tokens[2];
     }
 }

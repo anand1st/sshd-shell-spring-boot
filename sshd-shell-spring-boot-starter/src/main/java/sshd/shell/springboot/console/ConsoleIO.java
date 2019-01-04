@@ -87,22 +87,27 @@ public enum ConsoleIO {
      */
     public static void writeOutput(String output, String textToHighlight) {
         Terminal terminal = SshSessionContext.<Terminal>get(TERMINAL);
-        AttributedStyle textStyle = SshSessionContext.<AttributedStyle>get(TEXT_STYLE);
-        AttributedStringBuilder builder = new AttributedStringBuilder().style(textStyle);
-        if (!Objects.isNull(textToHighlight)) {
-            String[] split = output.split(textToHighlight);
-            for (int i = 0; i < split.length - 1; i++) {
-                builder.append(split[i])
-                        .style(SshSessionContext.<AttributedStyle>get(HIGHLIGHT_COLOR))
-                        .append(textToHighlight)
-                        .style(textStyle);
-            }
-            builder.append(split[split.length - 1]);
-        } else {
+        AttributedStringBuilder builder = new AttributedStringBuilder()
+                .style(SshSessionContext.<AttributedStyle>get(TEXT_STYLE));
+        if (Objects.isNull(textToHighlight)) {
             builder.append(output);
+        } else {
+            addHighlightedTextToBuilder(output, textToHighlight, builder);
         }
         terminal.writer().println(builder.style(AttributedStyle.DEFAULT).toAnsi(terminal));
         terminal.flush();
+    }
+
+    private static void addHighlightedTextToBuilder(String output, String textToHighlight,
+            AttributedStringBuilder builder) {
+        String[] split = output.split(textToHighlight);
+        for (int i = 0; i < split.length - 1; i++) {
+            builder.append(split[i])
+                    .style(SshSessionContext.<AttributedStyle>get(HIGHLIGHT_COLOR))
+                    .append(textToHighlight)
+                    .style(SshSessionContext.<AttributedStyle>get(TEXT_STYLE));
+        }
+        builder.append(split[split.length - 1]);
     }
 
     public static void writeJsonOutput(Object object) {

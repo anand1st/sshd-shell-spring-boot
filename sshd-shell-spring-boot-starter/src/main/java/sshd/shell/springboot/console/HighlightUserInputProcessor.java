@@ -48,11 +48,16 @@ class HighlightUserInputProcessor extends BaseUserInputProcessor {
 
     @Override
     public void processUserInput(String userInput) throws InterruptedException, ShellException {
-        String[] part = splitAndValidateCommand(userInput, "\\|", 2);
+        String textToHighlight = getHighlightedText(userInput);
+        String[] tokens = splitAndValidateCommand(userInput, "\\|", 2);
+        String commandExecution = tokens[0];
+        String output = processCommands(commandExecution);
+        ConsoleIO.writeOutput(output, textToHighlight);
+    }
+
+    private String getHighlightedText(String userInput) throws ShellException {
         Matcher matcher = pattern.matcher(userInput);
         Assert.isTrue(matcher.find(), "Unexpected error");
-        String textToHighlight = matcher.group(1).trim();
-        String output = processCommands(part[0]);
-        ConsoleIO.writeOutput(output, textToHighlight);
+        return matcher.group(1).trim();
     }
 }

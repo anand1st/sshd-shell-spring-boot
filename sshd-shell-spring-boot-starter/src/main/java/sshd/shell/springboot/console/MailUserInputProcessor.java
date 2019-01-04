@@ -61,19 +61,24 @@ class MailUserInputProcessor extends BaseUserInputProcessor {
     @Override
     public void processUserInput(String userInput) throws InterruptedException, ShellException {
         String[] part = splitAndValidateCommand(userInput, "\\|", 2);
-        Matcher matcher = pattern.matcher(userInput);
-        Assert.isTrue(matcher.find(), "Unexpected error");
-        String emailId = matcher.group(1).trim();
-        String output = processCommands(part[0]);
-        sendMail(emailId, part[0], output);
+        String emailId = getEmailId(userInput);
+        String commandExecution = part[0];
+        String output = processCommands(commandExecution);
+        sendMail(emailId, commandExecution, output);
     }
 
-    private void sendMail(String emailId, String command, String output) {
+    private String getEmailId(String userInput) throws ShellException {
+        Matcher matcher = pattern.matcher(userInput);
+        Assert.isTrue(matcher.find(), "Unexpected error");
+        return matcher.group(1).trim();
+    }
+
+    private void sendMail(String emailId, String commandExecution, String output) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
         try {
             helper.setTo(emailId);
-            helper.setSubject(command);
+            helper.setSubject(commandExecution);
             helper.setText(output);
             mailSender.send(mimeMessage);
             ConsoleIO.writeOutput("Output response sent to " + emailId);

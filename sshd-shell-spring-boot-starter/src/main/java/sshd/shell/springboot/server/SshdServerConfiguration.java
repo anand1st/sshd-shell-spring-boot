@@ -77,16 +77,15 @@ class SshdServerConfiguration {
             log.info("********** User password not set. Use following password to login: {} **********",
                     props.getPassword());
         }
-        SshServer server = buildServer(props);
-        configureAuthenticationPolicies(server, props);
-        configureServer(server);
-        return server;
+        return buildServer(props);
     }
 
     private SshServer buildServer(Shell props) {
         SshServer server = SshServer.setUpDefaultServer();
         server.setHost(props.getHost());
         server.setPort(props.getPort());
+        configureAuthenticationPolicies(server, props);
+        configureServer(server);
         return server;
     }
 

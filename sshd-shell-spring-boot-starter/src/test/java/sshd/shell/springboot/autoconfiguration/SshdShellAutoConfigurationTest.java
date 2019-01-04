@@ -161,8 +161,10 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         ServerSetup setup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
         setup.setServerStartupTimeout(5000);
         GreenMail mailServer = new GreenMail(setup);
+        JavaMailSenderImpl jmsi = (JavaMailSenderImpl) mailSender;
+        mailServer.setUser(jmsi.getUsername(), jmsi.getPassword());
         mailServer.start();
-        ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
+        jmsi.setPort(smtpPort);
         assertEquals(0, mailServer.getReceivedMessages().length);
         sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
@@ -294,8 +296,10 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         ServerSetup setup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
         setup.setServerStartupTimeout(5000);
         GreenMail mailServer = new GreenMail(setup);
+        JavaMailSenderImpl jmsi = (JavaMailSenderImpl) mailSender;
+        mailServer.setUser(jmsi.getUsername(), jmsi.getPassword());
         mailServer.start();
-        ((JavaMailSenderImpl) mailSender).setPort(smtpPort);
+        jmsi.setPort(smtpPort);
         sshCallShell((is, os) -> {
             write(os, "health info");
             verifyResponseContains(is, "{\r\n  \"status\" : \"UP\"");
