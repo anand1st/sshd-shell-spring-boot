@@ -1,11 +1,9 @@
 package demo;
 
 import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 import sshd.shell.springboot.console.ConsoleIO;
 
 /**
@@ -15,9 +13,6 @@ import sshd.shell.springboot.console.ConsoleIO;
 @Component
 @SshdShellCommand(value = "echo", description = "Echo by users. Type 'echo' for supported subcommands")
 public class EchoCommand {
-    
-    @Autowired
-    private SshdShellProperties props;
     
     @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
     public String bobSays(String arg) throws IOException {
