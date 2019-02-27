@@ -24,6 +24,7 @@ import com.icegreen.greenmail.util.ServerSetup;
 import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import org.awaitility.Duration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -168,7 +169,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         assertEquals(0, mailServer.getReceivedMessages().length);
         sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
-            verifyResponseContains(is, "Output response sent to anand@test.com");
+            verifyResponseContains(is, "Output response sent to anand@test.com", Duration.ONE_MINUTE);
             assertTrue(mailServer.waitForIncomingEmail(5000, 1));
             MimeMessage message = mailServer.getReceivedMessages()[0];
             try {

@@ -83,9 +83,13 @@ abstract class AbstractSshSupport {
     }
 
     protected void verifyResponseContains(InputStream pis, String response) {
+        verifyResponseContains(pis, response, Duration.TEN_SECONDS);
+    }
+    
+    protected void verifyResponseContains(InputStream pis, String response, Duration duration) {
         StringBuilder sb = new StringBuilder();
         try {
-            await().atMost(Duration.TEN_SECONDS).until(() -> {
+            await().atMost(duration).until(() -> {
                 while (true) {
                     sb.append((char) pis.read());
                     String s = sb.toString();
