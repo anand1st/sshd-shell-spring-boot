@@ -16,7 +16,7 @@
 package sshd.shell.springboot.util;
 
 import java.util.Objects;
-import sshd.shell.springboot.console.ShellException;
+import sshd.shell.springboot.ShellException;
 
 /**
  *
@@ -24,13 +24,13 @@ import sshd.shell.springboot.console.ShellException;
  */
 public enum Assert {
     ;
-        
+
     public static void isTrue(boolean statement, String errorMessage) throws ShellException {
         if (!statement) {
             throw new ShellException(errorMessage);
         }
     }
-    
+
     public static void isNotNull(Object object, String errorMessage) throws ShellException {
         isTrue(Objects.nonNull(object), errorMessage);
     }
