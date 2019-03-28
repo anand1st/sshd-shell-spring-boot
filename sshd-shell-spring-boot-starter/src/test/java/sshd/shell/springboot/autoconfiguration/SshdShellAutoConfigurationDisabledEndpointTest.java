@@ -41,7 +41,7 @@ import org.springframework.boot.test.context.SpringBootTest;
     "management.endpoint.caches.enabled=false"
 })
 public class SshdShellAutoConfigurationDisabledEndpointTest extends AbstractSshSupport {
-    
+
     @Test
     public void testHelp() {
         sshCallShell((is, os) -> {
@@ -60,9 +60,9 @@ public class SshdShellAutoConfigurationDisabledEndpointTest extends AbstractSshS
                     .append(String.format(Locale.ENGLISH, format, "", "Example usage: help | m bob@hope.com"));
             verifyResponseContains(is, String.format(Locale.ENGLISH, sb.toString(),
                     "dummy", "dummy description",
+                    "exception", "throws Exceptions",
                     "exit", "Exit shell",
                     "help", "Show list of help commands",
-                    "iae", "throws IAE",
                     "test", "test description"));
         });
     }

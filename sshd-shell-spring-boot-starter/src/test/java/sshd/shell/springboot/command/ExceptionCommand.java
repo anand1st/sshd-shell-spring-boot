@@ -19,6 +19,7 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.stereotype.Component;
+import sshd.shell.springboot.ShellException;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**
@@ -26,10 +27,16 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
  * @author anand
  */
 @Component
-@SshdShellCommand(value = "iae", description = "throws IAE")
-public class IAECommand {
-    
-    public void iae(String arg) {
-        throw new IllegalArgumentException("iae");
+@SshdShellCommand(value = "exception", description = "throws Exceptions")
+public class ExceptionCommand {
+
+    @SshdShellCommand(value = "iae", description = "throws IAE")
+    public String iae(String arg) {
+        throw new IllegalArgumentException("illegalargumentexception");
+    }
+
+    @SshdShellCommand(value = "se", description = "throws ShellException")
+    public String se(String arg) throws ShellException {
+        throw new ShellException("shellexception");
     }
 }

@@ -71,9 +71,16 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Test
     public void testIAECommand() {
         sshCallShell((is, os) -> {
-            write(os, "iae");
-            verifyResponseContains(is, "Error performing method invocation\r\r\nPlease check server logs for more "
-                    + "information");
+            write(os, "exception iae");
+            verifyResponseContains(is, "illegalargumentexception");
+        });
+    }
+
+    @Test
+    public void testSECommand() {
+        sshCallShell((is, os) -> {
+            write(os, "exception se");
+            verifyResponseContains(is, "shellexception");
         });
     }
 
@@ -131,12 +138,12 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     "configurationPropertiesReport", "Configuration properties report",
                     "dummy", "dummy description",
                     "environment", "Environment details",
+                    "exception", "throws Exceptions",
                     "exit", "Exit shell",
                     "health", "System health info",
                     "heapDump", "Heap dump command",
                     "help", "Show list of help commands",
                     "httpTrace", "Http trace information",
-                    "iae", "throws IAE",
                     "info", "System status",
                     "loggers", "Logging configuration",
                     "mappings", "List http request mappings",
