@@ -35,6 +35,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
+import sshd.shell.springboot.ShellException;
 
 /**
  *
@@ -108,15 +109,23 @@ class SshdShellAutoConfiguration {
             try {
                 return (String) method.invoke(obj, arg);
             } catch (InvocationTargetException ex) {
-                if (ex.getCause() instanceof InterruptedException) {
-                    throw (InterruptedException) ex.getCause();
-                } else {
-                    return printAndGetErrorInfo(ex.getCause());
-                }
-            } catch (IllegalAccessException | IllegalArgumentException ex) {
+                rethrowSupportedExceptionsOnCommandExecutor(ex.getCause());
+                return printAndGetErrorInfo(ex.getCause());
+            } catch (IllegalAccessException ex) {
                 return printAndGetErrorInfo(ex);
             }
         });
+    }
+
+    private void rethrowSupportedExceptionsOnCommandExecutor(Throwable ex) throws IllegalArgumentException,
+            InterruptedException, ShellException {
+        if (ex instanceof InterruptedException) {
+            throw (InterruptedException) ex;
+        } else if (ex instanceof ShellException) {
+            throw (ShellException) ex;
+        } else if (ex instanceof IllegalArgumentException) {
+            throw (IllegalArgumentException) ex;
+        }
     }
 
     private String printAndGetErrorInfo(Throwable ex) {

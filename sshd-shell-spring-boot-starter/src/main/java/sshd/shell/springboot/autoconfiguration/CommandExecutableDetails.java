@@ -21,33 +21,34 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.util.CollectionUtils;
+import sshd.shell.springboot.ShellException;
 
 /**
  *
  * @author anand
  */
 public class CommandExecutableDetails {
-    
+
     private final Set<String> roles;
     @lombok.Getter
     private final String description;
     @lombok.Getter
     private final CommandExecutor commandExecutor;
-    
+
     CommandExecutableDetails(SshdShellCommand command, CommandExecutor commandExecutor) {
         this.roles = Collections.unmodifiableSet(new HashSet<>(Arrays.<String>asList(command.roles())));
         this.description = command.description();
         this.commandExecutor = commandExecutor;
     }
-    
+
     public boolean matchesRole(Collection<String> userRoles) {
         if (roles.contains("*") || userRoles.contains("*")) {
             return true;
         }
         return CollectionUtils.containsAny(roles, userRoles);
     }
-    
-    public String executeWithArg(String arg) throws InterruptedException {
+
+    public String executeWithArg(String arg) throws InterruptedException, ShellException {
         return commandExecutor.get(arg);
     }
 }

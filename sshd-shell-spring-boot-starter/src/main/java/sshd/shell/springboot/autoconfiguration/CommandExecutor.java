@@ -18,12 +18,14 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
+import sshd.shell.springboot.ShellException;
+
 /**
  *
  * @author anand
  */
 @FunctionalInterface
 interface CommandExecutor {
-    
-    String get(String arg) throws InterruptedException;
+
+    String get(String arg) throws InterruptedException, ShellException;
 }
