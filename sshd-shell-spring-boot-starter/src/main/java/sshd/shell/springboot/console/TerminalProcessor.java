@@ -29,6 +29,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
+import sshd.shell.springboot.ShellException;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell;
@@ -97,7 +98,7 @@ public class TerminalProcessor {
 
     private AttributedStyle getStyle(ColorType color) {
         // This check is done to allow for default contrasting color texts to be shown on black or white screens
-        return color == ColorType.BLACK || color == ColorType.WHITE 
+        return color == ColorType.BLACK || color == ColorType.WHITE
                 ? AttributedStyle.DEFAULT
                 : AttributedStyle.DEFAULT.foreground(color.value);
     }
@@ -106,6 +107,7 @@ public class TerminalProcessor {
         try {
             processUserInput(reader, exitCallback);
         } catch (UserInterruptException ex) {
+            // Need not concern with this exception
             log.warn("[{}] Ctrl-C interrupt", SshSessionContext.<String>get(Constants.USER));
             exitCallback.accept(1);
         }
@@ -120,7 +122,7 @@ public class TerminalProcessor {
                 ConsoleIO.writeOutput(ex.getMessage());
                 exitCallback.accept(0);
                 break;
-            } catch (ShellException ex) {
+            } catch (ShellException | IllegalArgumentException ex) {
                 ConsoleIO.writeOutput(ex.getMessage());
             }
         }

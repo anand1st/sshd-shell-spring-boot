@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import sshd.shell.springboot.ShellException;
 import sshd.shell.springboot.util.Assert;
 
 /**

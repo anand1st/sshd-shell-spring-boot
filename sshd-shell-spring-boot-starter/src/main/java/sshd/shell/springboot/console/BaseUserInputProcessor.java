@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import sshd.shell.springboot.ShellException;
 import sshd.shell.springboot.autoconfiguration.CommandExecutableDetails;
 import sshd.shell.springboot.autoconfiguration.Constants;
 import sshd.shell.springboot.autoconfiguration.SshSessionContext;
@@ -77,7 +78,7 @@ public abstract class BaseUserInputProcessor {
     }
 
     private String handleCommandOnlyUserInput(String command, Collection<String> userRoles) throws
-            InterruptedException {
+            InterruptedException, ShellException {
         CommandExecutableDetails ced = commandMap.get(command).get(Constants.EXECUTE);
         return Objects.isNull(ced.getCommandExecutor())
                 ? unknownSubcommandMessage(command, userRoles)
