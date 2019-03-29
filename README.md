@@ -6,14 +6,14 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.0.M4 till 2.0.x.RELEASE with support its new endpoint infrastructure. For supporting the older spring boot versions, please see the git branch 1.5.x which supports 1.5.x right up to 2.0.0.M3 for more information.
+This starter has been tested with spring-boot 2.0.x to 2.1.x.RELEASE with support for its new endpoint infrastructure.
 
 To import into Maven project, add the following dependency inside `pom.xml`:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.6</version>
+        <version>3.7</version>
     </dependency>
     
 For Gradle users, add these lines inside `build.gradle`:
@@ -24,6 +24,9 @@ For Gradle users, add these lines inside `build.gradle`:
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 3.7
+Running with latest jline 3.10.0 and Apache SSHD version 2.2.0 and some code refactoring and cleanup. Fixed bug with exception handling of ShellException and IllegalArgumentException in methods with SshdShellCommand annotation. These exceptions can now be safely thrown and handled correctly by the CommandExecutor. Other exceptions are considered unexpected and will result in a error log.
 
 ### Version 3.6
 Getting a user's root directory for the purposes of SCP/SFTP is now made easier with the following approach:
