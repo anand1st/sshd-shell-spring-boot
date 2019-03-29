@@ -19,7 +19,7 @@ To import into Maven project, add the following dependency inside `pom.xml`:
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
-        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.6'
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.7'
     }
 
 ### Note
