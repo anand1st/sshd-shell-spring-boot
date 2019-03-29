@@ -6,7 +6,7 @@ This artifact is a spring boot starter that provides SSH access to spring boot a
 
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.x to 2.1.x.RELEASE with support for its new endpoint infrastructure.
+This starter has been tested with spring-boot 2.0.x to 2.1.x releases with support for its new endpoint infrastructure.
 
 To import into Maven project, add the following dependency inside `pom.xml`:
 
