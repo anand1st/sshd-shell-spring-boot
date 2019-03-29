@@ -63,7 +63,7 @@
         <dependency>
             <groupId>io.github.anand1st</groupId>
             <artifactId>sshd-shell-spring-boot-starter</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
