@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.ImageBanner;
 import org.springframework.boot.ResourceBanner;
@@ -38,7 +37,7 @@ import org.springframework.util.StringUtils;
  * @author anand
  */
 @Component(value = Constants.SHELL_BANNER)
-@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE, onConstructor = @__(@Autowired))
+@lombok.AllArgsConstructor(access = lombok.AccessLevel.PACKAGE)
 class ShellBanner implements Banner {
 
     private static final String[] SUPPORTED_IMAGES = {"gif", "jpg", "png"};
@@ -81,7 +80,7 @@ class ShellBanner implements Banner {
     private static class BannerDecorator implements Banner {
 
         private final Banner decorator;
-        
+
         @Override
         public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
