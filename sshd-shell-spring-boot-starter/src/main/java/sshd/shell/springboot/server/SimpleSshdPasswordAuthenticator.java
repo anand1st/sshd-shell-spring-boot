@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.server;
 
-import java.util.Collections;
+import java.util.Set;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
 import org.apache.sshd.server.session.ServerSession;
@@ -30,12 +30,13 @@ import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell;
 class SimpleSshdPasswordAuthenticator implements PasswordAuthenticator {
 
     private final Shell props;
+    private final Set<String> systemCommandRoles;
 
     @Override
     public boolean authenticate(String username, String password, ServerSession session) throws
             PasswordChangeRequiredException {
         if (username.equals(props.getUsername()) && password.equals(props.getPassword())) {
-            session.getIoSession().setAttribute(Constants.USER_ROLES, Collections.<String>singleton("*"));
+            session.getIoSession().setAttribute(Constants.USER_ROLES, systemCommandRoles);
             session.getIoSession().setAttribute(Constants.USER, username);
             return true;
         }

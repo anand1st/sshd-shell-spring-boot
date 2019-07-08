@@ -17,7 +17,9 @@ package sshd.shell.springboot.server;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +37,7 @@ import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
@@ -57,6 +60,8 @@ import sshd.shell.springboot.console.TerminalProcessor;
 @lombok.extern.slf4j.Slf4j
 class SshdServerConfiguration {
 
+    @Value("${sshd.system.command.roles}")
+    private String systemCommandRoles;
     @Autowired
     private SshdShellProperties properties;
     @Autowired
@@ -101,7 +106,7 @@ class SshdServerConfiguration {
         Auth authProps = props.getAuth();
         switch (authProps.getAuthType()) {
             case SIMPLE:
-                return new SimpleSshdPasswordAuthenticator(props);
+                return new SimpleSshdPasswordAuthenticator(props, new HashSet<>(Arrays.asList(systemCommandRoles)));
             case AUTH_PROVIDER:
                 return authProviderAuthenticator(authProps);
             default:
@@ -154,7 +159,7 @@ class SshdServerConfiguration {
     private void configureServerForSshOnly(SshServer server) {
         server.setCommandFactory(sshCommandFactory(null));
     }
-    
+
     private void configureShellFactory(SshServer server) {
         Optional<String> baseDir = properties.getFiletransfer().isEnabled()
                 ? Optional.of(properties.getFilesystem().getBase().getDir())
