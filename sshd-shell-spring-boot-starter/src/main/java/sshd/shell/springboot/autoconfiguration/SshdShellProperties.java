@@ -18,8 +18,8 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
-import sshd.shell.springboot.console.ColorType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import sshd.shell.springboot.console.ColorType;
 
 /**
  *
