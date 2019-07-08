@@ -2,9 +2,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/anand1st/sshd-shell-spring-boot/badge.svg?branch=master)](https://coveralls.io/github/anand1st/sshd-shell-spring-boot?branch=master)
 
 # sshd-shell-spring-boot
-This artifact is a spring boot starter that provides SSH access to spring boot applications. It is primarily designed for  developers who want to roll out custom shell commands for various purposes.
+This artifact is a spring boot starter that provides SSH access to spring boot applications. It is primarily designed
+for  developers who want to roll out custom shell commands for various purposes.
 
-The motivation for this starter was due to the fact that spring-boot had officially dropped support for spring-boot-starter-remote-shell for the 2.x versions.
+The motivation for this starter was due to the fact that spring-boot had officially dropped support for
+spring-boot-starter-remote-shell for the 2.x versions.
 
 This starter has been tested with spring-boot 2.0.x to 2.1.x releases with support for its new endpoint infrastructure.
 
@@ -27,7 +29,8 @@ Versions < 2.1 are deprecated and unsupported. The artifact above supports the f
 
 ### Version 4.0-SNAPSHOT
 Updated dependencies to jline 3.11.0.
-One of the biggest noise of this library was the various management commands that were visible to all users. Version 4.0 introduces some properties to help manage these commands (hereby called system commands).
+One of the biggest 'noise' of this library was the various management commands that were visible to all users.
+Version 4.0 introduces some properties to help manage these commands (hereby called system commands).
 
     sshd.system.command.roles=ADMIN #Defaults to ADMIN
     sshd.system.command.roles.auditEvents=${sshd.system.command.roles}
@@ -47,16 +50,23 @@ One of the biggest noise of this library was the various management commands tha
     sshd.system.command.roles.shutdown=${sshd.system.command.roles}
     sshd.system.command.roles.threadDump=${sshd.system.command.roles}
 
-The user just need to set the `sshd.system.command.roles` to an admin role or to '*' if anyone should be able to have access to these commands. For individual configuration of management endpoints, setting the roles in the above system commands properties manually should suffice.
+The user just need to set the `sshd.system.command.roles` to an admin role or to `*` if any authenticated user should
+be able to have access to these commands. For individual configuration of management endpoints, setting the roles in
+the above system command properties manually should suffice. Please note that these changes may affect the functionality
+in previous versions of this library. Sufficient testing with this version is recommended.
 
 ### Version 3.7
-Running with latest jline 3.10.0 and Apache SSHD version 2.2.0 and some code refactoring and cleanup. Fixed bug with exception handling of ShellException and IllegalArgumentException in methods with SshdShellCommand annotation. These exceptions can now be safely thrown and handled correctly by the CommandExecutor. Other exceptions are considered unexpected and will result in a error log.
+Running with latest jline 3.10.0 and Apache SSHD version 2.2.0 and some code refactoring and cleanup. Fixed bug with
+exception handling of ShellException and IllegalArgumentException in methods with SshdShellCommand annotation.
+These exceptions can now be safely thrown and handled correctly by the CommandExecutor. Other exceptions are considered
+unexpected and will result in a error log.
 
 ### Version 3.6
 Getting a user's root directory for the purposes of SCP/SFTP is now made easier with the following approach:
 
     SshSessionContext.getUserDir()
-Upgraded jline to 3.9.0 and Apache SSHD version to 2.0.0. `heapDump` command now zips the dump and places it into the session user's directory if SCP/SFTP is enabled so that it can be downloaded.
+Upgraded jline to 3.9.0 and Apache SSHD version to 2.0.0. `heapDump` command now zips the dump and places it into the
+session user's directory if SCP/SFTP is enabled so that it can be downloaded.
 
 
 ### Version 3.5
@@ -67,23 +77,27 @@ Modified SshdShellProperties to add the properties
 Added also username into SshSessionContext that can be accessed via
 
     SshSessionContext.get(Constants.USER)
-With these changes, one can now figure out the rooted filesystem for a session user by autowiring SshdShellProperties into the custom command classes to access the sshd.filesystem.base.dir property and by the session username.
+With these changes, one can now figure out the rooted filesystem for a session user by autowiring SshdShellProperties
+into the custom command classes to access the sshd.filesystem.base.dir property and by the session username.
 
 ### Version 3.4
-Support for SFTP and SCP with configurable Root File System. Upgraded jline to 3.7.0. See Usage section below for properties to be set. Tested with OSX only. Usage:
+Support for SFTP and SCP with configurable Root File System. Upgraded jline to 3.7.0. See Usage section below for
+properties to be set. Tested with OSX only. Usage:
 
     sftp -P 8022 admin@localhost
     scp -P 8022 <localFile> admin@localhost:<filename>
 
 ### Version 3.3
-Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the ssh command likewise is enabled/disabled according to this setting.
+Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the ssh command likewise
+is enabled/disabled according to this setting.
 
 ### Version 3.2.1
 Support for spring boot 2.0.0.RC1, 2.0.0.RC2 and 2.0.0.RELEASE.
 Upgraded to jline 3.6.0 and sshd-core 1.7.0.
 Minor code fixes and refactorings.
 
-##### Please do not use version 3.2 as there seems to be some Jackson incompatibilities on Linux. Version 3.2.1 fixes these issues.
+##### Please do not use version 3.2 as there seems to be some Jackson incompatibilities on Linux. Version 3.2.1 fixes
+these issues.
 
 ### Version 3.1
 Added support for SSH exec in addition to SSH shell.
@@ -95,12 +109,13 @@ Added support for spring boot 2.0.0.M4 endpoint infrastructure which is very dif
 ### Version 2.5
 Supports spring boot versions from 1.5.x till 2.0.0.M3 (tested for these versions only).
 Upgraded to jline-3.5.1.
-Added support for highlighting of response output based on searched text using postprocessors (highlighting tested on OSX).
-Added support for the emailing response output using postprocessors.
+Added support for highlighting of response output based on searched text using postprocessors (highlighting tested on
+OSX). Added support for the emailing response output using postprocessors.
 Examples of post processors can be seen below.
 
 ### Version 2.4
-Upgraded to jline-3.4.0. Refactored I/O related activity from SshSessionContext to ConsoleIO. Separated console processing into separate packages from SSH server packages.
+Upgraded to jline-3.4.0. Refactored I/O related activity from SshSessionContext to ConsoleIO. Separated console
+processing into separate packages from SSH server packages.
 
 ### Version 2.3
 Support for auto-completion of commands and subcommands using tab.
@@ -109,12 +124,16 @@ Support for auto-completion of commands and subcommands using tab.
 Fixed bug with prompt & text color.
 
 ### Version 2.1
-Support for role-based access control using spring-security's `AuthenticationProvider` bean. `SshdShellCommand` annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command.
+Support for role-based access control using spring-security's `AuthenticationProvider` bean. `SshdShellCommand`
+annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use
+spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's
+role matches the roles in the command classes, he/she should be able to execute the command.
 
 Every user session has a session context which a developer can use to manage state between command invocations
 
 # Usage
-All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application Context:
+All the developer needs to do it to create a class similar to below and make sure it's loaded by the Application
+Context:
 
     @Component
     @SshdShellCommand(value = "echo", description = "Echo by users. Type 'echo help' for supported subcommands")
@@ -163,7 +182,10 @@ Supported properties in application.properties (defaults are as below):
     sshd.filetransfer.enabled=true          # Defaults to false. Must be enabled for SCP and SFTP functionality
     sshd.filesystem.base.dir=/home/app      # Defaults to 'user.home' property
 
-When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading. It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the application.
+When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will
+show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading.
+It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the
+application.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
@@ -236,5 +258,6 @@ For an admin user, the following extras can be seen in the help and echo subcomm
 For more information, check out the sshd-shell-spring-boot-test-app project for a fully working example.
 
 Limitations:
-1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String parameter (denoting nullable arguments in shell command).
+1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String
+parameter (denoting nullable arguments in shell command).
 2) Requires minimum JDK 8.
