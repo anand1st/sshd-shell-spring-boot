@@ -15,10 +15,8 @@
  */
 package sshd.shell.springboot.autoconfiguration;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import org.springframework.util.CollectionUtils;
 import sshd.shell.springboot.ShellException;
@@ -27,16 +25,19 @@ import sshd.shell.springboot.ShellException;
  *
  * @author anand
  */
+@lombok.extern.slf4j.Slf4j
 public class CommandExecutableDetails {
 
     private final Set<String> roles;
+    private final String command;
     @lombok.Getter
     private final String description;
     @lombok.Getter
     private final CommandExecutor commandExecutor;
 
-    CommandExecutableDetails(SshdShellCommand command, CommandExecutor commandExecutor) {
-        this.roles = Collections.unmodifiableSet(new HashSet<>(Arrays.<String>asList(command.roles())));
+    CommandExecutableDetails(SshdShellCommand command, Set<String> roles, CommandExecutor commandExecutor) {
+        this.roles = Collections.unmodifiableSet(roles);
+        this.command = command.value();
         this.description = command.description();
         this.commandExecutor = commandExecutor;
     }
@@ -50,5 +51,11 @@ public class CommandExecutableDetails {
 
     public String executeWithArg(String arg) throws InterruptedException, ShellException {
         return commandExecutor.get(arg);
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("Command: ").append(command).append(", description: ").append(description)
+                .append(", roles: ").append(roles).toString();
     }
 }
