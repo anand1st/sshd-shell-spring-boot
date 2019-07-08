@@ -20,7 +20,9 @@ package sshd.shell.springboot.autoconfiguration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -36,6 +38,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import sshd.shell.springboot.ShellException;
+import sshd.shell.springboot.command.AbstractSystemCommand;
 
 /**
  *
@@ -96,16 +99,25 @@ class SshdShellAutoConfiguration {
         log.debug("Loading class level command supplier for {}", clazz.getName());
         try {
             Method method = clazz.getDeclaredMethod(annotation.value(), String.class);
-            log.debug("Adding default command method {}", method.getName());
-            map.put(Constants.EXECUTE, getMethodSupplier(annotation, method, obj));
+            map.put(Constants.EXECUTE, getMethodSupplier(annotation, obj, buildCommandExecutable(method, obj)));
         } catch (NoSuchMethodException ex) {
-            map.put(Constants.EXECUTE, new CommandExecutableDetails(annotation, null));
-            log.debug("Does not contain default command method {}", ex.getMessage());
+            map.put(Constants.EXECUTE, getMethodSupplier(annotation, obj, null));
         }
     }
 
-    private CommandExecutableDetails getMethodSupplier(SshdShellCommand annotation, Method method, Object obj) {
-        return new CommandExecutableDetails(annotation, arg -> {
+    private CommandExecutableDetails getMethodSupplier(SshdShellCommand annotation, Object obj,
+            CommandExecutor commandExecutor) {
+        CommandExecutableDetails ced = new CommandExecutableDetails(annotation,
+                obj instanceof AbstractSystemCommand
+                        ? ((AbstractSystemCommand) obj).getSystemRoles()
+                        : new HashSet<>(Arrays.asList(annotation.roles())),
+                commandExecutor);
+        log.debug("Command Execution details summary: {}", ced);
+        return ced;
+    }
+
+    private CommandExecutor buildCommandExecutable(Method method, Object obj) {
+        return arg -> {
             try {
                 return (String) method.invoke(obj, arg);
             } catch (InvocationTargetException ex) {
@@ -114,7 +126,7 @@ class SshdShellAutoConfiguration {
             } catch (IllegalAccessException ex) {
                 return printAndGetErrorInfo(ex);
             }
-        });
+        };
     }
 
     private void rethrowSupportedExceptionsOnCommandExecutor(Throwable ex) throws IllegalArgumentException,
@@ -138,8 +150,8 @@ class SshdShellAutoConfiguration {
             if (method.isAnnotationPresent(SshdShellCommand.class)) {
                 log.debug("{}.#{} is marked with annotation {}", clazz.getName(), method.getName(),
                         SshdShellCommand.class.getName());
-                SshdShellCommand command = method.getDeclaredAnnotation(SshdShellCommand.class);
-                map.put(command.value(), getMethodSupplier(command, method, obj));
+                SshdShellCommand annotation = method.getDeclaredAnnotation(SshdShellCommand.class);
+                map.put(annotation.value(), getMethodSupplier(annotation, method, buildCommandExecutable(method, obj)));
             }
         }
     }
