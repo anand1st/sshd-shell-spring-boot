@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.annotation.DirtiesContext;
@@ -39,6 +40,9 @@ import org.springframework.util.SocketUtils;
  *
  * @author anand
  */
+@SpringBootTest(classes = ConfigTest.class, properties = {
+    "sshd.system.command.roles=*"
+})
 public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Autowired

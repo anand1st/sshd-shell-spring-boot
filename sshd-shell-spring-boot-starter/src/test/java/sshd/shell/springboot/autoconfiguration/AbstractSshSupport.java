@@ -31,7 +31,6 @@ import org.awaitility.Duration;
 import static org.junit.Assert.fail;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
@@ -39,13 +38,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author anand
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = ConfigTest.class)
 abstract class AbstractSshSupport {
 
     @Autowired
     protected SshdShellProperties props;
 
-    protected void sshCall(String username, String password, SshExecutor executor, String channelType) {
+    void sshCall(String username, String password, SshExecutor executor, String channelType) {
         try {
             Session session = openSession(username, password);
             Channel channel = session.openChannel(channelType);
@@ -67,7 +65,7 @@ abstract class AbstractSshSupport {
         }
     }
 
-    protected Session openSession(String username, String password) throws JSchException {
+    Session openSession(String username, String password) throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession(username, props.getShell().getHost(), props.getShell().getPort());
         session.setPassword(password);
@@ -78,15 +76,15 @@ abstract class AbstractSshSupport {
         return session;
     }
 
-    protected void sshCallShell(SshExecutor executor) {
+    void sshCallShell(SshExecutor executor) {
         sshCall(props.getShell().getUsername(), props.getShell().getPassword(), executor, "shell");
     }
 
-    protected void verifyResponseContains(InputStream pis, String response) {
+    void verifyResponseContains(InputStream pis, String response) {
         verifyResponseContains(pis, response, Duration.TEN_SECONDS);
     }
-    
-    protected void verifyResponseContains(InputStream pis, String response, Duration duration) {
+
+    void verifyResponseContains(InputStream pis, String response, Duration duration) {
         StringBuilder sb = new StringBuilder();
         try {
             await().atMost(duration).until(() -> {
@@ -104,7 +102,7 @@ abstract class AbstractSshSupport {
         }
     }
 
-    protected void write(OutputStream os, String... input) throws IOException {
+    void write(OutputStream os, String... input) throws IOException {
         for (String s : input) {
             os.write((s + '\r').getBytes(StandardCharsets.UTF_8));
             os.flush();
@@ -112,7 +110,7 @@ abstract class AbstractSshSupport {
     }
 
     @FunctionalInterface
-    protected static interface SshExecutor {
+    static interface SshExecutor {
 
         void execute(InputStream is, OutputStream os) throws IOException;
     }
