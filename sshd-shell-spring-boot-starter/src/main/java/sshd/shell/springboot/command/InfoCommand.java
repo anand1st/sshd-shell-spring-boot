@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,15 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(InfoEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.info.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "info", description = "System status")
-public final class InfoCommand {
-    
-    @Autowired
-    private InfoEndpoint infoEndpoint;
-    
+public final class InfoCommand extends AbstractSystemCommand {
+
+    private final InfoEndpoint infoEndpoint;
+
+    InfoCommand(@Value("${sshd.system.command.roles.info}") String[] systemRoles, InfoEndpoint infoEndpoint) {
+        super(systemRoles);
+        this.infoEndpoint = infoEndpoint;
+    }
+
     public String info(String arg) {
         return JsonUtils.asJson(infoEndpoint.info());
     }

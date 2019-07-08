@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.env.EnvironmentEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,10 +32,15 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(EnvironmentEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.env.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "environment", description = "Environment details")
-public final class EnvironmentCommand {
+public final class EnvironmentCommand extends AbstractSystemCommand {
 
-    @Autowired
-    private EnvironmentEndpoint envEndpoint;
+    private final EnvironmentEndpoint envEndpoint;
+
+    EnvironmentCommand(@Value("${sshd.system.command.roles.environment}") String[] systemRoles,
+            EnvironmentEndpoint envEndpoint) {
+        super(systemRoles);
+        this.envEndpoint = envEndpoint;
+    }
 
     @SshdShellCommand(value = "pattern", description = "Get environment details with given pattern")
     public String withPattern(String arg) {
@@ -44,7 +49,7 @@ public final class EnvironmentCommand {
 
     @SshdShellCommand(value = "entry", description = "Get environment details with string to match")
     public String withEntry(String arg) {
-        return StringUtils.isEmpty(arg) 
+        return StringUtils.isEmpty(arg)
                 ? "Usage: environment entry <stringToMatch>"
                 : JsonUtils.asJson(envEndpoint.environmentEntry(arg));
     }

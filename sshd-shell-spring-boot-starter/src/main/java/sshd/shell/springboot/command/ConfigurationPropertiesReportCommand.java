@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,16 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(ConfigurationPropertiesReportEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.configprops.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "configurationPropertiesReport", description = "Configuration properties report")
-public final class ConfigurationPropertiesReportCommand {
-    
-    @Autowired
-    private ConfigurationPropertiesReportEndpoint confPropsReportEndpoint;
-    
+public final class ConfigurationPropertiesReportCommand extends AbstractSystemCommand {
+
+    private final ConfigurationPropertiesReportEndpoint confPropsReportEndpoint;
+
+    ConfigurationPropertiesReportCommand(ConfigurationPropertiesReportEndpoint confPropsReportEndpoint,
+            @Value("${sshd.system.command.roles.configurationPropertiesReport}") String[] systemRoles) {
+        super(systemRoles);
+        this.confPropsReportEndpoint = confPropsReportEndpoint;
+    }
+
     public String configurationPropertiesReport(String arg) {
         return JsonUtils.asJson(confPropsReportEndpoint.configurationProperties());
     }

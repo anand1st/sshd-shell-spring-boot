@@ -18,7 +18,7 @@ package sshd.shell.springboot.command;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.OffsetDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.audit.AuditEventsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,11 +35,15 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(AuditEventsEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.auditevents.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "auditEvents", description = "Event auditing")
-@lombok.extern.slf4j.Slf4j
-public final class AuditEventsCommand {
+public final class AuditEventsCommand extends AbstractSystemCommand {
 
-    @Autowired
-    private AuditEventsEndpoint auditEventsEndpoint;
+    private final AuditEventsEndpoint auditEventsEndpoint;
+
+    AuditEventsCommand(@Value("${sshd.system.command.roles.auditEvents}") String[] systemRoles,
+            AuditEventsEndpoint auditEventsEndpoint) {
+        super(systemRoles);
+        this.auditEventsEndpoint = auditEventsEndpoint;
+    }
 
     @SshdShellCommand(value = "list", description = "List events")
     public String auditEvents(String arg) {
@@ -47,7 +51,7 @@ public final class AuditEventsCommand {
             return "Usage: auditEvents list {\"principal\":\"<user>\",\"after\":\"<yyyy-MM-dd HH:mm>\","
                     + "\"type\":\"<type>\"}";
         }
-        return CommandUtils.process(log, () -> {
+        return CommandUtils.process(() -> {
             Event event = JsonUtils.stringToObject(arg, Event.class);
             return JsonUtils.asJson(auditEventsEndpoint.events(event.principal, event.after, event.type));
         });

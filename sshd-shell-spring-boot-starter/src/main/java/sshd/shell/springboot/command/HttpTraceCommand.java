@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.trace.http.HttpTraceEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,16 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(HttpTraceEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.httptrace.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "httpTrace", description = "Http trace information")
-public final class HttpTraceCommand {
-    
-    @Autowired
-    private HttpTraceEndpoint httpTraceEndpoint;
-    
+public final class HttpTraceCommand extends AbstractSystemCommand {
+
+    private final HttpTraceEndpoint httpTraceEndpoint;
+
+    HttpTraceCommand(@Value("${sshd.system.command.roles.httpTrace}") String[] systemRoles,
+            HttpTraceEndpoint httpTraceEndpoint) {
+        super(systemRoles);
+        this.httpTraceEndpoint = httpTraceEndpoint;
+    }
+
     public String httpTrace(String arg) {
         return JsonUtils.asJson(httpTraceEndpoint.traces());
     }

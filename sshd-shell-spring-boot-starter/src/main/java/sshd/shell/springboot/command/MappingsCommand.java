@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.web.mappings.MappingsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,16 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(MappingsEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.mappings.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "mappings", description = "List http request mappings")
-public class MappingsCommand {
-    
-    @Autowired
-    private MappingsEndpoint mappingsEndpoint;
-    
+public final class MappingsCommand extends AbstractSystemCommand {
+
+    private final MappingsEndpoint mappingsEndpoint;
+
+    MappingsCommand(@Value("${sshd.system.command.roles.mappings}") String[] systemRoles,
+            MappingsEndpoint mappingsEndpoint) {
+        super(systemRoles);
+        this.mappingsEndpoint = mappingsEndpoint;
+    }
+
     public String mappings(String arg) {
         return JsonUtils.asJson(mappingsEndpoint.mappings());
     }

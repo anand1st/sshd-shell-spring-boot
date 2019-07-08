@@ -16,7 +16,7 @@
 package sshd.shell.springboot.command;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,11 +34,15 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(LoggersEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.loggers.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "loggers", description = "Logging configuration")
-@lombok.extern.slf4j.Slf4j
-public final class LoggersCommand {
+public final class LoggersCommand extends AbstractSystemCommand {
 
-    @Autowired
-    private LoggersEndpoint loggersEndpoint;
+    private final LoggersEndpoint loggersEndpoint;
+
+    LoggersCommand(@Value("${sshd.system.command.roles.loggers}") String[] systemRoles,
+            LoggersEndpoint loggersEndpoint) {
+        super(systemRoles);
+        this.loggersEndpoint = loggersEndpoint;
+    }
 
     @SshdShellCommand(value = "info", description = "Show logging info")
     public String info(String arg) {
@@ -58,7 +62,7 @@ public final class LoggersCommand {
             return "Usage: loggers configure {\"name\":\"<loggerName>\",\"configuredLevel\":"
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}";
         }
-        return CommandUtils.process(log, () -> {
+        return CommandUtils.process(() -> {
             LogConfig logConfig = JsonUtils.stringToObject(arg, LogConfig.class);
             loggersEndpoint.configureLogLevel(logConfig.name, logConfig.configuredLevel);
             return "Changed log level for " + logConfig.name + " to " + logConfig.configuredLevel.name();

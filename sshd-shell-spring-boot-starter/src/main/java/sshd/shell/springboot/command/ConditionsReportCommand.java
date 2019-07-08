@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.condition.ConditionsReportEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,16 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(ConditionsReportEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.conditions.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "conditionsReport", description = "Conditions report")
-public class ConditionsReportCommand {
-    
-    @Autowired
-    private ConditionsReportEndpoint conditionsReportEndpoint;
-    
+public final class ConditionsReportCommand extends AbstractSystemCommand {
+
+    private final ConditionsReportEndpoint conditionsReportEndpoint;
+
+    ConditionsReportCommand(@Value("${sshd.system.command.roles.conditionsReport}") String[] systemRoles,
+            ConditionsReportEndpoint conditionsReportEndpoint) {
+        super(systemRoles);
+        this.conditionsReportEndpoint = conditionsReportEndpoint;
+    }
+
     public String conditionsReport(String arg) {
         return JsonUtils.asJson(conditionsReportEndpoint.applicationConditionEvaluation());
     }

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -40,10 +40,15 @@ import sshd.shell.springboot.util.ZipUtils;
 @ConditionalOnProperty(name = "management.endpoint.env.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "heapDump", description = "Heap dump command")
 @lombok.extern.slf4j.Slf4j
-public final class HeapDumpCommand {
+public final class HeapDumpCommand extends AbstractSystemCommand {
 
-    @Autowired
-    private HeapDumpWebEndpoint heapDumpEndpoint;
+    private final HeapDumpWebEndpoint heapDumpEndpoint;
+
+    HeapDumpCommand(@Value("${sshd.system.command.roles.heapDump}") String[] systemRoles,
+            HeapDumpWebEndpoint heapDumpEndpoint) {
+        super(systemRoles);
+        this.heapDumpEndpoint = heapDumpEndpoint;
+    }
 
     @SshdShellCommand(value = "live", description = "Get heapdump with live flag")
     public String withLive(String arg) throws IOException {

@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,16 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(ScheduledTasksEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.scheduledtasks.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "scheduledTasks", description = "Scheduled tasks")
-public class ScheduledTasksCommand {
-    
-    @Autowired
-    private ScheduledTasksEndpoint scheduledTasksEndpoint;
-    
+public final class ScheduledTasksCommand extends AbstractSystemCommand {
+
+    private final ScheduledTasksEndpoint scheduledTasksEndpoint;
+
+    ScheduledTasksCommand(@Value("${sshd.system.command.roles.scheduledTasks}") String[] systemRoles,
+            ScheduledTasksEndpoint scheduledTasksEndpoint) {
+        super(systemRoles);
+        this.scheduledTasksEndpoint = scheduledTasksEndpoint;
+    }
+
     public String scheduledTasks(String arg) {
         return JsonUtils.asJson(scheduledTasksEndpoint.scheduledTasks());
     }

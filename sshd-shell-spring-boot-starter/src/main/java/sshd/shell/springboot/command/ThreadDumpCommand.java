@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.management.ThreadDumpEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,16 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(ThreadDumpEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.threaddump.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "threadDump", description = "Print thread dump")
-public final class ThreadDumpCommand {
-    
-    @Autowired
-    private ThreadDumpEndpoint threadDumpEndpoint;
-    
+public final class ThreadDumpCommand extends AbstractSystemCommand {
+
+    private final ThreadDumpEndpoint threadDumpEndpoint;
+
+    ThreadDumpCommand(@Value("${sshd.system.command.roles.threadDump}") String[] systemRoles,
+            ThreadDumpEndpoint threadDumpEndpoint) {
+        super(systemRoles);
+        this.threadDumpEndpoint = threadDumpEndpoint;
+    }
+
     public String threadDump(String arg) {
         return JsonUtils.asJson(threadDumpEndpoint.threadDump());
     }

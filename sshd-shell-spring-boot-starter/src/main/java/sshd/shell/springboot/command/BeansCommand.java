@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.beans.BeansEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,15 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(BeansEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.beans.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "beans", description = "List beans")
-public final class BeansCommand {
-    
-    @Autowired
-    private BeansEndpoint beansEndpoint;
-    
+public final class BeansCommand extends AbstractSystemCommand {
+
+    private final BeansEndpoint beansEndpoint;
+
+    BeansCommand(@Value("${sshd.system.command.roles.beans}") String[] systemRoles, BeansEndpoint beansEndpoint) {
+        super(systemRoles);
+        this.beansEndpoint = beansEndpoint;
+    }
+
     public String beans(String arg) {
         return JsonUtils.asJson(beansEndpoint.beans());
     }

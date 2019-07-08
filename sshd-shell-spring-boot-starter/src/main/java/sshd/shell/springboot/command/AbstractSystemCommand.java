@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 anand.
+ * Copyright 2019 anand.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,24 @@
  */
 package sshd.shell.springboot.command;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  * @author anand
  */
-@lombok.extern.slf4j.Slf4j
-public enum CommandUtils {
-    ;
+public abstract class AbstractSystemCommand {
 
-    public static String process(JsonProcessor processor) {
-        try {
-            return processor.process();
-        } catch (IOException | IllegalArgumentException ex) {
-            log.warn("Invalid json", ex);
-            return "Expected valid json as argument";
-        }
+    private final Set<String> systemRoles;
+
+    public AbstractSystemCommand(String[] systemRoles) {
+        this.systemRoles = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(systemRoles)));
     }
 
-    @FunctionalInterface
-    public static interface JsonProcessor {
-
-        String process() throws IOException;
+    public final Set<String> getSystemRoles() {
+        return systemRoles;
     }
 }

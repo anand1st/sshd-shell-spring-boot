@@ -15,7 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,11 +32,14 @@ import sshd.shell.springboot.util.JsonUtils;
 @ConditionalOnClass(HealthEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.health.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "health", description = "System health info")
-@lombok.extern.slf4j.Slf4j
-public final class HealthCommand {
+public final class HealthCommand extends AbstractSystemCommand {
 
-    @Autowired
-    private HealthEndpoint healthEndpoint;
+    private final HealthEndpoint healthEndpoint;
+
+    HealthCommand(@Value("${sshd.system.command.roles.health}") String[] systemRoles, HealthEndpoint healthEndpoint) {
+        super(systemRoles);
+        this.healthEndpoint = healthEndpoint;
+    }
 
     @SshdShellCommand(value = "info", description = "Health info for all components")
     public String healthInfo(String arg) {
@@ -56,7 +59,7 @@ public final class HealthCommand {
         if (StringUtils.isEmpty(arg)) {
             return "Usage: health componentInstance {\"component\":\"<component>\",\"instance\":\"<instance>\"}";
         }
-        return CommandUtils.process(log, () -> {
+        return CommandUtils.process(() -> {
             ComponentInstance ci = JsonUtils.stringToObject(arg, ComponentInstance.class);
             return JsonUtils.asJson(healthEndpoint.healthForComponentInstance(ci.component, ci.instance));
         });
