@@ -15,7 +15,7 @@ To import into Maven project, add the following dependency inside `pom.xml`:
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
         <version>3.7</version>
     </dependency>
-    
+
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
@@ -24,6 +24,30 @@ For Gradle users, add these lines inside `build.gradle`:
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 4.0-SNAPSHOT
+Updated dependencies to jline 3.11.0.
+One of the biggest noise of this library was the various management commands that were visible to all users. Version 4.0 introduces some properties to help manage these commands (hereby called system commands).
+
+    sshd.system.command.roles=ADMIN #Defaults to ADMIN
+    sshd.system.command.roles.auditEvents=${sshd.system.command.roles}
+    sshd.system.command.roles.beans=${sshd.system.command.roles}
+    sshd.system.command.roles.caches=${sshd.system.command.roles}
+    sshd.system.command.roles.conditionsReport=${sshd.system.command.roles}
+    sshd.system.command.roles.configurationPropertiesReport=${sshd.system.command.roles}
+    sshd.system.command.roles.environment=${sshd.system.command.roles}
+    sshd.system.command.roles.health=${sshd.system.command.roles}
+    sshd.system.command.roles.heapDump=${sshd.system.command.roles}
+    sshd.system.command.roles.httpTrace=${sshd.system.command.roles}
+    sshd.system.command.roles.info=${sshd.system.command.roles}
+    sshd.system.command.roles.loggers=${sshd.system.command.roles}
+    sshd.system.command.roles.mappings=${sshd.system.command.roles}
+    sshd.system.command.roles.metrics=${sshd.system.command.roles}
+    sshd.system.command.roles.scheduledTasks=${sshd.system.command.roles}
+    sshd.system.command.roles.shutdown=${sshd.system.command.roles}
+    sshd.system.command.roles.threadDump=${sshd.system.command.roles}
+
+The user just need to set the `sshd.system.command.roles` to an admin role or to '*' if anyone should be able to have access to these commands. For individual configuration of management endpoints, setting the roles in the above system commands properties manually should suffice.
 
 ### Version 3.7
 Running with latest jline 3.10.0 and Apache SSHD version 2.2.0 and some code refactoring and cleanup. Fixed bug with exception handling of ShellException and IllegalArgumentException in methods with SshdShellCommand annotation. These exceptions can now be safely thrown and handled correctly by the CommandExecutor. Other exceptions are considered unexpected and will result in a error log.
@@ -36,7 +60,7 @@ Upgraded jline to 3.9.0 and Apache SSHD version to 2.0.0. `heapDump` command now
 
 
 ### Version 3.5
-Modified SshdShellProperties to add the properties 
+Modified SshdShellProperties to add the properties
 
     sshd.filetransfer.enabled
     sshd.filesystem.base.dir
@@ -49,8 +73,8 @@ With these changes, one can now figure out the rooted filesystem for a session u
 Support for SFTP and SCP with configurable Root File System. Upgraded jline to 3.7.0. See Usage section below for properties to be set. Tested with OSX only. Usage:
 
     sftp -P 8022 admin@localhost
-    scp -P 8022 <localFile> admin@localhost:<filename> 
-	
+    scp -P 8022 <localFile> admin@localhost:<filename>
+
 ### Version 3.3
 Adheres to the management enabled endpoint for actuators. If the endpoint is enabled/disabled, the ssh command likewise is enabled/disabled according to this setting.
 
@@ -85,7 +109,7 @@ Support for auto-completion of commands and subcommands using tab.
 Fixed bug with prompt & text color.
 
 ### Version 2.1
-Support for role-based access control using spring-security's `AuthenticationProvider` bean. `SshdShellCommand` annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command. 
+Support for role-based access control using spring-security's `AuthenticationProvider` bean. `SshdShellCommand` annotation includes a 'roles' parameter (defaults to * denoting permission to all commands) which should use spring-security's role tag if `sshd.shell.authType=AUTH_PROVIDER` and spring-security is in the classpath. If a user's role matches the roles in the command classes, he/she should be able to execute the command.
 
 Every user session has a session context which a developer can use to manage state between command invocations
 
@@ -95,7 +119,7 @@ All the developer needs to do it to create a class similar to below and make sur
     @Component
     @SshdShellCommand(value = "echo", description = "Echo by users. Type 'echo help' for supported subcommands")
     public class EchoCommand {
-    
+
         @SshdShellCommand(value = "bob", description = "Bob's echo. Usage: echo bob <arg>")
         public String bobSays(String arg) throws IOException {
 	        ConsoleIO.writeOutput("Need user info");
@@ -103,7 +127,7 @@ All the developer needs to do it to create a class similar to below and make sur
             SshSessionContext.put("name", name);
             return "bob echoes " + arg + " and your name is " + name;
         }
-    
+
         @SshdShellCommand(value = "alice", description = "Alice's echo. Usage: echo alice <arg>")
         public String aliceSays(String arg) {
             String str = "";
@@ -112,7 +136,7 @@ All the developer needs to do it to create a class similar to below and make sur
             }
             return "alice says " + arg + str;
         }
-	
+
 	    @SshdShellCommand(value = "admin", description = "Admin's echo. Usage: echo admin <arg>", roles = "ADMIN")
 	    public String adminSays(String arg) {
 	        return "admin says " + arg;
@@ -129,7 +153,7 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.host=127.0.0.1		#Allowed IP addresses
     sshd.shell.hostKeyFile=hostKey.ser
     sshd.shell.prompt.title=app
-    
+
     # Supported values for colors: BLACK,RED,GREEN,YELLOW,BLUE,MAGENTA,CYAN,WHITE (leave blank for default)
     sshd.shell.prompt.color=           # Defaults to BLACK
     sshd.shell.text.color=             # Defaults to BLACK
@@ -138,7 +162,7 @@ Supported properties in application.properties (defaults are as below):
     sshd.shell.auth.authProviderBeanName=	# Bean name of authentication provider if authType is AUTH_PROVIDER (optional)
     sshd.filetransfer.enabled=true          # Defaults to false. Must be enabled for SCP and SFTP functionality
     sshd.filesystem.base.dir=/home/app      # Defaults to 'user.home' property
-    
+
 When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading. It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the application.
 
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
