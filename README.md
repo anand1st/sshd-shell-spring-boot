@@ -15,24 +15,24 @@ To import into Maven project, add the following dependency inside `pom.xml`:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>3.7</version>
+        <version>4.0</version>
     </dependency>
 
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
-        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '3.7'
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '4.0'
     }
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
 
-### Version 4.0-SNAPSHOT
+### Version 4.0
 Updated dependencies to jline 3.11.0.
 One of the biggest 'noise' of this library was the various management commands that were visible to all users.
 Version 4.0 introduces some properties to help manage these commands (hereby called system commands).
 
-    sshd.system.command.roles=ADMIN #Defaults to ADMIN
+    sshd.system.command.roles=ADMIN #Defaults to ADMIN, use comms-separated values for multiple admin roles
     sshd.system.command.roles.auditEvents=${sshd.system.command.roles}
     sshd.system.command.roles.beans=${sshd.system.command.roles}
     sshd.system.command.roles.caches=${sshd.system.command.roles}
