@@ -148,7 +148,7 @@ class SshdServerConfiguration {
     }
 
     private CommandFactory sshCommandFactory(String baseDir) {
-        return command -> sshSessionInstance(Optional.ofNullable(baseDir));
+        return (channel, command) -> sshSessionInstance(Optional.ofNullable(baseDir));
     }
 
     private SshSessionInstance sshSessionInstance(Optional<String> baseDir) {
@@ -164,7 +164,7 @@ class SshdServerConfiguration {
         Optional<String> baseDir = properties.getFiletransfer().isEnabled()
                 ? Optional.of(properties.getFilesystem().getBase().getDir())
                 : Optional.empty();
-        server.setShellFactory(() -> sshSessionInstance(baseDir));
+        server.setShellFactory(channel -> sshSessionInstance(baseDir));
     }
 
     @PostConstruct

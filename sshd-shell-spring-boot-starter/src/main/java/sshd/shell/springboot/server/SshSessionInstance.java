@@ -26,7 +26,6 @@ import java.io.PrintStream;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import org.apache.sshd.common.Factory;
-import org.apache.sshd.server.ChannelSessionAware;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.channel.ChannelSession;
@@ -41,7 +40,7 @@ import sshd.shell.springboot.console.TerminalProcessor;
  */
 @lombok.extern.slf4j.Slf4j
 @lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PACKAGE)
-class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAware, Runnable {
+class SshSessionInstance implements Command, Factory<Command>, Runnable {
 
     private final TerminalProcessor terminalProcessor;
     private final Optional<String> rootedFileSystemBaseDir;
@@ -50,13 +49,14 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     private OutputStream os;
     private ExitCallback exitCallback;
     private Thread sshThread;
-    private ChannelSession session;
+    private ChannelSession channel;
     private String terminalType;
 
     @Override
-    public void start(Environment env) throws IOException {
+    public void start(ChannelSession channel, Environment env) throws IOException {
         terminalType = env.getEnv().get(Environment.ENV_TERM);
-        sshThread = new Thread(this, "ssh-cli " + session.getSession().getIoSession().getAttribute(Constants.USER));
+        this.channel = channel;
+        sshThread = new Thread(this, "ssh-cli " + channel.getSession().getIoSession().getAttribute(Constants.USER));
         sshThread.start();
     }
 
@@ -72,8 +72,8 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     }
 
     private void populateSessionContext() {
-        SshSessionContext.put(Constants.USER, session.getSession().getIoSession().getAttribute(Constants.USER));
-        SshSessionContext.put(Constants.USER_ROLES, session.getSession().getIoSession()
+        SshSessionContext.put(Constants.USER, channel.getSession().getIoSession().getAttribute(Constants.USER));
+        SshSessionContext.put(Constants.USER_ROLES, channel.getSession().getIoSession()
                 .getAttribute(Constants.USER_ROLES));
         SshSessionContext.setUserDir(() -> getRootedUserDir());
     }
@@ -84,7 +84,8 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy(ChannelSession channel) throws Exception {
+        channel.close();
         sshThread.interrupt();
     }
 
@@ -105,11 +106,6 @@ class SshSessionInstance implements Command, Factory<Command>, ChannelSessionAwa
     @Override
     public void setOutputStream(OutputStream os) {
         this.os = os;
-    }
-
-    @Override
-    public void setChannelSession(ChannelSession session) {
-        this.session = session;
     }
 
     @Override
