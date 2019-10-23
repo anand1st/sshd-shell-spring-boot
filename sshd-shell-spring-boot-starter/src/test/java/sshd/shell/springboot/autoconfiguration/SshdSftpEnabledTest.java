@@ -31,7 +31,8 @@ import org.springframework.test.annotation.DirtiesContext;
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
     "sshd.filetransfer.enabled=true",
-    "sshd.filesystem.base.dir=target/sftp"
+    "sshd.filesystem.base.dir=target/sftp",
+    "spring.jmx.enabled=true"
 })
 public class SshdSftpEnabledTest extends AbstractSshSupport {
 

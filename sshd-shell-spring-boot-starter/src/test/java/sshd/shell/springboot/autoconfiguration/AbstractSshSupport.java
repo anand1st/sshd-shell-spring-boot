@@ -25,9 +25,9 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Properties;
 import static org.awaitility.Awaitility.await;
-import org.awaitility.Duration;
 import static org.junit.Assert.fail;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +81,7 @@ abstract class AbstractSshSupport {
     }
 
     void verifyResponseContains(InputStream pis, String response) {
-        verifyResponseContains(pis, response, Duration.TEN_SECONDS);
+        verifyResponseContains(pis, response, Duration.ofSeconds(10));
     }
 
     void verifyResponseContains(InputStream pis, String response, Duration duration) {

@@ -21,10 +21,10 @@ package sshd.shell.springboot.autoconfiguration;
 import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+import java.time.Duration;
 import java.util.Locale;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import org.awaitility.Duration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -41,7 +41,8 @@ import org.springframework.util.SocketUtils;
  * @author anand
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
-    "sshd.system.command.roles=*"
+    "sshd.system.command.roles=*",
+    "spring.jmx.enabled=true"
 })
 public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
@@ -124,7 +125,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
             String format = "\r" + props.getShell().getText().getUsageInfoFormat();
             write(os, "help");
             StringBuilder sb = new StringBuilder("Supported Commands");
-            for (int i = 0; i < 21; i++) {
+            for (int i = 0; i < 22; i++) {
                 sb.append(format);
             }
             sb.append("\r\nSupported post processors for output")
@@ -149,6 +150,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     "help", "Show list of help commands",
                     "httpTrace", "Http trace information",
                     "info", "System status",
+                    "integrationGraph", "Information about Spring Integration graph",
                     "loggers", "Logging configuration",
                     "mappings", "List http request mappings",
                     "metrics", "Metrics operations",
@@ -180,7 +182,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         assertEquals(0, mailServer.getReceivedMessages().length);
         sshCallShell((is, os) -> {
             write(os, "help | m anand@test.com");
-            verifyResponseContains(is, "Output response sent to anand@test.com", Duration.ONE_MINUTE);
+            verifyResponseContains(is, "Output response sent to anand@test.com", Duration.ofMinutes(1));
             assertTrue(mailServer.waitForIncomingEmail(5000, 1));
             MimeMessage message = mailServer.getReceivedMessages()[0];
             try {
@@ -323,7 +325,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testHealthComponentEmpty() {
         sshCallShell((is, os) -> {
             write(os, "health component");
-            verifyResponseContains(is, "Usage: health component <component>");
+            verifyResponseContains(is, "Usage: health component <component1>,<component2> and so on");
         });
     }
 
@@ -332,23 +334,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCallShell((is, os) -> {
             write(os, "health component diskSpace");
             verifyResponseContains(is, "{\r\n  \"status\" : \"UP\"");
-        });
-    }
-
-    @Test
-    public void testHealthComponentInstanceEmpty() {
-        sshCallShell((is, os) -> {
-            write(os, "health componentInstance");
-            verifyResponseContains(is, "Usage: health componentInstance {\"component\":\"<component>\",\"instance\":"
-                    + "\"<instance>\"}");
-        });
-    }
-
-    @Test
-    public void testHealthComponentInstance() {
-        sshCallShell((is, os) -> {
-            write(os, "health componentInstance {\"component\":\"diskSpace\",\"instance\":\"xxx\"}");
-            verifyResponseContains(is, "null");
         });
     }
 
