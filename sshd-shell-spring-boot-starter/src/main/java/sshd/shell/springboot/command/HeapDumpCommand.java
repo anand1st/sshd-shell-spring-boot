@@ -21,8 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ import sshd.shell.springboot.util.ZipUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(HeapDumpWebEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = HeapDumpWebEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.env.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "heapDump", description = "Heap dump command")
 @lombok.extern.slf4j.Slf4j

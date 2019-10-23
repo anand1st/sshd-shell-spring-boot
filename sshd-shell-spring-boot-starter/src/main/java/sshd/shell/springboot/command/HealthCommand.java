@@ -16,8 +16,8 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -29,7 +29,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(HealthEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = HealthEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.health.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "health", description = "System health info")
 public final class HealthCommand extends AbstractSystemCommand {
@@ -46,28 +46,12 @@ public final class HealthCommand extends AbstractSystemCommand {
         return JsonUtils.asJson(healthEndpoint.health());
     }
 
-    @SshdShellCommand(value = "component", description = "Health for component")
+    @SshdShellCommand(value = "component", description = "Health for specified components")
     public String healthForComponent(String arg) {
         if (StringUtils.isEmpty(arg)) {
-            return "Usage: health component <component>";
+            return "Usage: health component <component1>,<component2> and so on";
         }
-        return JsonUtils.asJson(healthEndpoint.healthForComponent(arg));
-    }
-
-    @SshdShellCommand(value = "componentInstance", description = "Health for component instance")
-    public String healthForComponentInstance(String arg) {
-        if (StringUtils.isEmpty(arg)) {
-            return "Usage: health componentInstance {\"component\":\"<component>\",\"instance\":\"<instance>\"}";
-        }
-        return CommandUtils.process(() -> {
-            ComponentInstance ci = JsonUtils.stringToObject(arg, ComponentInstance.class);
-            return JsonUtils.asJson(healthEndpoint.healthForComponentInstance(ci.component, ci.instance));
-        });
-    }
-
-    private static class ComponentInstance {
-
-        public String component;
-        public String instance;
+        String[] components = StringUtils.trimAllWhitespace(arg).split(",");
+        return JsonUtils.asJson(healthEndpoint.healthForPath(components));
     }
 }

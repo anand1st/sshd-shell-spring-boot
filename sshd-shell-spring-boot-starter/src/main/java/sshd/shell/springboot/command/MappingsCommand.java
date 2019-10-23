@@ -16,8 +16,8 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.web.mappings.MappingsEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -28,7 +28,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(MappingsEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = MappingsEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.mappings.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "mappings", description = "List http request mappings")
 public final class MappingsCommand extends AbstractSystemCommand {

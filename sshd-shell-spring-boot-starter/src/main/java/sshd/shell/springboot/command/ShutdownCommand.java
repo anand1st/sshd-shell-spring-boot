@@ -16,8 +16,8 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.context.ShutdownEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -28,7 +28,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(ShutdownEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = ShutdownEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.shutdown.enabled", havingValue = "true", matchIfMissing = false)
 @SshdShellCommand(value = "shutdown", description = "Shutdown application")
 public final class ShutdownCommand extends AbstractSystemCommand {

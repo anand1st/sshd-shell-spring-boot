@@ -16,8 +16,8 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -28,7 +28,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(ScheduledTasksEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = ScheduledTasksEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.scheduledtasks.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "scheduledTasks", description = "Scheduled tasks")
 public final class ScheduledTasksCommand extends AbstractSystemCommand {

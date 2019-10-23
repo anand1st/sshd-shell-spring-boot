@@ -17,8 +17,8 @@ package sshd.shell.springboot.command;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.logging.LoggersEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(LoggersEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = LoggersEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.loggers.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "loggers", description = "Logging configuration")
 public final class LoggersCommand extends AbstractSystemCommand {

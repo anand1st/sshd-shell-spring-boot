@@ -19,8 +19,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.actuate.audit.AuditEventsEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -32,7 +34,8 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnClass(AuditEventsEndpoint.class)
+@ConditionalOnBean(AuditEventRepository.class)
+@ConditionalOnAvailableEndpoint(endpoint = AuditEventsEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.auditevents.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "auditEvents", description = "Event auditing")
 public final class AuditEventsCommand extends AbstractSystemCommand {
