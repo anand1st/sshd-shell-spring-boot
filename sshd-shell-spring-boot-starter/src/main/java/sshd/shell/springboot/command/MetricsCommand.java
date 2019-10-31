@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -32,14 +32,14 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnAvailableEndpoint(endpoint = MetricsEndpoint.class)
+@ConditionalOnBean(MetricsEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.metrics.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "metrics", description = "Metrics operations")
 public final class MetricsCommand extends AbstractSystemCommand {
 
     private final MetricsEndpoint metricsEndpoint;
 
-    MetricsCommand(@Value("${sshd.system.command.roles.mappings}") String[] systemRoles,
+    MetricsCommand(@Value("${sshd.system.command.roles.metrics}") String[] systemRoles,
             MetricsEndpoint metricsEndpoint) {
         super(systemRoles);
         this.metricsEndpoint = metricsEndpoint;

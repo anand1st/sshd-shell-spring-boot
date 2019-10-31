@@ -15,11 +15,10 @@
  */
 package sshd.shell.springboot.command;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.session.SessionsEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -30,15 +29,15 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnBean(FindByIndexNameSessionRepository.class)
-@ConditionalOnAvailableEndpoint(endpoint = SessionsEndpoint.class)
+@ConditionalOnBean(SessionsEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.sessions.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "sessions", description = "Sessions management")
 public final class SessionsCommand extends AbstractSystemCommand {
 
     private final SessionsEndpoint sessionsEndpoint;
 
-    public SessionsCommand(String[] systemRoles, SessionsEndpoint sessionsEndpoint) {
+    SessionsCommand(@Value("${sshd.system.command.roles.sessions}") String[] systemRoles,
+            SessionsEndpoint sessionsEndpoint) {
         super(systemRoles);
         this.sessionsEndpoint = sessionsEndpoint;
     }

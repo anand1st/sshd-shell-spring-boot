@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 anand.
+ * Copyright 2019 anand.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,31 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
+import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
-import sshd.shell.springboot.util.JsonUtils;
 
 /**
  *
  * @author anand
  */
 @Component
-@ConditionalOnBean(ScheduledTasksEndpoint.class)
-@ConditionalOnProperty(name = "management.endpoint.scheduledtasks.enabled", havingValue = "true", matchIfMissing = true)
-@SshdShellCommand(value = "scheduledTasks", description = "Scheduled tasks")
-public final class ScheduledTasksCommand extends AbstractSystemCommand {
+@ConditionalOnBean(PrometheusScrapeEndpoint.class)
+@ConditionalOnProperty(name = "management.endpoint.prometheus.enabled", havingValue = "true", matchIfMissing = true)
+@SshdShellCommand(value = "prometheus", description = "Produces formatted metrics for scraping by Prometheus server")
+public final class PrometheusCommand extends AbstractSystemCommand {
 
-    private final ScheduledTasksEndpoint scheduledTasksEndpoint;
+    private final PrometheusScrapeEndpoint prometheusScrapeEndpoint;
 
-    ScheduledTasksCommand(@Value("${sshd.system.command.roles.scheduledTasks}") String[] systemRoles,
-            ScheduledTasksEndpoint scheduledTasksEndpoint) {
+    PrometheusCommand(@Value("${sshd.system.command.roles.prometheus}") String[] systemRoles,
+            PrometheusScrapeEndpoint prometheusScrapeEndpoint) {
         super(systemRoles);
-        this.scheduledTasksEndpoint = scheduledTasksEndpoint;
+        this.prometheusScrapeEndpoint = prometheusScrapeEndpoint;
     }
 
-    public String scheduledTasks(String arg) {
-        return JsonUtils.asJson(scheduledTasksEndpoint.scheduledTasks());
+    public String prometheus(String arg) {
+        return prometheusScrapeEndpoint.scrape();
     }
 }

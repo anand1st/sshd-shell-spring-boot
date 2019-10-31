@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 anand.
+ * Copyright 2019 anand.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package sshd.shell.springboot.command;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.management.HeapDumpWebEndpoint;
+import org.springframework.boot.actuate.logging.LogFileWebEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 
 /**
@@ -31,32 +30,28 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
  * @author anand
  */
 @Component
-@ConditionalOnBean(HeapDumpWebEndpoint.class)
-@ConditionalOnProperty(name = "management.endpoint.env.enabled", havingValue = "true", matchIfMissing = true)
-@SshdShellCommand(value = "heapDump", description = "Heap dump command")
+@ConditionalOnBean(LogFileWebEndpoint.class)
+@ConditionalOnProperty(name = "management.endpoint.logfile.enabled", havingValue = "true", matchIfMissing = true)
+@SshdShellCommand(value = "logfile", description = "Not sure what to put here")
 @lombok.extern.slf4j.Slf4j
-public final class HeapDumpCommand extends AbstractSystemCommand {
+public final class LogfileCommand extends AbstractSystemCommand {
 
-    private final HeapDumpWebEndpoint heapDumpEndpoint;
+    private final LogFileWebEndpoint logFileWebEndpoint;
 
-    HeapDumpCommand(@Value("${sshd.system.command.roles.heapDump}") String[] systemRoles,
-            HeapDumpWebEndpoint heapDumpEndpoint) {
+    LogfileCommand(@Value("${sshd.system.command.roles.logfile}") String[] systemRoles,
+            LogFileWebEndpoint logFileWebEndpoint) {
         super(systemRoles);
-        this.heapDumpEndpoint = heapDumpEndpoint;
+        this.logFileWebEndpoint = logFileWebEndpoint;
     }
 
-    @SshdShellCommand(value = "live", description = "Get heapdump with live flag")
-    public String withLive(String arg) throws IOException {
-        if (StringUtils.isEmpty(arg)) {
-            return "Usage: heapDump live <true|false>";
-        }
-        Resource heapDumpResource = heapDumpEndpoint.heapDump(Boolean.valueOf(arg)).getBody();
+    public String logfile(String arg) throws IOException {
+        Resource logFileResource = logFileWebEndpoint.logFile();
         try {
-            Path path = CommandUtils.sessionUserPathContainingZippedResource(heapDumpResource);
+            Path path = CommandUtils.sessionUserPathContainingZippedResource(logFileResource);
             return "Resource can be downloaded with SFTP/SCP at " + path.getFileName().toString();
         } catch (IllegalStateException ex) {
             log.warn(ex.getMessage());
-            return "Resource can be found at " + heapDumpResource.getFile().getAbsolutePath();
+            return "Resource can be found at " + logFileResource.getFile().getAbsolutePath();
         }
     }
 }

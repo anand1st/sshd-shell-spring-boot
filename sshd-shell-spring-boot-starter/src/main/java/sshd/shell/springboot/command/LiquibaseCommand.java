@@ -15,9 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.liquibase.LiquibaseEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,15 +28,14 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnBean(SpringLiquibase.class)
-@ConditionalOnAvailableEndpoint(endpoint = LiquibaseEndpoint.class)
+@ConditionalOnBean(LiquibaseEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.liquibase.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "liquibase", description = "Liquibase database migration details (if applicable)")
 public final class LiquibaseCommand extends AbstractSystemCommand {
 
     private final LiquibaseEndpoint liquibaseEndpoint;
 
-    LiquibaseCommand(@Value("${management.endpoint.liquibase.enabled}") String[] systemRoles,
+    LiquibaseCommand(@Value("${sshd.system.command.roles.liquibase}") String[] systemRoles,
             LiquibaseEndpoint liquibaseEndpoint) {
         super(systemRoles);
         this.liquibaseEndpoint = liquibaseEndpoint;

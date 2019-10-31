@@ -16,8 +16,8 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.context.properties.ConfigurationPropertiesReportEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -28,7 +28,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnAvailableEndpoint(endpoint = ConfigurationPropertiesReportEndpoint.class)
+@ConditionalOnBean(ConfigurationPropertiesReportEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.configprops.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "configurationPropertiesReport", description = "Configuration properties report")
 public final class ConfigurationPropertiesReportCommand extends AbstractSystemCommand {

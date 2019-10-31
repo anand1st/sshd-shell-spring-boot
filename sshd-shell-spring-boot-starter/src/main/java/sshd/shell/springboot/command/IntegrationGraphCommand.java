@@ -16,7 +16,6 @@
 package sshd.shell.springboot.command;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.integration.IntegrationGraphEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,7 +29,6 @@ import sshd.shell.springboot.util.JsonUtils;
  */
 @Component
 @ConditionalOnBean(IntegrationGraphEndpoint.class)
-@ConditionalOnAvailableEndpoint(endpoint = IntegrationGraphEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.integrationgraph.enabled", havingValue = "true",
         matchIfMissing = true)
 @SshdShellCommand(value = "integrationGraph", description = "Information about Spring Integration graph")
@@ -38,7 +36,7 @@ public final class IntegrationGraphCommand extends AbstractSystemCommand {
 
     private final IntegrationGraphEndpoint integrationGraphEndpoint;
 
-    IntegrationGraphCommand(@Value("${sshd.system.command.roles.integrationgraph}") String[] systemRoles,
+    IntegrationGraphCommand(@Value("${sshd.system.command.roles.integrationGraph}") String[] systemRoles,
             IntegrationGraphEndpoint integrationGraphEndpoint) {
         super(systemRoles);
         this.integrationGraphEndpoint = integrationGraphEndpoint;

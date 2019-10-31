@@ -15,7 +15,14 @@
  */
 package sshd.shell.springboot.command;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.springframework.core.io.Resource;
+import sshd.shell.springboot.autoconfiguration.SshSessionContext;
+import sshd.shell.springboot.util.ZipUtils;
 
 /**
  *
@@ -24,6 +31,19 @@ import java.io.IOException;
 @lombok.extern.slf4j.Slf4j
 public enum CommandUtils {
     ;
+
+    public static Path sessionUserPathContainingZippedResource(Resource resource) throws IOException {
+        Path heapDumpFilePath = Paths.get(resource.getURI());
+        return ZipUtils.zipFiles(sessionUserDir(), true, heapDumpFilePath);
+    }
+
+    private static Path sessionUserDir() throws IOException {
+        File sessionUserDir = SshSessionContext.getUserDir();
+        if (!sessionUserDir.exists()) {
+            Files.createDirectories(sessionUserDir.toPath());
+        }
+        return sessionUserDir.toPath();
+    }
 
     public static String process(JsonProcessor processor) {
         try {

@@ -15,9 +15,7 @@
  */
 package sshd.shell.springboot.command;
 
-import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.flyway.FlywayEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,8 +28,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnBean(Flyway.class)
-@ConditionalOnAvailableEndpoint(endpoint = FlywayEndpoint.class)
+@ConditionalOnBean(FlywayEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.flyway.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "flyway", description = "Flyway database migration details (if applicable)")
 public final class FlywayCommand extends AbstractSystemCommand {

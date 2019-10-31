@@ -17,8 +17,8 @@ package sshd.shell.springboot.command;
 
 import io.micrometer.core.instrument.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.cache.CachesEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
@@ -29,7 +29,7 @@ import sshd.shell.springboot.util.JsonUtils;
  * @author anand
  */
 @Component
-@ConditionalOnAvailableEndpoint(endpoint = CachesEndpoint.class)
+@ConditionalOnBean(CachesEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.caches.enabled", havingValue = "true", matchIfMissing = true)
 @SshdShellCommand(value = "caches", description = "Caches info")
 @lombok.extern.slf4j.Slf4j
