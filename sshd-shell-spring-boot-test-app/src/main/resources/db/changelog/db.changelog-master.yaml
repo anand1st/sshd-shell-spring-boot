@@ -1,0 +1,3 @@
+databaseChangeLog:
+    - includeAll:
+        path: classpath*:db/changelog/changes/

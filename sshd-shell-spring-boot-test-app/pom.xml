@@ -10,6 +10,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+        <start-class>demo.Main</start-class>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -53,12 +54,41 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-integration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>it.ozimov</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.anand1st</groupId>
@@ -80,7 +110,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>demo.Main</mainClass>
                     <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1045</jvmArguments>
                 </configuration>
             </plugin>
