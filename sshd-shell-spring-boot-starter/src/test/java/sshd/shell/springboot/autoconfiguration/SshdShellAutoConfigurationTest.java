@@ -44,6 +44,7 @@ import org.springframework.util.SocketUtils;
     "sshd.system.command.roles=*",
     "spring.jmx.enabled=true"
 })
+@DirtiesContext
 public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
 
     @Autowired
@@ -122,10 +123,39 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     @Test
     public void testHelp() {
         sshCallShell((is, os) -> {
-            String format = "\r" + props.getShell().getText().getUsageInfoFormat();
             write(os, "help");
+            Object[] supportedCommands = new Object[]{
+                "auditEvents", "Event auditing",
+                "beans", "List beans",
+                "caches", "Caches info",
+                "conditionsReport", "Conditions report",
+                "configurationPropertiesReport", "Configuration properties report",
+                "dummy", "dummy description",
+                "environment", "Environment details",
+                "exception", "throws Exceptions",
+                "exit", "Exit shell",
+                "flyway", "Flyway database migration details (if applicable)",
+                "health", "System health info",
+                "heapDump", "Heap dump command",
+                "help", "Show list of help commands",
+                "httpTrace", "Http trace information",
+                "info", "System status",
+                "integrationGraph", "Information about Spring Integration graph",
+                "liquibase", "Liquibase database migration details (if applicable)",
+                "logfile", "Not sure what to put here",
+                "loggers", "Logging configuration",
+                "mappings", "List http request mappings",
+                "metrics", "Metrics operations",
+                "prometheus", "Produces formatted metrics for scraping by Prometheus server",
+                "scheduledTasks", "Scheduled tasks",
+                "sessions", "Sessions management",
+                "shutdown", "Shutdown application",
+                "test", "test description",
+                "threadDump", "Print thread dump"
+            };
+            String format = "\r" + props.getShell().getText().getUsageInfoFormat();
             StringBuilder sb = new StringBuilder("Supported Commands");
-            for (int i = 0; i < 22; i++) {
+            for (int i = 0; i < supportedCommands.length / 2; i++) {
                 sb.append(format);
             }
             sb.append("\r\nSupported post processors for output")
@@ -135,29 +165,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                     .append(String.format(Locale.ENGLISH, format, "m <emailId>",
                             "Send response output of command execution to <emailId>"))
                     .append(String.format(Locale.ENGLISH, format, "", "Example usage: help | m bob@hope.com"));
-            verifyResponseContains(is, String.format(Locale.ENGLISH, sb.toString(),
-                    "auditEvents", "Event auditing",
-                    "beans", "List beans",
-                    "caches", "Caches info",
-                    "conditionsReport", "Conditions report",
-                    "configurationPropertiesReport", "Configuration properties report",
-                    "dummy", "dummy description",
-                    "environment", "Environment details",
-                    "exception", "throws Exceptions",
-                    "exit", "Exit shell",
-                    "health", "System health info",
-                    "heapDump", "Heap dump command",
-                    "help", "Show list of help commands",
-                    "httpTrace", "Http trace information",
-                    "info", "System status",
-                    "integrationGraph", "Information about Spring Integration graph",
-                    "loggers", "Logging configuration",
-                    "mappings", "List http request mappings",
-                    "metrics", "Metrics operations",
-                    "scheduledTasks", "Scheduled tasks",
-                    "shutdown", "Shutdown application",
-                    "test", "test description",
-                    "threadDump", "Print thread dump"));
+            verifyResponseContains(is, String.format(Locale.ENGLISH, sb.toString(), supportedCommands));
         });
     }
 
@@ -358,7 +366,8 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testCachesShowCommand() {
         sshCallShell((is, os) -> {
             write(os, "caches show {\"cache\":\"test\"}");
-            verifyResponseContains(is, "{\r\n  \"target\" : \"com.github.benmanes.caffeine");
+            verifyResponseContains(is,
+                    "{\r\n  \"target\" : \"org.springframework.data.redis.cache.DefaultRedisCacheWriter");
         });
     }
 

@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,6 +50,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import redis.embedded.RedisServer;
 
 /**
  *
@@ -57,6 +60,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableCaching
 @lombok.extern.slf4j.Slf4j
 public class ConfigTest {
+
+    private RedisServer redisServer;
 
     public ConfigTest() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -141,5 +146,20 @@ public class ConfigTest {
     @Bean
     public HttpTraceRepository httpTraceRepository() {
         return new InMemoryHttpTraceRepository();
+    }
+
+    @PostConstruct
+    void init() {
+        try {
+            redisServer = new RedisServer(6379);
+            redisServer.start();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+
+    @PreDestroy
+    void cleanup() {
+        redisServer.stop();
     }
 }
