@@ -66,4 +66,12 @@ public class SshdSftpEnabledTest extends AbstractSshSupport {
             verifyResponseContains(is, "Resource can be downloaded with SFTP/SCP at banner.txt.zip");
         });
     }
+
+    @Test
+    public void testLogfileWithSftpEnabled() {
+        sshCallShell((is, os) -> {
+            write(os, "logfile");
+            verifyResponseContains(is, "Resource can be downloaded with SFTP/SCP at ");
+        });
+    }
 }

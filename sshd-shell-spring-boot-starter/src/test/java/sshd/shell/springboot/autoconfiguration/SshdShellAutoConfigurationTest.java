@@ -142,7 +142,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                 "info", "System status",
                 "integrationGraph", "Information about Spring Integration graph",
                 "liquibase", "Liquibase database migration details (if applicable)",
-                "logfile", "Not sure what to put here",
+                "logfile", "Application log file",
                 "loggers", "Logging configuration",
                 "mappings", "List http request mappings",
                 "metrics", "Metrics operations",
@@ -517,6 +517,102 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCallShell((is, os) -> {
             write(os, "heapDump live true");
             verifyResponseContains(is, "Resource can be found at ");
+        });
+    }
+
+    @Test
+    public void testFlyway() {
+        sshCallShell((is, os) -> {
+            write(os, "flyway");
+            verifyResponseContains(is, "{\r\n  \"contexts\" :");
+        });
+    }
+
+    @Test
+    public void testIntegrationGraph() {
+        sshCallShell((is, os) -> {
+            write(os, "integrationGraph");
+            verifyResponseContains(is, "{\r\n  \"contentDescriptor\" :");
+        });
+    }
+
+    @Test
+    public void testIntegrationGraphRebuild() {
+        sshCallShell((is, os) -> {
+            write(os, "integrationGraph rebuild");
+            verifyResponseContains(is, "Integration Graph rebuilt");
+        });
+    }
+
+    @Test
+    public void testLiquibase() {
+        sshCallShell((is, os) -> {
+            write(os, "liquibase");
+            verifyResponseContains(is, "{\r\n  \"contexts\" :");
+        });
+    }
+
+    @Test
+    public void testSessionsGetByUsernameEmpty() {
+        sshCallShell((is, os) -> {
+            write(os, "sessions username");
+            verifyResponseContains(is, "Usage: sessions username <username>");
+        });
+    }
+
+    @Test
+    public void testSessionsGetByUsername() {
+        sshCallShell((is, os) -> {
+            write(os, "sessions username anand");
+            verifyResponseContains(is, "{\r\n  \"sessions\" :");
+        });
+    }
+
+    @Test
+    public void testSessionsGetBySessionIdEmpty() {
+        sshCallShell((is, os) -> {
+            write(os, "sessions get");
+            verifyResponseContains(is, "Usage: sessions get <sessionId>");
+        });
+    }
+
+    @Test
+    public void testSessionsGetBySessionIdInvalid() {
+        sshCallShell((is, os) -> {
+            write(os, "sessions get XXX");
+            verifyResponseContains(is, "No such sessionId");
+        });
+    }
+
+    @Test
+    public void testSessionsDeleteBySessionIdEmpty() {
+        sshCallShell((is, os) -> {
+            write(os, "sessions delete");
+            verifyResponseContains(is, "Usage: sessions delete <sessionId>");
+        });
+    }
+
+    @Test
+    public void testSessionsDeleteBySessionId() {
+        sshCallShell((is, os) -> {
+            write(os, "sessions delete XXX");
+            verifyResponseContains(is, "Session [XXX] is deleted");
+        });
+    }
+
+    @Test
+    public void testLogfile() {
+        sshCallShell((is, os) -> {
+            write(os, "logfile");
+            verifyResponseContains(is, "Resource can be found at ");
+        });
+    }
+
+    @Test
+    public void testPrometheus() {
+        sshCallShell((is, os) -> {
+            write(os, "prometheus");
+            verifyResponseContains(is, "jvm_memory_max_bytes");
         });
     }
 }
