@@ -34,6 +34,7 @@ import org.springframework.test.annotation.DirtiesContext;
     "sshd.filesystem.base.dir=target/sftp",
     "spring.jmx.enabled=true"
 })
+@DirtiesContext
 public class SshdSftpEnabledTest extends AbstractSshSupport {
 
     @DirtiesContext

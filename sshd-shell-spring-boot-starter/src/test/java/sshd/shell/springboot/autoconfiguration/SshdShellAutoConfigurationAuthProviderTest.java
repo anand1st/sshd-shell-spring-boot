@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Properties;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  *
@@ -32,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
     "sshd.shell.username=bob",
     "sshd.shell.password=bob"
 })
+@DirtiesContext
 public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSupport {
 
     @Test

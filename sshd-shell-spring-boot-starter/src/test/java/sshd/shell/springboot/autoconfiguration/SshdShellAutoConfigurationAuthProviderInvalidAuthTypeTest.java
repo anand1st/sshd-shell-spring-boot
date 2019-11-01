@@ -16,6 +16,7 @@
 package sshd.shell.springboot.autoconfiguration;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  *
@@ -27,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
     "sshd.shell.password=bob",
     "sshd.shell.auth.authProviderBeanName=authProvider"
 })
+@DirtiesContext
 public class SshdShellAutoConfigurationAuthProviderInvalidAuthTypeTest extends
         SshdShellAutoConfigurationAuthProviderTest {
 }

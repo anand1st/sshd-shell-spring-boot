@@ -18,6 +18,7 @@ package sshd.shell.springboot.autoconfiguration;
 import java.util.Locale;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  *
@@ -40,6 +41,7 @@ import org.springframework.boot.test.context.SpringBootTest;
     "management.endpoint.threaddump.enabled=false",
     "management.endpoint.caches.enabled=false"
 })
+@DirtiesContext
 public class SshdShellAutoConfigurationDisabledEndpointTest extends AbstractSshSupport {
 
     @Test

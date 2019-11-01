@@ -30,6 +30,7 @@ import java.util.Properties;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  *
@@ -40,6 +41,7 @@ import org.springframework.boot.test.context.SpringBootTest;
     "banner.image.location=banner.png",
     "logging.level.sshd.shell=DEBUG"
 })
+@DirtiesContext
 public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends AbstractSshSupport {
 
     @Autowired
