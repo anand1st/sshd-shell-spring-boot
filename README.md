@@ -8,24 +8,36 @@ for  developers who want to roll out custom shell commands for various purposes.
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for
 spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.x to 2.1.x releases with support for its new endpoint infrastructure.
+This starter has been tested with spring-boot 2.0.x to 2.2.x releases with support for its new endpoint infrastructure.
 
 To import into Maven project, add the following dependency inside `pom.xml`:
 
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>4.0</version>
+        <version>4.1</version>
     </dependency>
 
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
-        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '4.0'
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '4.1'
     }
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 4.1
+Supports Spring Boot 2.2.x versions.
+Updated dependencies to jline 3.13.1, Apache SSHD 2.3.0.
+Additional system commands for the following endpoints i.e. Flyway, IntegrationGraph, Liquibase, Sessions, Logfile and Prometheus:
+
+    sshd.system.command.roles.flyway=${sshd.system.command.roles}
+    sshd.system.command.roles.integrationGraph=${sshd.system.command.roles}
+    sshd.system.command.roles.liquibase=${sshd.system.command.roles}
+    sshd.system.command.roles.sessions=${sshd.system.command.roles}
+    sshd.system.command.roles.logfile=${sshd.system.command.roles}
+    sshd.system.command.roles.prometheus=${sshd.system.command.roles}
 
 ### Version 4.0
 Updated dependencies to jline 3.11.0.
