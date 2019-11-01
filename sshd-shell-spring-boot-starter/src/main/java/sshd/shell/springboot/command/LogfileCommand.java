@@ -32,7 +32,7 @@ import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 @Component
 @ConditionalOnBean(LogFileWebEndpoint.class)
 @ConditionalOnProperty(name = "management.endpoint.logfile.enabled", havingValue = "true", matchIfMissing = true)
-@SshdShellCommand(value = "logfile", description = "Not sure what to put here")
+@SshdShellCommand(value = "logfile", description = "Application log file")
 @lombok.extern.slf4j.Slf4j
 public final class LogfileCommand extends AbstractSystemCommand {
 
