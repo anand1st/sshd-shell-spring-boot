@@ -15,8 +15,10 @@
  */
 package sshd.shell.springboot.command;
 
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.session.SessionsEndpoint;
+import org.springframework.boot.actuate.session.SessionsEndpoint.SessionDescriptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -55,7 +57,10 @@ public final class SessionsCommand extends AbstractSystemCommand {
         if (StringUtils.isEmpty(arg)) {
             return "Usage: sessions get <sessionId>";
         }
-        return JsonUtils.asJson(sessionsEndpoint.getSession(arg));
+        SessionDescriptor sessionsDescriptor = sessionsEndpoint.getSession(arg);
+        return Objects.isNull(sessionsDescriptor)
+                ? "No such sessionId"
+                : JsonUtils.asJson(sessionsDescriptor);
     }
 
     @SshdShellCommand(value = "delete", description = "Delete by session id")
