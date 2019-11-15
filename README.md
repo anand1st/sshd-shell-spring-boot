@@ -255,7 +255,7 @@ The following are sample inputs/outputs from the shell command if an admin user 
     bob has been managed by admin
     
 
-For an admin user, the following extras can be seen in the help and echo subcommand as per settings of roles in the annotation:
+For a non-admin user, the following is seen in the `help` and `echo` subcommand as per settings of roles in the annotation:
 
     app> help
     Supported Commands
