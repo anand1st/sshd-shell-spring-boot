@@ -194,11 +194,6 @@ Supported properties in application.properties (defaults are as below):
     sshd.filetransfer.enabled=true          # Defaults to false. Must be enabled for SCP and SFTP functionality
     sshd.filesystem.base.dir=/home/app      # Defaults to 'user.home' property
 
-When spring-boot-actuator is included, `HealthIndicator` classes in classpath will be loaded. The 'health' command will
-show all `HealthIndicator` components. Developers can also write their own custom `HealthIndicator` classes for loading.
-It's important that the names of these custom classes end with the suffix `HealthIndicator` to be loaded by the
-application.
-
 To connect to the application's SSH daemon (the port number can found from the logs when application starts up):
 
     ssh -p <port> <username>@<host>
@@ -207,27 +202,34 @@ If public key file is used for SSH daemon:
 
     ssh -p <port> -i <privateKeyFile> <username>@<host>
 
-The following are sample inputs/outputs from the shell command if a non-admin user logs in:
-
+The following are sample inputs/outputs from the shell command if an admin user logs in:
+    
     app> help
+    Supported Commands
     admin                              Admin functionality. Type 'admin' for supported subcommands
-    auditEvents                        Event auditing
-    autoConfigurationReport            Autoconfiguration report
     beans                              List beans
+    caches                             Caches info
+    conditionsReport                   Conditions report
     configurationPropertiesReport      Configuration properties report
     echo                               Echo by users. Type 'echo' for supported subcommands
     environment                        Environment details
     exit                               Exit shell
+    flyway                             Flyway database migration details (if applicable)
     health                             System health info
+    heapDump                           Heap dump command
     help                               Show list of help commands
     info                               System status
+    integrationGraph                   Information about Spring Integration graph
+    liquibase                          Liquibase database migration details (if applicable)
+    logfile                            Application log file
     loggers                            Logging configuration
+    mappings                           List http request mappings
     metrics                            Metrics operations
-    requestMapping                     Request mapping information
+    prometheus                         Produces formatted metrics for scraping by Prometheus server
+    scheduledTasks                     Scheduled tasks
+    sessions                           Sessions management
     shutdown                           Shutdown application
-    status                             System status
     threadDump                         Print thread dump
-    traces                             Trace information
     Supported post processors for output
     h <arg>                            Highlights <arg> in response output of command execution
                                        Example usage: help | h exit
@@ -235,8 +237,9 @@ The following are sample inputs/outputs from the shell command if a non-admin us
                                        Example usage: help | m bob@hope.com
     app> echo
     Supported subcommand for echo
-            alice    Alice's echo. Usage: echo alice <arg>
-            bob      Bob's echo. Usage: echo bob <arg>
+    admin                              Admin's echo. Usage: echo admin <arg>
+    alice                              Alice's echo. Usage: echo alice <arg>
+    bob                                Bob's echo. Usage: echo bob <arg>
     app> echo alice hi
     alice says hi
     app> echo alice hi | h alice
@@ -245,31 +248,37 @@ The following are sample inputs/outputs from the shell command if a non-admin us
     Output response sent to bob@hope.com
     app> echo bob hi
     What's your name? Jake
-    bob echoes hi and your name is Jake
+    bob echoes hi and your name is Jake, rooted filesystem path is /Users/user/admin
     app> echo alice hi
     alice says hi, Name Jake exists
-    app> admin manage
-    Permission denied
+    app> admin manage bob
+    bob has been managed by admin
+    
 
 For an admin user, the following extras can be seen in the help and echo subcommand as per settings of roles in the annotation:
 
     app> help
-    ...
-    admin		Admin functionality. Type 'admin' for supported subcommands
-    ...
-    app> echo
+    Supported Commands
+    echo                               Echo by users. Type 'echo' for supported subcommands
+    exit                               Exit shell
+    help                               Show list of help commands
+    Supported post processors for output
+    h <arg>                            Highlights <arg> in response output of command execution
+                                       Example usage: help | h exit
+    m <emailId>                        Send response output of command execution to <emailId>
+                                       Example usage: help | m bob@hope.com
+    server> echo
     Supported subcommand for echo
-    admin		Admin's echo. Usage: echo admin <arg>
-    alice		Alice's echo. Usage: echo alice <arg>
-    bob		Bob's echo. Usage: echo bob <arg>
-    app> admin
-    Supported subcommand for admin
-    manage		Manage task. Usage: admin manage <arg>
-    app>
+    alice                              Alice's echo. Usage: echo alice <arg>
+    bob                                Bob's echo. Usage: echo bob <arg>
+    app> admin manage Bob
+    Permission denied
+    app> exit
+    Exiting shell
 
 For more information, check out the sshd-shell-spring-boot-test-app project for a fully working example.
 
 Limitations:
 1) Currently, every method must return a java.lang.String (shell output) and take in exactly one java.lang.String
-parameter (denoting nullable arguments in shell command).
+parameter. This parameter can be null at runtime.
 2) Requires minimum JDK 8.
