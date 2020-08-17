@@ -300,7 +300,7 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
     public void testEnvironmentEntryCommandValidArg() {
         sshCallShell((is, os) -> {
             write(os, "environment entry server.port");
-            verifyResponseContains(is, "{\r\n  \"property\"");
+            verifyResponseContains(is, "{\r\n  \"activeProfiles\"");
         });
     }
 

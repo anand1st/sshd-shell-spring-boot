@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 import org.apache.sshd.common.file.nativefs.NativeFileSystemFactory;
 import org.apache.sshd.common.file.root.RootedFileSystem;
 import org.apache.sshd.common.file.root.RootedFileSystemProvider;
-import org.apache.sshd.common.session.Session;
+import org.apache.sshd.common.session.SessionContext;
 
 /**
  *
@@ -37,7 +37,7 @@ class SshdNativeFileSystemFactory extends NativeFileSystemFactory {
     private final String baseDir;
 
     @Override
-    public FileSystem createFileSystem(Session session) throws IOException {
+    public FileSystem createFileSystem(SessionContext session) throws IOException {
         Path sessionUserDir = Paths.get(baseDir, session.getUsername());
         processForSessionUserDirectory(sessionUserDir);
         return new RootedFileSystem(new RootedFileSystemProvider(), sessionUserDir, null);

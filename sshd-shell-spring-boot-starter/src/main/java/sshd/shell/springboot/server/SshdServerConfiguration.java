@@ -15,16 +15,6 @@
  */
 package sshd.shell.springboot.server;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
@@ -50,6 +40,12 @@ import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties.Shell.Auth;
 import sshd.shell.springboot.console.TerminalProcessor;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  *
@@ -137,8 +133,7 @@ class SshdServerConfiguration {
     private void configureServerForSshAndFileTransfer(SshServer server) {
         server.setCommandFactory(sshAndScpCommandFactory());
         server.setFileSystemFactory(new SshdNativeFileSystemFactory(properties.getFilesystem().getBase().getDir()));
-        server.setSubsystemFactories(Collections.<NamedFactory<Command>>singletonList(
-                new SftpSubsystemFactory.Builder().build()));
+        server.setSubsystemFactories(Collections.singletonList(new SftpSubsystemFactory.Builder().build()));
     }
 
     private CommandFactory sshAndScpCommandFactory() {
