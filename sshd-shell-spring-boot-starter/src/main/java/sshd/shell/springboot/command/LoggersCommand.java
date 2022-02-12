@@ -51,14 +51,14 @@ public final class LoggersCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "level", description = "Show log levels for given logger name")
     public String loggerLevels(String arg) {
-        return StringUtils.isEmpty(arg)
+        return !StringUtils.hasText(arg)
                 ? "Usage: loggers level <loggerName>"
                 : JsonUtils.asJson(loggersEndpoint.loggerLevels(arg));
     }
 
     @SshdShellCommand(value = "configure", description = "Configure log level for logger name")
     public String configureLogLevel(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: loggers configure {\"name\":\"<loggerName>\",\"configuredLevel\":"
                     + "\"<Select from TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF>\"}";
         }

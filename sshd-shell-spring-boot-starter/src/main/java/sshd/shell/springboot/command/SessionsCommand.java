@@ -46,7 +46,7 @@ public final class SessionsCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "username", description = "Find sessions given username")
     public String findSessionsByUsername(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: sessions username <username>";
         }
         return JsonUtils.asJson(sessionsEndpoint.sessionsForUsername(arg));
@@ -54,7 +54,7 @@ public final class SessionsCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "get", description = "Get session descriptor by session id")
     public String getSessionById(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: sessions get <sessionId>";
         }
         SessionDescriptor sessionsDescriptor = sessionsEndpoint.getSession(arg);
@@ -65,7 +65,7 @@ public final class SessionsCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "delete", description = "Delete by session id")
     public String deleteSessionById(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: sessions delete <sessionId>";
         }
         sessionsEndpoint.deleteSession(arg);

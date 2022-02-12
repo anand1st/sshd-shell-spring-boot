@@ -47,7 +47,7 @@ public final class HeapDumpCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "live", description = "Get heapdump with live flag")
     public String withLive(String arg) throws IOException {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: heapDump live <true|false>";
         }
         Resource heapDumpResource = heapDumpEndpoint.heapDump(Boolean.valueOf(arg)).getBody();

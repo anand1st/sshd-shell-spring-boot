@@ -48,7 +48,7 @@ public final class HealthCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "component", description = "Health for specified components")
     public String healthForComponent(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: health component <component1>,<component2> and so on";
         }
         String[] components = StringUtils.trimAllWhitespace(arg).split(",");

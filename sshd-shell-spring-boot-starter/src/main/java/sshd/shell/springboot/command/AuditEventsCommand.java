@@ -47,7 +47,7 @@ public final class AuditEventsCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "list", description = "List events")
     public String auditEvents(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: auditEvents list {\"principal\":\"<user>\",\"after\":\"<yyyy-MM-dd HH:mm>\","
                     + "\"type\":\"<type>\"}";
         }

@@ -28,6 +28,7 @@ import sshd.shell.springboot.autoconfiguration.SshSessionContext;
 import sshd.shell.springboot.autoconfiguration.SshdShellCommand;
 import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 import sshd.shell.springboot.console.BaseUserInputProcessor;
+import sshd.shell.springboot.console.UsageInfo;
 
 /**
  *
@@ -51,14 +52,12 @@ public final class HelpCommand {
         Collection<String> roles = SshSessionContext.<Collection<String>>get(Constants.USER_ROLES);
         String format = properties.getShell().getText().getUsageInfoFormat();
         sshdShellCommands.entrySet().stream().filter(e -> e.getValue().get(Constants.EXECUTE).matchesRole(roles))
-                .forEachOrdered(e -> {
-                    sb.append(String.format(Locale.ENGLISH, format, e.getKey(),
-                            e.getValue().get(Constants.EXECUTE).getDescription()));
-                });
+                .forEachOrdered(e -> sb.append(String.format(Locale.ENGLISH, format, e.getKey(),
+                        e.getValue().get(Constants.EXECUTE).getDescription())));
         sb.append("\nSupported post processors for output");
         processors.stream().filter(p -> p.getUsageInfo().isPresent()).forEachOrdered(p -> {
-            p.getUsageInfo().get().getRows().forEach(r -> sb.append(String.format(Locale.ENGLISH, format, r.getUsage(),
-                    r.getDescription())));
+            List<UsageInfo.Row> rows = p.getUsageInfo().get().getRows();
+            rows.forEach(r -> sb.append(String.format(Locale.ENGLISH, format, r.getUsage(), r.getDescription())));
         });
         return sb.toString();
     }

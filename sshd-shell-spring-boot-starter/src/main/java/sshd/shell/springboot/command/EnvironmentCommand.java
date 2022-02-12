@@ -49,7 +49,7 @@ public final class EnvironmentCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "entry", description = "Get environment details with string to match")
     public String withEntry(String arg) {
-        return StringUtils.isEmpty(arg)
+        return !StringUtils.hasText(arg)
                 ? "Usage: environment entry <stringToMatch>"
                 : JsonUtils.asJson(envEndpoint.environmentEntry(arg));
     }

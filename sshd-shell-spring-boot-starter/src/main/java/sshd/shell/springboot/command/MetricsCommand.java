@@ -52,7 +52,7 @@ public final class MetricsCommand extends AbstractSystemCommand {
 
     @SshdShellCommand(value = "metricName", description = "List metric name")
     public String metricName(String arg) {
-        if (StringUtils.isEmpty(arg)) {
+        if (!StringUtils.hasText(arg)) {
             return "Usage: metrics metricName {\"name\":\"<metricName>\",\"tags\":[\"<array of tags>\"]}";
         }
         return CommandUtils.process(() -> {
