@@ -41,8 +41,10 @@ import org.springframework.util.SocketUtils;
  * @author anand
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
-    "sshd.system.command.roles=*",
-    "spring.jmx.enabled=true"
+        "sshd.system.command.roles=*",
+        "spring.jmx.enabled=true",
+        "spring.flyway.baseline-on-migrate=true",
+        "spring.main.allow-circular-references=true"
 })
 @DirtiesContext
 public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
@@ -146,7 +148,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
                 "loggers", "Logging configuration",
                 "mappings", "List http request mappings",
                 "metrics", "Metrics operations",
-                "prometheus", "Produces formatted metrics for scraping by Prometheus server",
                 "scheduledTasks", "Scheduled tasks",
                 "sessions", "Sessions management",
                 "shutdown", "Shutdown application",
@@ -605,14 +606,6 @@ public class SshdShellAutoConfigurationTest extends AbstractSshSupport {
         sshCallShell((is, os) -> {
             write(os, "logfile");
             verifyResponseContains(is, "Resource can be found at ");
-        });
-    }
-
-    @Test
-    public void testPrometheus() {
-        sshCallShell((is, os) -> {
-            write(os, "prometheus");
-            verifyResponseContains(is, "jvm_memory_max_bytes");
         });
     }
 }

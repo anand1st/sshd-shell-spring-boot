@@ -30,9 +30,11 @@ import org.springframework.test.annotation.DirtiesContext;
  * @author anand
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
-    "sshd.filetransfer.enabled=true",
-    "sshd.filesystem.base.dir=target/sftp",
-    "spring.jmx.enabled=true"
+        "sshd.filetransfer.enabled=true",
+        "sshd.filesystem.base.dir=target/sftp",
+        "spring.jmx.enabled=true",
+        "spring.flyway.baseline-on-migrate=true",
+        "spring.main.allow-circular-references=true"
 })
 @DirtiesContext
 public class SshdSftpEnabledTest extends AbstractSshSupport {

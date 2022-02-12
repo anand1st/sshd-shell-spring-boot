@@ -25,21 +25,23 @@ import org.springframework.test.annotation.DirtiesContext;
  * @author anand
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
-    "management.endpoint.auditevents.enabled=false",
-    "management.endpoint.beans.enabled=false",
-    "management.endpoint.conditions.enabled=false",
-    "management.endpoint.configprops.enabled=false",
-    "management.endpoint.env.enabled=false",
-    "management.endpoint.health.enabled=false",
-    "management.endpoint.httptrace.enabled=false",
-    "management.endpoint.info.enabled=false",
-    "management.endpoint.loggers.enabled=false",
-    "management.endpoint.mappings.enabled=false",
-    "management.endpoint.metrics.enabled=false",
-    "management.endpoint.scheduledtasks.enabled=false",
-    "management.endpoint.shutdown.enabled=false",
-    "management.endpoint.threaddump.enabled=false",
-    "management.endpoint.caches.enabled=false"
+        "management.endpoint.auditevents.enabled=false",
+        "management.endpoint.beans.enabled=false",
+        "management.endpoint.conditions.enabled=false",
+        "management.endpoint.configprops.enabled=false",
+        "management.endpoint.env.enabled=false",
+        "management.endpoint.health.enabled=false",
+        "management.endpoint.httptrace.enabled=false",
+        "management.endpoint.info.enabled=false",
+        "management.endpoint.loggers.enabled=false",
+        "management.endpoint.mappings.enabled=false",
+        "management.endpoint.metrics.enabled=false",
+        "management.endpoint.scheduledtasks.enabled=false",
+        "management.endpoint.shutdown.enabled=false",
+        "management.endpoint.threaddump.enabled=false",
+        "management.endpoint.caches.enabled=false",
+        "spring.flyway.baseline-on-migrate=true",
+        "spring.main.allow-circular-references=true"
 })
 @DirtiesContext
 public class SshdShellAutoConfigurationDisabledEndpointTest extends AbstractSshSupport {

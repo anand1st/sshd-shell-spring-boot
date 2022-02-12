@@ -37,9 +37,11 @@ import org.springframework.test.annotation.DirtiesContext;
  * @author anand
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
-    "sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
-    "banner.image.location=banner.png",
-    "logging.level.sshd.shell=DEBUG"
+        "sshd.shell.publicKeyFile=src/test/resources/id_rsa.pub",
+        "banner.image.location=banner.png",
+        "logging.level.sshd.shell=DEBUG",
+        "spring.flyway.baseline-on-migrate=true",
+        "spring.main.allow-circular-references=true"
 })
 @DirtiesContext
 public class SshdShellAutoConfigurationWithPublicKeyAndBannerImageTest extends AbstractSshSupport {

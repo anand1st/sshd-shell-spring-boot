@@ -29,9 +29,11 @@ import org.springframework.test.annotation.DirtiesContext;
  * @author anand
  */
 @SpringBootTest(classes = ConfigTest.class, properties = {
-    "sshd.shell.auth.authType=AUTH_PROVIDER",
-    "sshd.shell.username=bob",
-    "sshd.shell.password=bob"
+        "sshd.shell.auth.authType=AUTH_PROVIDER",
+        "sshd.shell.username=bob",
+        "sshd.shell.password=bob",
+        "spring.flyway.baseline-on-migrate=true",
+        "spring.main.allow-circular-references=true"
 })
 @DirtiesContext
 public class SshdShellAutoConfigurationAuthProviderTest extends AbstractSshSupport {
