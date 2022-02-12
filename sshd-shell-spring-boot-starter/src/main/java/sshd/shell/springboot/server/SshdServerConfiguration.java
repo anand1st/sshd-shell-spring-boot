@@ -15,15 +15,13 @@
  */
 package sshd.shell.springboot.server;
 
-import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.scp.server.ScpCommandFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
-import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.command.CommandFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.scp.ScpCommandFactory;
-import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
+import org.apache.sshd.sftp.server.SftpSubsystemFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -100,9 +98,10 @@ class SshdServerConfiguration {
 
     private PasswordAuthenticator passwordAuthenticator(Shell props) {
         Auth authProps = props.getAuth();
+
         switch (authProps.getAuthType()) {
             case SIMPLE:
-                return new SimpleSshdPasswordAuthenticator(props, new HashSet<>(Arrays.asList(systemCommandRoles)));
+                return new SimpleSshdPasswordAuthenticator(props, new HashSet<>(Collections.singletonList(systemCommandRoles)));
             case AUTH_PROVIDER:
                 return authProviderAuthenticator(authProps);
             default:

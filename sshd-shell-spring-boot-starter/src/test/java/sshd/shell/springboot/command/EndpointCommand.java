@@ -18,10 +18,13 @@ package sshd.shell.springboot.command;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Comparator;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.boot.actuate.logging.LogFileWebEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -40,7 +43,7 @@ public final class EndpointCommand {
     @Autowired
     EndpointCommand(ApplicationContext appCtx) {
         appCtx.getBeansWithAnnotation(Endpoint.class).entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getKey()))
+                .sorted(Map.Entry.comparingByKey())
                 .forEachOrdered(entry -> {
                     log.debug("{} : {}", entry.getKey(), entry.getValue().getClass().getName());
                     for (Method m : entry.getValue().getClass().getDeclaredMethods()) {
