@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.anand1st</groupId>
     <artifactId>sshd-shell-spring-boot-starter</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.3-SNAPSHOT</version>
     <name>SSH Shell starter for Spring Boot Application</name>
     <description>
         This artifact is a spring boot starter that provides SSH access to spring boot applications. It is to be used
@@ -51,14 +51,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <sshd.version>2.5.1</sshd.version>
+        <sshd.version>2.8.0</sshd.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.2.RELEASE</version>
+                <version>2.6.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-builtins</artifactId>
-            <version>3.16.0</version>
+            <version>3.21.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -138,7 +138,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.11.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -149,7 +149,7 @@
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail</artifactId>
-            <version>1.5.14</version>
+            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -182,6 +182,12 @@
             <artifactId>embedded-redis</artifactId>
             <version>0.7.3</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.session</groupId>
@@ -203,6 +209,11 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <pluginManagement>
@@ -217,7 +228,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.9.0</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-Xlint:unchecked</arg>
@@ -228,7 +239,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
+                <version>0.8.7</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
@@ -251,7 +262,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -282,7 +293,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -294,7 +305,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <configuration>
                             <useAgent>true</useAgent>
                         </configuration>
