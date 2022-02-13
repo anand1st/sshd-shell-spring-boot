@@ -8,7 +8,7 @@ for  developers who want to roll out custom shell commands for various purposes.
 The motivation for this starter was due to the fact that spring-boot had officially dropped support for
 spring-boot-starter-remote-shell for the 2.x versions.
 
-This starter has been tested with spring-boot 2.0.x to 2.2.x releases with support for its new endpoint infrastructure.
+This starter has been tested with spring-boot 2.0.x to 2.6.x releases with support for its new endpoint infrastructure.
 
 To import into Maven project, add the following dependency inside `pom.xml`:
 
