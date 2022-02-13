@@ -7,6 +7,9 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/anand1st/sshd-shell-spring-boot</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
