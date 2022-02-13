@@ -13,7 +13,9 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           cache: maven
+      - name: Change to sshd-shell-spring-boot-starter directory
+        run: cd sshd-shell-spring-boot-starter
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots test org.jacoco:jacoco-maven-plugin:report
       - name: Coverall Coverage Report Submission
-        run: mvn org.eluder.coveralls:coveralls-maven-plugin:report --define repoToken=${{ secrets.COVERALL_REPO_TOKEN }}
+        run: mvn --batch-mode org.eluder.coveralls:coveralls-maven-plugin:report --define repoToken=${{ secrets.COVERALL_REPO_TOKEN }}
