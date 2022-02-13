@@ -14,6 +14,6 @@ jobs:
           distribution: 'adopt'
           cache: maven
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots test jacoco:report
+        run: mvn --batch-mode --update-snapshots test org.jacoco:jacoco-maven-plugin:report
       - name: Coverall Coverage Report Submission
-        run: mvn coveralls:report --define repoToken=${{ secrets.COVERALL_REPO_TOKEN }}
+        run: mvn org.eluder.coveralls:coveralls-maven-plugin:report --define repoToken=${{ secrets.COVERALL_REPO_TOKEN }}
