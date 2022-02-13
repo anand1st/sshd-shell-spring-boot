@@ -15,17 +15,23 @@ To import into Maven project, add the following dependency inside `pom.xml`:
     <dependency>
         <groupId>io.github.anand1st</groupId>
         <artifactId>sshd-shell-spring-boot-starter</artifactId>
-        <version>4.1</version>
+        <version>4.2</version>
     </dependency>
 
 For Gradle users, add these lines inside `build.gradle`:
 
     dependencies {
-        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '4.1'
+        compile group: 'io.github.anand1st', name: 'sshd-shell-spring-boot-starter', version: '4.2'
     }
 
 ### Note
 Versions < 2.1 are deprecated and unsupported. The artifact above supports the following functionalities:
+
+### Version 4.2
+Supports Spring Boot 2.6.x versions.
+Updated dependencies to jline 3.21.0 and, Apache SSHD 2.8.0.
+Known issues: Circular dependency when used in Spring Boot 2.6 versions. Add the property `spring.mail.allow-circular-references=true`
+to resolve this issue.
 
 ### Version 4.1
 Supports Spring Boot 2.2.x versions.
