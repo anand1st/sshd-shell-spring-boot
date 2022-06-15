@@ -10,7 +10,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <start-class>demo.Main</start-class>
-        <spring-boot.version>2.6.3</spring-boot.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -99,7 +99,7 @@
         <dependency>
             <groupId>io.github.anand1st</groupId>
             <artifactId>sshd-shell-spring-boot-starter</artifactId>
-            <version>4.2</version>
+            <version>4.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
@@ -117,6 +117,7 @@
                 </executions>
                 <configuration>
                     <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1045</jvmArguments>
+                    <arguments>--server.port=7071</arguments>
                 </configuration>
             </plugin>
         </plugins>
