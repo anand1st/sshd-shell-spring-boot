@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import org.jline.builtins.Completers;
 import org.jline.builtins.Completers.TreeCompleter.Node;
 import static org.jline.builtins.Completers.TreeCompleter.node;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,20 +36,15 @@ import sshd.shell.springboot.autoconfiguration.SshdShellProperties;
 @ConditionalOnProperty(name = "sshd.shell.enabled", havingValue = "true")
 class ConsoleConfiguration {
 
-    @Autowired
-    private SshdShellProperties properties;
-    @Autowired
-    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands;
-    @Autowired
-    private List<BaseUserInputProcessor> userInputProcessors;
-
     @Bean
-    TerminalProcessor terminalProcessor() {
-        return new TerminalProcessor(properties.getShell(), new Completers.TreeCompleter(buildTextCompleters()),
-                userInputProcessors);
+    TerminalProcessor terminalProcessor(SshdShellProperties properties,
+                                        Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands,
+                                        List<BaseUserInputProcessor> userInputProcessors) {
+        return new TerminalProcessor(properties.getShell(),
+                new Completers.TreeCompleter(buildTextCompleters(sshdShellCommands)), userInputProcessors);
     }
 
-    private List<Node> buildTextCompleters() {
+    private List<Node> buildTextCompleters(Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands) {
         return sshdShellCommands.entrySet().stream().map(entry -> buildTextCompleterNode(entry))
                 .collect(Collectors.toList());
     }

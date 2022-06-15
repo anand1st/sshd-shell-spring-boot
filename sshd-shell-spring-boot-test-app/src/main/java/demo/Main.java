@@ -26,7 +26,7 @@ public class Main extends WebMvcConfigurationSupport {
         REDIS_SERVER.start();
     }
 
-    public static void main(String... args) throws InterruptedException {
+    public static void main(String... args) {
         SpringApplication.run(Main.class, args);
     }
 

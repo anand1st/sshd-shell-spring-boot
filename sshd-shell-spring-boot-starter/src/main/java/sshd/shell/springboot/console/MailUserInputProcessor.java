@@ -43,7 +43,7 @@ import sshd.shell.springboot.util.Assert;
 @lombok.extern.slf4j.Slf4j
 class MailUserInputProcessor extends BaseUserInputProcessor {
 
-    private final Pattern pattern = Pattern.compile("[\\w\\W]+\\s?\\|\\s?m (.+)");
+    private final Pattern pattern = Pattern.compile(".+\\s?\\|\\s?m (.+)");
     @Autowired
     private JavaMailSender mailSender;
 

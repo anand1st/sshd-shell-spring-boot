@@ -33,7 +33,7 @@ import sshd.shell.springboot.util.Assert;
 @Order(1)
 class HighlightUserInputProcessor extends BaseUserInputProcessor {
 
-    private final Pattern pattern = Pattern.compile("[\\w\\W]+\\s?\\|\\s?h (.+)");
+    private final Pattern pattern = Pattern.compile(".+\\s?\\|\\s?h (.+)");
 
     @Override
     public Optional<UsageInfo> getUsageInfo() {

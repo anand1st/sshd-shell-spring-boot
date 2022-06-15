@@ -91,6 +91,7 @@ class SshSessionInstance implements Command, Factory<Command>, Runnable {
 
     @Override
     public void setErrorStream(OutputStream errOS) {
+        // Ignore
     }
 
     @Override

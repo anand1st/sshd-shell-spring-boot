@@ -39,7 +39,7 @@ class DefaultUserInputProcessor extends BaseUserInputProcessor {
 
     @Override
     public Pattern getPattern() {
-        return Pattern.compile("[\\w\\W]+");
+        return Pattern.compile(".+");
     }
 
     @Override

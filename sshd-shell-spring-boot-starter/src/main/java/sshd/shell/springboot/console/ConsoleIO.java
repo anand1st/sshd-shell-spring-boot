@@ -44,9 +44,8 @@ public enum ConsoleIO {
      * @param text Text to show
      * @param mask mask
      * @return input from user
-     * @throws IOException if any
      */
-    public static String readInput(String text, Character mask) throws IOException {
+    public static String readInput(String text, Character mask) {
         LineReader reader = SshSessionContext.<LineReader>get(LINE_READER);
         AttributedStyle textStyle = SshSessionContext.<AttributedStyle>get(TEXT_STYLE);
         Terminal terminal = SshSessionContext.<Terminal>get(TERMINAL);

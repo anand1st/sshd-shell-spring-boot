@@ -33,5 +33,5 @@ public enum ColorType {
     CYAN(AttributedStyle.CYAN),
     WHITE(AttributedStyle.WHITE);
 
-    public int value;
+    public final int value;
 }

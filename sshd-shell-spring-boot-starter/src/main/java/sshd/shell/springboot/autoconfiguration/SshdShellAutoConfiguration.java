@@ -84,7 +84,8 @@ class SshdShellAutoConfiguration {
             Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap) {
         Map<String, CommandExecutableDetails> map = sshdShellCommandsMap.get(annotation.value());
         Assert.isTrue(Objects.isNull(map), "Duplicate commands in different classes are not allowed");
-        sshdShellCommandsMap.put(annotation.value(), map = new TreeMap<>());
+        map = new TreeMap<>();
+        sshdShellCommandsMap.put(annotation.value(), map);
         return map;
     }
 
