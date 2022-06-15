@@ -15,7 +15,6 @@
  */
 package sshd.shell.springboot.console;
 
-import java.io.IOException;
 import java.util.Objects;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
@@ -63,9 +62,8 @@ public enum ConsoleIO {
      *
      * @param text Text to show
      * @return input from user
-     * @throws IOException if any
      */
-    public static String readInput(String text) throws IOException {
+    public static String readInput(String text) {
         return readInput(text, null);
     }
 
