@@ -118,7 +118,7 @@ public class TerminalProcessor {
             try {
                 handleUserInput(reader.readLine(prompt).trim());
             } catch (InterruptedException ex) {
-                Thread.interrupted();
+                Thread.currentThread().interrupted();
                 ConsoleIO.writeOutput(ex.getMessage());
                 exitCallback.accept(0);
                 break;
