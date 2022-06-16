@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/anand1st/sshd-shell-spring-boot.svg?branch=master)](https://travis-ci.org/anand1st/sshd-shell-spring-boot)
 [![Coverage Status](https://coveralls.io/repos/github/anand1st/sshd-shell-spring-boot/badge.svg?branch=master)](https://coveralls.io/github/anand1st/sshd-shell-spring-boot?branch=master)
-
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=anand1st_sshd-shell-spring-boot&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=anand1st_sshd-shell-spring-boot)
 # sshd-shell-spring-boot
 This artifact is a spring boot starter that provides SSH access to spring boot applications. It is primarily designed
 for  developers who want to roll out custom shell commands for various purposes.

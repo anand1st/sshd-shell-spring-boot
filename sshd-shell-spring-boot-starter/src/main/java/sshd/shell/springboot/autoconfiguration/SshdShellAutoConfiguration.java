@@ -51,19 +51,16 @@ import sshd.shell.springboot.command.AbstractSystemCommand;
 @lombok.extern.slf4j.Slf4j
 class SshdShellAutoConfiguration {
 
-    @Autowired
-    private ApplicationContext appContext;
-
     @Bean
-    Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands() {
-        return Collections.unmodifiableMap(sshdShellCommandsMap().entrySet().stream()
+    Map<String, Map<String, CommandExecutableDetails>> sshdShellCommands(ApplicationContext appContext) {
+        return Collections.unmodifiableMap(sshdShellCommandsMap(appContext).entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> Collections.unmodifiableMap(e.getValue()),
                         (v1, v2) -> {
                             throw new IllegalStateException();
                         }, TreeMap::new)));
     }
 
-    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap() {
+    private Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap(ApplicationContext appContext) {
         Map<String, Map<String, CommandExecutableDetails>> sshdShellCommandsMap = new TreeMap<>();
         appContext.getBeansWithAnnotation(SshdShellCommand.class).entrySet()
                 .forEach(entry -> loadSshdShellCommands(sshdShellCommandsMap, entry.getValue()));

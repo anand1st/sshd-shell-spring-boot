@@ -25,16 +25,11 @@ import java.util.function.Supplier;
  * @author anand
  */
 public enum SshSessionContext {
-
     ;
 
     private static final ThreadLocal<Supplier<File>> USER_DIR_CONTEXT = new ThreadLocal<Supplier<File>>();
-    private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT = new ThreadLocal<Map<String, Object>>() {
-        @Override
-        protected Map<String, Object> initialValue() {
-            return new HashMap<>();
-        }
-    };
+    private static final ThreadLocal<Map<String, Object>> THREAD_CONTEXT
+            = ThreadLocal.withInitial(() -> new HashMap<>());
 
     public static void put(String key, Object value) {
         THREAD_CONTEXT.get().put(key, value);
